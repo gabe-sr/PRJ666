@@ -1,0 +1,23 @@
+.nav-template {
+  background-color: #f39a71;
+  padding: 3% 12% 3vw 15%;
+  width: 105%;
+}
+
+.logo {
+  font-family: "Ubuntu";
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.customColor {
+  color: #f8f8ff !important;
+}
+
+.customColor:hover {
+  color: #f8f8ffcb !important;
+}
+
+.nav-template-link {
+  width: 8.3vw;
+}

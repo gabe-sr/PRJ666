@@ -6,9 +6,9 @@ function MainPage() {
     <div className="MainPage">
       <section className="colored-section" id="title">
         <div className="container-fluid">
-          {/* <!-- Nav Bar -->
+          {/* <!-- Nav Bar --> */}
 
-          <nav className="navbar navbar-expand-lg navbar-dark">
+          {/* <nav className="navbar navbar-expand-lg navbar-dark">
             <a className="navbar-brand" href="/#">
               Psicoworking
             </a>

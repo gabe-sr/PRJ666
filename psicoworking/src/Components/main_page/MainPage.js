@@ -1,5 +1,5 @@
 import "./MainPage.css";
-import roomImage from "../images/room.png";
+import roomImage from "../../images/room.png";
 
 function MainPage() {
   return (

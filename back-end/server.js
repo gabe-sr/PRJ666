@@ -8,21 +8,28 @@
 // Date: 09/19/2021
 // -------------------------------------------------------------------- //
 
+// Import mongoose for db connection
+import mongoose from "mongoose";
 // Create express app
 import express from "express";
 const app = express();
-
-// require mongoose and setup the Schema
-import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+// Import user Router
+import {router as userRouter} from "../back-end/routes/users"
 
 // to load all environment variables from .env file
-import {} from "dotenv/config";
+import {} from "dotenv/config"
+
+/* Set up middlewares */
+// Use express to parse incoming requests, 
+app.use(express.urlencoded({extended:false}))
+// Set the router middleware for the user side, only requests to /users/* will be sent to userRouter
+app.use('/users', userRouter)
+
 
 // TESTING ROUTE
 /* delete after implementing home page route */
 app.get("/", (req, res) => {
-  res.send(" PSICOWORKING -  HOMEPAGE");
+    res.send(" PSICOWORKING -  HOMEPAGE");
 });
 
 //----------- DATABASE CONNECTION ----------//

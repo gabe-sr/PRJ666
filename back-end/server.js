@@ -8,21 +8,25 @@
 // Date: 09/19/2021
 // -------------------------------------------------------------------- //
 
-// require mongoose and setup the Schema
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const express = require("express");
+// import mongoose for db interactions
+import mongoose from "mongoose";
+import express from "express";
+import {router as userRouter} from "../back-end/routes/users"
 const app = express();
 
-
-
 // to load all environment variables from .env file
-require("dotenv").config();
+import {} from "dotenv/config"
+
+/* Set up middlewares */
+// Use express to parse incoming requests, 
+app.use(express.urlencoded({extended:false}))
+// Set the router middleware for the user side, only requests to /users/* will be sent to userRouter
+app.use('/users', userRouter)
 
 // TESTING ROUTE
 /* delete after implementing home page route */
 app.get("/", (req, res) => {
-  res.send(" PSICOWORKING -  HOMEPAGE");
+    res.send(" PSICOWORKING -  HOMEPAGE");
 });
 
 //----------- DATABASE CONNECTION ----------//
@@ -31,7 +35,6 @@ mongoose.connect(dbUrl, {useUnifiedTopology: true, useNewUrlParser: true})
     .then(() => {console.log(`MongoDB connection was sucessfully established.`)})
     .catch(err => {console.log(`MongoDB connection failed: ${err}`)
 });
-
 
 // Set server to listen at specific port
 const port = process.env.PORT || 8080;

@@ -22,9 +22,14 @@ function SignUpModal() {
         Proceed to Sign Up
       </Button>
 
-      <Modal show={show} fullscreen={fullscreen} onHide={() => setShow(false)}>
+      <Modal
+        size="lg"
+        show={show}
+        fullscreen={fullscreen}
+        onHide={() => setShow(false)}
+      >
         <Modal.Header closeButton>
-          <Modal.Title>Modal</Modal.Title>
+          <Modal.Title>Enter your information</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <SignUpForm />

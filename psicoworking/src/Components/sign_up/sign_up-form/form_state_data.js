@@ -1,4 +1,5 @@
 export const state_data = [
+  "Choose...",
   "AC - Acre",
   "AL - Alagoas",
   "AP - Amapá",

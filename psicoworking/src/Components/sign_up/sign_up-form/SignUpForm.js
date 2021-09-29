@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+//import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { TextField } from "./form-components/TextField";
-import { state_data } from "./form_state_data";
+import { FormField } from "./form-components/FormField";
+import { state_uf_data } from "./state_uf_data";
 import "./Signupform.css";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -10,10 +9,10 @@ import * as Yup from "yup";
 const SignUpForm = () => {
   // Yup validation schema
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string()
+    first_name: Yup.string()
       .max(20, "First Name must be 20 characters or less")
       .required("Required"),
-    lastName: Yup.string()
+    last_name: Yup.string()
       .max(20, "Last Name must be 20 characters or less")
       .required("Required"),
     crp_no: Yup.string()
@@ -37,56 +36,38 @@ const SignUpForm = () => {
     address2: Yup.string().required("Required"),
   });
 
-  const defaultValues = {
-    zip: "",
-    city: "",
-    state: state_data[0],
-    address1: "",
-  };
-
-  const [address, setAddress] = useState(defaultValues);
-
-  const handleChangeZip = (e, formik) => {
+  // This will handle address auto-complete when Zip is entered
+  // It fetches address data from an external API
+  // then it saves fetched data into respective formik field values
+  const handleFetchZip = async (e, formik) => {
     const cep = e.target.value;
-    setAddress({ ...address, zip: cep });
     if (cep.length >= 8) {
-      console.log("ZIP CHANGED");
-      axios.get(`https://viacep.com.br/ws/${cep}/json/ `).then((res) => {
-        let state_uf = state_data.find(
-          (uf) => uf.substring(0, 2).search(res.data.uf) >= 0
-        );
+      try {
+        axios.get(`https://viacep.com.br/ws/${cep}/json/ `).then((res) => {
+          if (!res.data.erro) {
+            let state_uf = state_uf_data.find(
+              (uf) => uf.substring(0, 2).search(res.data.uf) >= 0
+            );
 
-        formik.setFieldValue("zip", cep);
-        formik.setFieldValue("city", res.data.localidade);
-        formik.setFieldValue("state", state_uf);
-        formik.setFieldValue("address1", res.data.logradouro);
-        // setAddress({
-        //   zip: cep,
-        //   city: res.data.localidade,
-        //   state: state_uf,
-        //   address1: res.data.logradouro,
-        // });
-      });
+            formik.setFieldValue("city", res.data.localidade);
+            formik.setFieldValue("state", state_uf);
+            formik.setFieldValue("address1", res.data.logradouro);
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
-  // const handleChangeAddress = (e) => {
-  //   const name = e.target.name;
-  //   const value = e.target.value;
-  //   setAddress({ ...address, [name]: value });
-  // };
-
-  const resetForm = () => {
-    setAddress(defaultValues);
-  };
-
-  let history = useHistory();
+  // for redirection after POST
+  // let history = useHistory();
 
   return (
     <Formik
       initialValues={{
-        firstName: "",
-        lastName: "",
+        first_name: "",
+        last_name: "",
         crp_no: "",
         phone: "",
         email: "",
@@ -95,61 +76,98 @@ const SignUpForm = () => {
         dob: "",
         zip: "",
         city: "",
-        state: "",
+        state: state_uf_data[0],
         address1: "",
         address2: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
+      onSubmit={async (values) => {
         console.log(values);
-        history.push("/");
+        try {
+          // const response = await axios({ ...
+          await axios({
+            method: "post",
+            url: "http://localhost:8080/users",
+            data: values,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+
+        //history.push("/");
       }}
     >
       {(formik) => (
         <div className="signup-container">
           <Form>
-            <TextField label="First Name" name="firstName" type="text" />
-            <TextField label="Last Name" name="lastName" type="text" />
-            <TextField
+            <FormField
+              formType="input"
+              label="First Name"
+              name="first_name"
+              type="text"
+            />
+            <FormField
+              formType="input"
+              label="Last Name"
+              name="last_name"
+              type="text"
+            />
+            <FormField
+              formType="input"
               label="CRP (region/number)"
               name="crp_no"
               type="text"
               maxLength="8"
               placeholder="00/00000"
             />
-            <TextField
+            <FormField
+              formType="input"
               label="Phone"
               name="phone"
               type="text"
               maxLength="13"
               placeholder="00-00000-0000"
             />
-            <TextField
+            <FormField
+              formType="input"
               label="Email"
               name="email"
               type="email"
               placeholder="example@email.com"
             />
-            <TextField label="Password" name="password" type="password" />
-            <TextField
+            <FormField
+              formType="input"
+              label="Password"
+              name="password"
+              type="password"
+            />
+            <FormField
+              formType="input"
               label="Confirm Password"
               name="confirmPassword"
               type="password"
             />
-            <TextField label="Date of Birth" name="dob" type="date" />
+            <FormField
+              formType="input"
+              label="Date of Birth"
+              name="dob"
+              type="date"
+            />
             <div className="form-row">
               <div className="form-group col-md-3">
-                <TextField
+                <FormField
+                  formType="input"
                   label="Zip"
                   type="text"
                   maxLength="8"
                   name="zip"
-                  onKeyUp={(e) => handleChangeZip(e, formik)}
+                  onKeyUp={(e) => handleFetchZip(e, formik)}
                 />
               </div>
 
               <div className="form-group col-md-5">
-                <TextField
+                <FormField
+                  formType="input"
                   label="City"
                   type="text"
                   maxLength="30"
@@ -158,22 +176,26 @@ const SignUpForm = () => {
               </div>
 
               <div className="form-group col-md-4">
-                <label htmlFor="inputState">State</label>
-                <select id="inputState" className="form-control" name="state">
-                  {state_data.map((opt, idx) => {
-                    return <option key={idx}>{opt}</option>;
-                  })}
-                </select>
+                <FormField
+                  label="State"
+                  formType="select"
+                  formData={state_uf_data}
+                  id="inputState"
+                  className="form-control"
+                  name="state"
+                />
               </div>
             </div>
 
-            <TextField
+            <FormField
+              formType="input"
               label="Address"
               name="address1"
               type="text"
               placeholder="Main St"
             />
-            <TextField
+            <FormField
+              formType="input"
               label="Address 2"
               name="address2"
               type="text"
@@ -189,7 +211,6 @@ const SignUpForm = () => {
             <button
               className="btn btn-outline-danger mt-3 ml-3 mb-4"
               type="reset"
-              onClick={resetForm}
             >
               Reset Form
             </button>

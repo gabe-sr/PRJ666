@@ -1,4 +1,4 @@
-export const state_data = [
+export const state_uf_data = [
   "Choose...",
   "AC - Acre",
   "AL - Alagoas",

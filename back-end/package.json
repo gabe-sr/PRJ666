@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "PRJ666 - Group3 - Psicoworking web application",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
@@ -21,6 +20,7 @@
   },
   "homepage": "https://github.com/gabe-sr/PRJ666#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongoose": "^6.0.7",

@@ -31,7 +31,11 @@ export const FormField = ({ label, formType, formData, ...props }) => {
           })}
         </select>
       )}
-      <ErrorMessage component="div" name={field.name} className="error" />
+      <ErrorMessage
+        component="div"
+        name={field.name}
+        className="error small text-danger "
+      />
     </div>
   );
 };

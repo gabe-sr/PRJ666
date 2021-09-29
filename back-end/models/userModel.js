@@ -3,15 +3,9 @@ const Schema = mongoose.Schema; // used to create Schema objects
 
 // Some properties are commented for testing
 const userSchema = new Schema({
-  user_id: {
-    type: String,
-    //required: true,
-    //unique: true,
-    trim: true,
-  },
   active: {
     type: Boolean,
-    // required: true
+    default: false,
   },
   first_name: {
     type: String,
@@ -21,20 +15,21 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  loginStatus: {
+  isAdmin: {
     type: Boolean,
-    //required: true
+    default: false,
   },
   crp_no: {
     type: String,
     required: true,
-    // unique: true,
+    unique: true,
   },
   email: {
     type: String,
     required: true,
-    //unique: true,
+    unique: true,
   },
+
   phone: {
     type: String,
     required: true,
@@ -57,12 +52,11 @@ const userSchema = new Schema({
   },
   cpf_no: {
     type: String,
-    // required: true,
-    //unique: true,
+    default: "",
   },
   methodology: {
     type: String,
-    //required: true
+    default: "",
   },
 });
 

@@ -1,13 +1,46 @@
 //import { useHistory } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { FormField } from "./form-components/FormField";
 import { state_uf_data } from "./state_uf_data";
 import "./Signupform.css";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { Modal, Button } from "react-bootstrap";
 
 const SignUpForm = () => {
-  // Yup validation schema
+  // --- This will handle the autocomplete delimiters in form ---/
+  const [crpDelimiter, setCrpDelimiter] = useState(false);
+  const [phoneDelimiter, setPhoneDelimiter] = useState(false);
+
+  const crpDelimiterHandle = (formik) => {
+    const { crp_no } = formik.values;
+    console.log(crp_no);
+    if (crp_no.length > 1) {
+      if (!crpDelimiter) {
+        formik.setFieldValue("crp_no", crp_no + "/");
+        setCrpDelimiter(true);
+      }
+    } else {
+      setCrpDelimiter(false);
+    }
+  };
+
+  const phoneDelimiterHandle = (formik) => {
+    const { phone } = formik.values;
+    console.log(phone);
+    if (phone.length === 2 && !phoneDelimiter) {
+      formik.setFieldValue("phone", phone + "-");
+      setPhoneDelimiter(true);
+    } else if (phone.length === 8 && !phoneDelimiter) {
+      formik.setFieldValue("phone", phone + "-");
+      setPhoneDelimiter(true);
+    } else {
+      setPhoneDelimiter(false);
+    }
+  };
+
+  //--- *Yup* validation schema ---/
   const validationSchema = Yup.object().shape({
     first_name: Yup.string()
       .max(20, "First Name must be 20 characters or less")
@@ -24,7 +57,11 @@ const SignUpForm = () => {
     email: Yup.string().email("Email is invalid").required("Email is required"),
     password: Yup.string()
       .min(8, "Password must be at least 8 charaters")
-      .required("Required"),
+      .required("Required")
+      .matches(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/,
+        "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number."
+      ),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), null], "Password must match")
       .required("You must confirm your password"),
@@ -36,7 +73,7 @@ const SignUpForm = () => {
     address2: Yup.string().required("Required"),
   });
 
-  // This will handle address auto-complete when Zip is entered
+  //---- This will handle address auto-complete when Zip is entered ----/
   // It fetches address data from an external API
   // then it saves fetched data into respective formik field values
   const handleFetchZip = async (e, formik) => {
@@ -60,6 +97,16 @@ const SignUpForm = () => {
     }
   };
 
+  const [error, setError] = useState([]);
+  const errorRef = useRef(null);
+
+  const executeScroll = () =>
+    errorRef.current && errorRef.current.scrollIntoView({ behavior: "smooth" });
+
+  useEffect(() => {
+    executeScroll();
+  }, [error]);
+
   // for redirection after POST
   // let history = useHistory();
 
@@ -76,20 +123,28 @@ const SignUpForm = () => {
         dob: "",
         zip: "",
         city: "",
-        state: state_uf_data[0],
+        state: state_uf_data[0], // 'Choose...'
         address1: "",
         address2: "",
       }}
       validationSchema={validationSchema}
       onSubmit={async (values) => {
-        console.log(values);
+        values = {
+          ...values,
+          address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
+        };
+
         try {
-          // const response = await axios({ ...
-          await axios({
+          const response = await axios({
             method: "post",
             url: "http://localhost:8080/users",
             data: values,
           });
+
+          if (!response.data.success) {
+            setError({ error: true, message: response.data.error });
+            console.log(error.message);
+          }
         } catch (e) {
           console.log(e);
         }
@@ -119,6 +174,7 @@ const SignUpForm = () => {
               type="text"
               maxLength="8"
               placeholder="00/00000"
+              onKeyUp={() => crpDelimiterHandle(formik)}
             />
             <FormField
               formType="input"
@@ -127,6 +183,7 @@ const SignUpForm = () => {
               type="text"
               maxLength="13"
               placeholder="00-00000-0000"
+              onKeyUp={() => phoneDelimiterHandle(formik)}
             />
             <FormField
               formType="input"
@@ -134,6 +191,7 @@ const SignUpForm = () => {
               name="email"
               type="email"
               placeholder="example@email.com"
+              ref={errorRef}
             />
             <FormField
               formType="input"
@@ -214,6 +272,24 @@ const SignUpForm = () => {
             >
               Reset Form
             </button>
+
+            {/* {
+              <>
+                <Modal
+                  size="lg"
+                  show={true}
+                  fullscreen="lg-down"
+                  onHide={() => setError(false)}
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>There was an error</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-danger">
+                    {error.message}
+                  </Modal.Body>
+                </Modal>
+              </>
+            } */}
           </Form>
         </div>
       )}

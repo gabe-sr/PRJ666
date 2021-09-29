@@ -4,6 +4,8 @@ import express from "express";
 import { User } from "../models/userModel.js";
 // const User = require("../models/userModel")
 const router = express.Router();
+// to hash passwords
+import bcrypt from "bcryptjs";
 
 // -------- ROUTES DEFINITIONS -------- //
 
@@ -53,17 +55,33 @@ router.get("/edit/:id", async (req, res) => {
 
 // Add user to DB
 router.post("/", async (req, res) => {
-  const { address1, address2, city, state, zip } = req.body;
+  const errors = [];
 
   let user = new User({
     ...req.body,
-    address: `${address1},${address2},${city},${state},${zip}`, //temporary, to be fixed on front end
   });
-
+  console.log(user);
   try {
-    user = await user.save();
-    console.log(`User was posted!`);
-    res.redirect(`/users/${user._id}`); // temporary (after saving user in db exibit it (afterwards it will redirect to user area)
+    const userFound = await User.findOne({ email: user.email });
+
+    // this means that the email already exists in DB
+    if (userFound) {
+      errors.push(
+        "The email address is already in use. Please try again or login into your account."
+      );
+      //return res.status(500).json({ success: false, error: errors });
+      res.send({ success: false, error: errors });
+    } else {
+      // generate salt to hash password
+      const salt = await bcrypt.genSalt(10);
+
+      // hash password
+      user.password = await bcrypt.hash(user.password, salt);
+
+      user = await user.save();
+      console.log(`User was posted!`);
+      res.redirect(`/users/${user._id}`); // temporary (after saving user in db exibit it (afterwards it will redirect to user area)
+    }
   } catch (err) {
     console.log(err);
   }

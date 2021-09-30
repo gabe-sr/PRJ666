@@ -1,4 +1,4 @@
-//import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { FormField } from "./form-components/FormField";
@@ -6,19 +6,17 @@ import { state_uf_data } from "./state_uf_data";
 import "./Signupform.css";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Modal, Button } from "react-bootstrap";
 
 const SignUpForm = () => {
   // --- This will handle the autocomplete delimiters in form ---/
   const [crpDelimiter, setCrpDelimiter] = useState(false);
   const [phoneDelimiter, setPhoneDelimiter] = useState(false);
 
-  const crpDelimiterHandle = (formik) => {
-    const { crp_no } = formik.values;
-    console.log(crp_no);
+  const crpDelimiterHandle = () => {
+    const { crp_no } = formRef.current.values;
     if (crp_no.length > 1) {
       if (!crpDelimiter) {
-        formik.setFieldValue("crp_no", crp_no + "/");
+        formRef.current.setFieldValue("crp_no", crp_no + "/");
         setCrpDelimiter(true);
       }
     } else {
@@ -26,14 +24,13 @@ const SignUpForm = () => {
     }
   };
 
-  const phoneDelimiterHandle = (formik) => {
-    const { phone } = formik.values;
-    console.log(phone);
+  const phoneDelimiterHandle = () => {
+    const { phone } = formRef.current.values;
     if (phone.length === 2 && !phoneDelimiter) {
-      formik.setFieldValue("phone", phone + "-");
+      formRef.current.setFieldValue("phone", phone + "-");
       setPhoneDelimiter(true);
     } else if (phone.length === 8 && !phoneDelimiter) {
-      formik.setFieldValue("phone", phone + "-");
+      formRef.current.setFieldValue("phone", phone + "-");
       setPhoneDelimiter(true);
     } else {
       setPhoneDelimiter(false);
@@ -76,8 +73,8 @@ const SignUpForm = () => {
   //---- This will handle address auto-complete when Zip is entered ----/
   // It fetches address data from an external API
   // then it saves fetched data into respective formik field values
-  const handleFetchZip = async (e, formik) => {
-    const cep = e.target.value;
+  const handleFetchZip = async () => {
+    const cep = formRef.current.values.zip;
     if (cep.length >= 8) {
       try {
         axios.get(`https://viacep.com.br/ws/${cep}/json/ `).then((res) => {
@@ -86,9 +83,9 @@ const SignUpForm = () => {
               (uf) => uf.substring(0, 2).search(res.data.uf) >= 0
             );
 
-            formik.setFieldValue("city", res.data.localidade);
-            formik.setFieldValue("state", state_uf);
-            formik.setFieldValue("address1", res.data.logradouro);
+            formRef.current.setFieldValue("city", res.data.localidade);
+            formRef.current.setFieldValue("state", state_uf);
+            formRef.current.setFieldValue("address1", res.data.logradouro);
           }
         });
       } catch (err) {
@@ -97,21 +94,58 @@ const SignUpForm = () => {
     }
   };
 
-  const [error, setError] = useState([]);
+  // --- Handle response from backend POST --- //
+  const [apiError, setApiError] = useState(false);
   const errorRef = useRef(null);
+  const formRef = useRef();
 
-  const executeScroll = () =>
+  // scrolls up to the email field
+  const executeScroll = () => {
     errorRef.current && errorRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    executeScroll();
-  }, [error]);
+    if (apiError) {
+      executeScroll();
+      setApiError(false);
+    }
+  }, [apiError]);
 
+  // ---- Handle form submit ---- //
+  const handleSubmitForm = async (values, { setFieldError }) => {
+    values = {
+      ...values,
+      address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
+    };
+
+    try {
+      const response = await axios({
+        method: "post",
+        url: "http://localhost:8080/users",
+        data: values,
+      });
+
+      const { success, errorMessage, redirectUrl } = response.data;
+      console.log(response.data);
+
+      if (!success) {
+        setApiError(true);
+        setFieldError("email", errorMessage);
+      } else {
+        history.push(redirectUrl);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // --- Redirects --- //
   // for redirection after POST
-  // let history = useHistory();
+  let history = useHistory();
 
   return (
     <Formik
+      innerRef={formRef}
       initialValues={{
         first_name: "",
         last_name: "",
@@ -128,29 +162,7 @@ const SignUpForm = () => {
         address2: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={async (values) => {
-        values = {
-          ...values,
-          address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
-        };
-
-        try {
-          const response = await axios({
-            method: "post",
-            url: "http://localhost:8080/users",
-            data: values,
-          });
-
-          if (!response.data.success) {
-            setError({ error: true, message: response.data.error });
-            console.log(error.message);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-
-        //history.push("/");
-      }}
+      onSubmit={handleSubmitForm}
     >
       {(formik) => (
         <div className="signup-container">
@@ -174,7 +186,7 @@ const SignUpForm = () => {
               type="text"
               maxLength="8"
               placeholder="00/00000"
-              onKeyUp={() => crpDelimiterHandle(formik)}
+              onKeyUp={() => crpDelimiterHandle()}
             />
             <FormField
               formType="input"
@@ -183,7 +195,7 @@ const SignUpForm = () => {
               type="text"
               maxLength="13"
               placeholder="00-00000-0000"
-              onKeyUp={() => phoneDelimiterHandle(formik)}
+              onKeyUp={() => phoneDelimiterHandle()}
             />
             <FormField
               formType="input"
@@ -191,7 +203,7 @@ const SignUpForm = () => {
               name="email"
               type="email"
               placeholder="example@email.com"
-              ref={errorRef}
+              myref={errorRef}
             />
             <FormField
               formType="input"
@@ -219,7 +231,7 @@ const SignUpForm = () => {
                   type="text"
                   maxLength="8"
                   name="zip"
-                  onKeyUp={(e) => handleFetchZip(e, formik)}
+                  onKeyUp={(e) => handleFetchZip()}
                 />
               </div>
 
@@ -272,24 +284,6 @@ const SignUpForm = () => {
             >
               Reset Form
             </button>
-
-            {/* {
-              <>
-                <Modal
-                  size="lg"
-                  show={true}
-                  fullscreen="lg-down"
-                  onHide={() => setError(false)}
-                >
-                  <Modal.Header closeButton>
-                    <Modal.Title>There was an error</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body className="text-danger">
-                    {error.message}
-                  </Modal.Body>
-                </Modal>
-              </>
-            } */}
           </Form>
         </div>
       )}

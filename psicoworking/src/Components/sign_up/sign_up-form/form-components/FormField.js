@@ -7,7 +7,9 @@ export const FormField = ({ label, formType, formData, ...props }) => {
   const [field, meta] = useField(props);
   return (
     <div className="mb-3">
-      <label htmlFor={field.name}>{label}</label>
+      <label ref={props.myref} htmlFor={field.name}>
+        {label}
+      </label>
       {formType === "input" ? (
         <input
           className={`form-control shadow-none ${

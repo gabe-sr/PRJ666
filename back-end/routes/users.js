@@ -55,11 +55,16 @@ router.get("/edit/:id", async (req, res) => {
 
 // --- POST user to db --- //
 router.post("/", async (req, res) => {
-  // to store errors
-  const errors = [];
+  // to store messages/errors
+  const messages = [];
 
   // the body response to front end
-  const body = { success: true, errorMessage: [], redirectUrl: "" };
+  const body = {
+    success: false,
+    message: messages,
+    redirectURL: "/signup",
+    type: "",
+  };
 
   // new userModel object
   let user = new User({
@@ -72,10 +77,10 @@ router.post("/", async (req, res) => {
 
     // this means that the email already exists in DB
     if (userFound) {
-      errors.push(
+      messages.push(
         "The email address is already in use. Please try again or login into your account."
       );
-      res.send({ ...body, success: false, errorMessage: errors });
+      res.send({ ...body, type: "email" });
     } else {
       // generate salt to hash password
       const salt = await bcrypt.genSalt(10);
@@ -88,12 +93,15 @@ router.post("/", async (req, res) => {
       console.log(user);
 
       // send response to front end, with redirect information
-      res.send({ ...body, redirectURl: "/" });
-
-      //res.redirect(`/users/${user._id}`); // temporary (after saving user in db exibit it (afterwards it will redirect to user area)
+      messages.push("Success");
+      res.send({ ...body, success: true });
     }
+
+    // if any other error occurs, send an error message to front end
   } catch (err) {
     console.log(err);
+    messages.push("A problem has occurred...");
+    res.send(body);
   }
 });
 

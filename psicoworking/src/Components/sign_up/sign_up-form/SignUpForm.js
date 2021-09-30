@@ -47,10 +47,12 @@ const SignUpForm = () => {
       .required("Required"),
     crp_no: Yup.string()
       .min(8, "Invalid CRP format")
-      .required("CRP number is required"),
+      .required("CRP number is required")
+      .matches(/^[0-9]{2}\/[0-9]{5}$/, "Invalid CRP format"),
     phone: Yup.string()
       .min(12, "Phone number is invalid")
-      .required("Phone number is required"),
+      .required("Phone number is required")
+      .matches(/^[0-9]{2}-[0-9]{5}-[0-9]{4}$/, "Invalid phone format"),
     email: Yup.string().email("Email is invalid").required("Email is required"),
     password: Yup.string()
       .min(8, "Password must be at least 8 charaters")
@@ -94,7 +96,12 @@ const SignUpForm = () => {
     }
   };
 
-  // --- Handle response from backend POST --- //
+  // --- Redirects --- //
+  // enables history object: allows redirection after POST
+  let history = useHistory();
+
+  // --- Handle error response from backend POST --- //
+  // uses useRef to scrool up to the field with problems (email, crp, etc...)
   const [apiError, setApiError] = useState(false);
   const errorRef = useRef(null);
   const formRef = useRef();
@@ -104,6 +111,7 @@ const SignUpForm = () => {
     errorRef.current && errorRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  // tracks changes to apiError, if true call function to scroll up
   useEffect(() => {
     if (apiError) {
       executeScroll();
@@ -125,23 +133,30 @@ const SignUpForm = () => {
         data: values,
       });
 
-      const { success, errorMessage, redirectUrl } = response.data;
+      response.data = { ...response.data, display: false };
+      const { success, message, redirectURL, type } = response.data;
       console.log(response.data);
 
       if (!success) {
-        setApiError(true);
-        setFieldError("email", errorMessage);
+        if (type === "email") {
+          setApiError(true);
+          setFieldError(type, message);
+        } else {
+          history.push({
+            pathname: redirectURL,
+            state: { ...response.data, display: true },
+          });
+        }
       } else {
-        history.push(redirectUrl);
+        history.push({
+          pathname: redirectURL,
+          state: { ...response.data, display: true },
+        });
       }
     } catch (e) {
       console.log(e);
     }
   };
-
-  // --- Redirects --- //
-  // for redirection after POST
-  let history = useHistory();
 
   return (
     <Formik

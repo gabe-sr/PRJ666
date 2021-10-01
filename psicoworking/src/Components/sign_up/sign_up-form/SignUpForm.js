@@ -1,7 +1,7 @@
 import { useHistory } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { FormField } from "./form-components/FormField";
+import { FormField } from "../../shared/form-components/FormField";
 import { state_uf_data } from "./state_uf_data";
 import "./Signupform.css";
 import { Formik, Form } from "formik";
@@ -154,7 +154,13 @@ const SignUpForm = () => {
         });
       }
     } catch (e) {
-      console.log(e);
+      history.push({
+        pathname: "/signup",
+        state: {
+          message: "Something went wrong",
+          display: true,
+        },
+      });
     }
   };
 

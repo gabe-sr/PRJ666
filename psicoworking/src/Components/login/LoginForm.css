@@ -1,0 +1,41 @@
+.login-container {
+  text-align: left;
+  padding: 0 3%;
+}
+
+.login-forgotPassword {
+  text-align: right;
+  font-size: 0.8rem;
+}
+.login-forgotPassword a {
+  color: #f06f33;
+  text-decoration: none;
+}
+.login-forgotPassword a:hover {
+  color: #eca787;
+}
+
+.login-form-btn {
+  background-color: #f39a71;
+  color: #fff;
+  border-color: #f06f33;
+}
+
+.login-form-btn:hover {
+  background-color: #fff;
+  color: #f06f33;
+  border-color: #f06f33;
+}
+
+.login-form-footer {
+  font-size: 0.9rem;
+}
+
+.login-form-signup-link a {
+  text-decoration: none;
+  color: #f06f33;
+}
+
+.login-form-signup-link a:hover {
+  color: #eca787;
+}

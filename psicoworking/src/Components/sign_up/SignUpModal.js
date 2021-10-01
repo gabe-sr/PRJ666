@@ -42,7 +42,13 @@ const SignUpModal = (props) => {
   return (
     <>
       {/*Form Modal*/}
-      <Modal size="lg" show={show} fullscreen={"lg-down"} onHide={handleModal}>
+      <Modal
+        size="lg"
+        show={show}
+        fullscreen={"lg-down"}
+        onHide={handleModal}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Enter your information</Modal.Title>
         </Modal.Header>

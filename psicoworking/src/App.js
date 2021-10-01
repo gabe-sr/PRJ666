@@ -2,8 +2,7 @@ import "./App.css";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 // Navbar
-import NavbarTemplate from "./Components/shared/navbar/NavbarTemplate";
-import { navItems } from "./Components/main_page/navbar_data";
+import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 
 // Routes
 import MainPage from "./Components/main_page/MainPage";
@@ -15,7 +14,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <NavbarTemplate navData={navItems} />
+        <MainNavbar />
         <Switch>
           <Route exact path="/">
             <MainPage />
@@ -25,7 +24,7 @@ function App() {
           <Route path="/signup">
             <SignUp />
           </Route>
-          <Route path="/login"></Route>
+          {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>
           <Route path="*">
             <Error />

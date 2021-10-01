@@ -25,6 +25,7 @@ const NavbarTemplate = (props) => {
                 key={item}
                 className="nav-template-link md-auto customColor"
                 href={href}
+                onClick={() => console.log(item)}
               >
                 {item}
               </Nav.Link>

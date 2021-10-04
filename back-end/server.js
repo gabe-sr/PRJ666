@@ -13,6 +13,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import express from "express";
 import { router as userRouter } from "../back-end/routes/users.js";
+import { router as roomRouter } from "../back-end/routes/rooms.js";
+import { router as bookingRouter } from "../back-end/routes/bookings.js";
 
 // Create express app
 const app = express();
@@ -32,6 +34,8 @@ import {} from "dotenv/config";
 /* Set up middlewares */
 // Set the router middleware for the user side, only requests to /users/* will be sent to userRouter
 app.use("/users", userRouter);
+app.use("/rooms", roomRouter);
+app.use("/rooms/book", bookingRouter);
 
 // TESTING ROUTE
 /* delete after linking with frontend home page route */

@@ -14,7 +14,7 @@ import cors from "cors";
 import express from "express";
 import { router as userRouter } from "../back-end/routes/users.js";
 import session from "express-session";
-import { sessionConfig } from "./middleware/sessionConfig.js";
+import { sessionConfig } from "./middleware/sessionConfig.js"; // configuration for session middleware
 
 // Create express app
 const app = express();
@@ -34,7 +34,6 @@ import {} from "dotenv/config";
 // Session middleware
 app.use(session(sessionConfig));
 
-/* Set up middlewares */
 // Set the router middleware for the user side, only requests to /users/* will be sent to userRouter
 app.use("/users", userRouter);
 

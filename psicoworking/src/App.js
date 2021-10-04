@@ -6,7 +6,6 @@ import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 
 // Routes
 import MainPage from "./Components/main_page/MainPage";
-//import SignUpModal from "./Components/sign_up/SignUpModal";
 import SignUp from "./Components/sign_up/SignUp";
 
 // Main app

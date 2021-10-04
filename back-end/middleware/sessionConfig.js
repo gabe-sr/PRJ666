@@ -1,4 +1,6 @@
 // Configuration of session with mongoDB storage
+// sessions and cookies are stored in the database, under "sessions" collection
+// lifetime = 1hour, after that they are deleted from DB
 import MongoStore from "connect-mongo";
 import {} from "dotenv/config";
 

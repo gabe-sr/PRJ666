@@ -1,11 +1,9 @@
-//This allows you to pefrom CRUD operations on the User colections
+//This module allows you to pefrom CRUD operations on the User colections
 import express from "express";
-// const express = require("express")
 import { User } from "../models/userModel.js";
-// const User = require("../models/userModel")
 const router = express.Router();
-// to hash passwords
-import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs"; // to hash passwords
+import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 
 // -------- ROUTES DEFINITIONS -------- //
 
@@ -21,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 // Get one user by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", isAuthenticated, async (req, res) => {
   try {
     console.log(JSON.stringify(req.params.id));
     // const user = await User.findOne({ user_id: req.params.user_id })
@@ -102,6 +100,60 @@ router.post("/", async (req, res) => {
     console.log(err);
     messages.push("A problem has occurred...");
     res.send(body);
+  }
+});
+
+// --- USER LOGIN  --- //
+router.post("/login", async (req, res) => {
+  // response to be sent back to front end
+  const response = {
+    success: false,
+    message: "",
+    type: "",
+  };
+
+  // data received from the front end
+  const { email: userEmail, password: userPassword } = req.body;
+
+  try {
+    // search DB for existing email
+    const dbUser = await User.findOne({ email: userEmail });
+
+    // this means that the email does not exist in DB
+    if (!dbUser) {
+      return res.send({
+        ...response,
+        message: "The email address is not registered.",
+        type: "email",
+        data: dbUser,
+      });
+    }
+
+    // now, compare the input password with the stored password in DB
+    const passwordMatches = await bcrypt.compare(userPassword, dbUser.password);
+
+    // if password is incorrect...
+    if (!passwordMatches) {
+      return res.send({
+        ...response,
+        message: "The password is incorrect.",
+        type: "password",
+      });
+    }
+
+    // if email exists and password is correct, proceed with session creation
+
+    // if user is a normal user (not an admin)
+    if (dbUser.isAdmin === false) {
+      //add user_id to cookie
+      req.session.userInfo = { user_id: dbUser._id };
+      res.redirect(`${dbUser._id}`);
+    }
+
+    // TO-DO: crate admin session
+    //....
+  } catch (err) {
+    console.log(err);
   }
 });
 

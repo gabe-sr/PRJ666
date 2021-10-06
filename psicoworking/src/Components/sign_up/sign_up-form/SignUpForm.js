@@ -121,11 +121,12 @@ const SignUpForm = () => {
 
   // ---- Handle form submit ---- //
   const handleSubmitForm = async (values, { setFieldError }) => {
-    values = {
-      ...values,
-      address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
-    };
+    // values = {
+    //   ...values,
+    //   address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
+    // };
 
+    // Fetch data from API
     try {
       const response = await axios({
         method: "post",
@@ -133,11 +134,18 @@ const SignUpForm = () => {
         data: values,
       });
 
+      // include display property and set to false
       response.data = { ...response.data, display: false };
+
+      // destructuring the response data from API
       const { success, message, redirectURL, type } = response.data;
       console.log(response.data);
 
+      // if response is not success
+      // in case of an "email" error, it setApiError to true, which will call the scroll up function
+      // if any other error, it redirects to "redirectURL", using history.push()
       if (!success) {
+        //
         if (type === "email") {
           setApiError(true);
           setFieldError(type, message);
@@ -147,12 +155,16 @@ const SignUpForm = () => {
             state: { ...response.data, display: true },
           });
         }
+
+        // if success is true, redirects and display a success message
       } else {
         history.push({
           pathname: redirectURL,
           state: { ...response.data, display: true },
         });
       }
+
+      // if API call fails, shows an error message and redirects to /signup
     } catch (e) {
       history.push({
         pathname: "/signup",

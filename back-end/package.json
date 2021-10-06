@@ -28,7 +28,8 @@
     "marked": "^3.0.4",
     "express-session": "^1.17.2",
     "mongoose": "^6.0.7",
+    "node-fetch": "^3.0.0",
     "nodemon": "^2.0.12",
-    "slugify": "^1.6.0"
+    "slugify": "^1.6.0",
   }
 }

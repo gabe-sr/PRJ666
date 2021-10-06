@@ -8,6 +8,9 @@ import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
 
+// TESTING
+import TableData from "./Components/shared/table-data/TableData";
+
 // Main app
 function App() {
   return (
@@ -22,6 +25,11 @@ function App() {
           <Route path="/pricing"></Route>
           <Route path="/signup">
             <SignUp />
+          </Route>
+
+          {/*for testing...*/}
+          <Route path="/table">
+            <TableData />
           </Route>
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>

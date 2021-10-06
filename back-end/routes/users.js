@@ -4,6 +4,7 @@ import { User } from "../models/userModel.js";
 const router = express.Router();
 import bcrypt from "bcryptjs"; // to hash passwords
 import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
+import fetch from "node-fetch"; // authentication middlewares
 
 // -------- ROUTES DEFINITIONS -------- //
 
@@ -137,7 +138,7 @@ router.post("/login", async (req, res) => {
     if (!dbUser) {
       return res.send({
         ...response,
-        message: "The email address is not registered.",
+        message: "Wrong email and/or password.",
         type: "email",
         data: dbUser,
       });
@@ -150,7 +151,7 @@ router.post("/login", async (req, res) => {
     if (!passwordMatches) {
       return res.send({
         ...response,
-        message: "The password is incorrect.",
+        message: "Wrong email and/or password.",
         type: "password",
       });
     }
@@ -196,6 +197,61 @@ router.put("/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+// --- TEST POST TO SUBMIT DATA TO DATABASE ---//
+// takes data from mockaroo dataset at mockaroo URL
+// pass the URL in the post body
+router.post("/upload_data/", async (req, res) => {
+  let data = [];
+  let url = req.body.url;
+
+  // get data from mockaroo dataset
+  try {
+    const response = await fetch(url); // from the url that is passed in the post body
+    data = await response.json();
+
+    // append password
+    data.map((user) => {
+      user.password = "12345678Ab"; // <------ DEFAULT PASSWORD
+    });
+  } catch (err) {
+    console.log(err);
+  }
+
+  let count = 0; // number of users added
+
+  await Promise.all(
+    data.map(async (dat) => {
+      let user = new User(dat);
+
+      try {
+        // search DB for existing email
+        const userFound = await User.findOne({ email: user.email });
+
+        // this means that the email is unique
+        if (!userFound) {
+          // generate salt to hash password
+          const salt = await bcrypt.genSalt(10);
+
+          // hash password
+          user.password = await bcrypt.hash(user.password, salt);
+
+          // save user in DB
+          user = await user.save();
+          count++;
+        }
+
+        // if any other error occurs, send an error message to front end
+      } catch (err) {
+        console.log(err);
+      }
+    })
+  );
+
+  const message = `${count} USERS ADDED TO THE DATABASE!`;
+  console.log(message);
+  res.send(message);
 });
 
 export { router };

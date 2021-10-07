@@ -7,6 +7,7 @@ import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 // Routes
 import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
+import Dashboard from "./Components/dashboard/Dashboard";
 
 // Main app
 function App() {
@@ -23,6 +24,9 @@ function App() {
           <Route path="/signup">
             <SignUp />
           </Route>
+          <Route exact path="/user/:id" render={(props) => (
+              <Dashboard id={props.match.params.id}/>
+          )} />
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>
           <Route path="*">

@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { FormField } from "../shared/form-components/FormField";
 import "./LoginForm.css";
-import axios from "axios";
+//import axios from "axios";
 
 const LoginForm = (props) => {
   //--- *Yup* validation schema ---//;
@@ -15,7 +15,7 @@ const LoginForm = (props) => {
   });
 
   // ---- Handle login submit ---- //
-  const handleLoginSubmit = async (values, { setFieldError }) => {
+  //const handleLoginSubmit = async (values, { setFieldError }) => {
     // try {
     //   const response = await axios({
     //     method: "post",
@@ -50,7 +50,7 @@ const LoginForm = (props) => {
     //     },
     //   });
     // }
-  };
+  //};
 
   return (
     <Formik

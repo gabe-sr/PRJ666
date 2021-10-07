@@ -4138,6 +4138,11 @@
     "whatwg-mimetype" "^2.3.0"
     "whatwg-url" "^8.0.0"
 
+"dateformat@^5.0.1":
+  "integrity" "sha512-DrcKxOW2am3mtqoJwBTK3OlWcF0QSk1p8diEWwpu3Mf//VdURD7XVaeOV738JvcaBiFfm9o2fisoMhiJH0aYxg=="
+  "resolved" "https://registry.npmjs.org/dateformat/-/dateformat-5.0.1.tgz"
+  "version" "5.0.1"
+
 "debug@^2.2.0":
   "integrity" "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="
   "resolved" "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
@@ -11002,6 +11007,11 @@
   dependencies:
     "char-regex" "^1.0.2"
     "strip-ansi" "^6.0.0"
+
+"string-mask@^0.3.0":
+  "integrity" "sha1-nnJEuHuy9vlkfirJj5b6GlfCEZg="
+  "resolved" "https://registry.npmjs.org/string-mask/-/string-mask-0.3.0.tgz"
+  "version" "0.3.0"
 
 "string-natural-compare@^3.0.1":
   "integrity" "sha512-n3sPwynL1nwKi3WJ6AIsClwBMa0zTi54fn2oLU6ndfTSIO05xaznjSf15PcBZU6FNWbmN5Q6cxT4V5hGvB4taw=="

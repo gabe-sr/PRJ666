@@ -9,6 +9,9 @@ import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
 import Dashboard from "./Components/dashboard/Dashboard";
 
+// TESTING
+import TableData from "./Components/shared/table-data/TableData";
+
 // Main app
 function App() {
   return (
@@ -27,6 +30,11 @@ function App() {
           <Route exact path="/user/:id" render={(props) => (
               <Dashboard id={props.match.params.id}/>
           )} />
+
+          {/*for testing...*/}
+          <Route path="/table">
+            <TableData />
+          </Route>
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>
           <Route path="*">

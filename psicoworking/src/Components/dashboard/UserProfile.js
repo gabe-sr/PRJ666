@@ -124,9 +124,11 @@ const UserProfile = (props) => {
   return (     
     <div className="p-3 py-5">
         <div className="d-flex justify-content-between mb-3">
-                    <h4 className="text-right">{user.first_name} {user.last_name} - CRP: {user.crp_no.substring(0,2)}/{user.crp_no.substring(3,user.crp_no.length)}</h4>
-                    Account Status:<span class="dotGreen"/>
+                    <h4>{user.first_name} {user.last_name} - CRP: {user.crp_no.substring(0,2)}/{user.crp_no.substring(3,user.crp_no.length)}</h4>
+                    {user.active && <div>Account Status: <span className="badge badge-pill badge-success ml-2">Active</span></div>}
+                    {!user.active && <div>Account Status: <span className="badge badge-pill bg-danger ml-2">Inactive</span></div>}
         </div>
+        
         <div className="row mt-2">
                 <Formik
                 innerRef={formRef}

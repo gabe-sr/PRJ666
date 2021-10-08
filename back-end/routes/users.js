@@ -50,7 +50,6 @@ router.get("/:id", isAuthenticated, async (req, res) => {
 // Get for edit route
 router.get("/edit/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
-  //link to front end, sending object
 });
 
 // Get one user by user_id (!=id) (WIP)
@@ -65,6 +64,40 @@ router.get("/edit/:id", async (req, res) => {
 //         console.log(err)
 //     }
 // })
+
+// --- POST edit user to db --- //
+router.post("/edit/:id", async (req, res) =>{
+  console.log("post route");
+  console.log(req.body);
+  // to store messages/errors
+  const messages = [];
+
+  // the body response to front end
+  const response = {
+    success: false,
+    message: messages,
+    redirectURL: `/user/${req.body._id}`,
+    type: "",
+  };
+
+  User.findOne({ _id: req.body._id})
+  .then(() =>{
+    console.log("user found");
+    User.updateOne(req.body).catch(
+      error => {
+         console.log(error);
+       })
+    console.log("user updated");
+    // send response to front end, with redirect information
+    messages.push("Success");
+    res.send({ ...response, success: true });
+  })
+  .catch((err) => {
+    console.log(err);
+    messages.push("A problem has occurred...");
+    res.send(response);
+  });
+});
 
 // --- POST user to db --- //
 router.post("/", async (req, res) => {

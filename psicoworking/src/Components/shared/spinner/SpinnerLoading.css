@@ -1,0 +1,10 @@
+.data-loading-modal .modal-content {
+  text-align: center;
+}
+
+.data-loading-spinner {
+  color: #e46e38;
+  border-width: 0.5rem;
+  width: 100px;
+  height: 100px;
+}

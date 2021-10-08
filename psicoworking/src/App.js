@@ -7,6 +7,7 @@ import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 // Routes
 import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
+import Scheduler from "./Components/scheduler/Scheduler";
 
 // TESTING
 import TableData from "./Components/shared/table-data/TableData";
@@ -25,6 +26,9 @@ function App() {
           <Route path="/pricing"></Route>
           <Route path="/signup">
             <SignUp />
+          </Route>
+          <Route path="/scheduler">
+            <Scheduler />
           </Route>
 
           {/*for testing...*/}

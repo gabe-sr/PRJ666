@@ -36,7 +36,7 @@ export default function TimePicker({date}) {
             }
         }
         setTslots(newts)
-        if(newts[value]){alert(`Your chosen booking is: ${format(curr,"MMM do yyy")} at ${times[value]}`)}
+        if(newts[value]){alert(`Your chosen booking is: ${format(curr,"MMM do yyyy")} at ${times[value]}`)}
         
     }
 

@@ -4,7 +4,6 @@ import { FormField } from "../shared/form-components/FormField";
 import { state_uf_data } from "../sign_up/sign_up-form/state_uf_data";
 import {Formik, Form } from "formik";
 import * as Yup from "yup";
-import dateFormat from "dateformat";
 import "./UserProfile.css";
 import { useHistory } from "react-router-dom";
 
@@ -132,7 +131,7 @@ const UserProfile = (props) => {
                 crp_no: user.crp_no,
                 phone: user.phone,
                 email: user.email,
-                dob: dateFormat(user.dob, "yyyy-mm-dd"),
+                dob: user.dob,
                 zip: user.zip,
                 city: user.city,
                 state: user.state, 

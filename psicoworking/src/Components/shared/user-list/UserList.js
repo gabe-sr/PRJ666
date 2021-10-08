@@ -18,6 +18,9 @@ import axios from "axios";
 import SpinnerLoading from "../spinner/SpinnerLoading";
 import ModalMessage from "./modal-message/ModalMessage";
 import "./UserList.css";
+import { useHistory } from "react-router";
+
+
 
 const UserList = (props) => {
   // ------------- FETCH DATA ------------- //
@@ -146,6 +149,14 @@ const UserList = (props) => {
     );
   };
 
+  // Get current URL
+  const history = useHistory();
+
+  const displayUser = (user) => {
+    const path = `/user/${user._id}`
+    history.push(path)
+  }
+
   // rendering the component...
   // (1) - Check if isLoaded=true (if not show the loading spinner),
   //       then check if showModalMessage=true (show message "user xxx was authorized....")
@@ -214,14 +225,14 @@ const UserList = (props) => {
                 <tbody>
                   {values.map((user, index) => (
                     <tr style={{ cursor: "pointer" }} key={user._id}>
-                      <td onClick={() => alert("CLICKED!")}>{index + 1}</td>
+                      <td onClick={() => displayUser(user)}>{index + 1}</td>
 
                       {/* (5) */}
                       {props.columns.map((colName, index) => {
                         if (colName === "fullname") {
                           return (
                             <td
-                              onClick={() => alert("CLICKED!")}
+                              onClick={() => displayUser(user)}
                               key={index}
                             >{`${user.first_name} ${user.last_name}`}</td>
                           );
@@ -229,7 +240,7 @@ const UserList = (props) => {
                           return handleActive(user, index);
                         }
                         return (
-                          <td onClick={() => alert("CLICKED!")} key={index}>
+                          <td onClick={() => displayUser(user)} key={index}>
                             {user[colName]}
                           </td>
                         );

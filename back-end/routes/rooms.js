@@ -1,5 +1,5 @@
 import express from "express";
-import { Room } from "../models/roomModel";
+import { Room } from "../models/roomModel.js";
 
 const router = express.Router();
 
@@ -14,3 +14,5 @@ router.get("/:slug", async (req, res)=>{
     }
     
 })
+
+export {router};

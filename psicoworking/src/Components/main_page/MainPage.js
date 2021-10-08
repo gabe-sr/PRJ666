@@ -1,7 +1,15 @@
 import "./MainPage.css";
 import roomImage from "../../images/room.png";
+import { useHistory } from "react-router-dom";
 
 function MainPage() {
+  const history = useHistory()
+
+  const redirect = ()=>{
+    let path = "/scheduler"
+    history.push(path)
+  }
+
   return (
     <div className="MainPage">
       <section className="colored-section" id="title">
@@ -53,6 +61,7 @@ function MainPage() {
               <button
                 type="button"
                 className="btn btn-outline-light btn-lg download-button"
+                onClick={redirect}
               >
                 Book Now
               </button>

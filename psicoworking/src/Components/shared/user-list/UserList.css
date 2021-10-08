@@ -1,0 +1,26 @@
+.btn-active-dropdown-green .btn-secondary {
+  background-color: #fff !important;
+  border: #fff !important;
+  color: green !important;
+}
+
+.btn-active-dropdown-red .btn-secondary {
+  background-color: #fff !important;
+  border: #fff !important;
+  color: rgb(202, 29, 29) !important;
+}
+
+.users-filter-tab .nav-link.active {
+  color: #d66f3f !important;
+}
+.users-filter-tab .nav-link.active:hover {
+  color: #f0966d !important;
+}
+
+.users-filter-tab .nav-link {
+  color: #7c7b7b !important;
+}
+
+.users-filter-tab .nav-link:hover {
+  color: #f0966d !important;
+}

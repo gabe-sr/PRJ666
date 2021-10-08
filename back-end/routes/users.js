@@ -207,6 +207,23 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// --- AUTHORIZATION: UPDATE STATUS  --- //
+// searchs the database by ID and update the active property
+// the response is a success status and the updated authorization status
+router.patch("/update_authorize/:id", async (req, res) => {
+  try {
+    let user = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { active: req.body.active },
+      { new: true }
+    );
+    res.send({ success: true, activeStatus: user.active });
+  } catch (err) {
+    res.send({ success: false });
+    console.log(err);
+  }
+});
+
 router.put("/:id", async (req, res) => {
   try {
     let user = await User.findById(req.params.id);

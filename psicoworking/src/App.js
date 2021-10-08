@@ -9,7 +9,7 @@ import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
 
 // TESTING
-import TableData from "./Components/shared/table-data/TableData";
+import UserList from "./Components/shared/user-list/UserList";
 
 // Main app
 function App() {
@@ -28,8 +28,11 @@ function App() {
           </Route>
 
           {/*for testing...*/}
-          <Route path="/table">
-            <TableData />
+          <Route path="/authorization">
+            <UserList
+              headers={["Name", "CRP Number", "Email", "Active"]}
+              columns={["fullname", "crp_no", "email", "active"]}
+            />
           </Route>
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>

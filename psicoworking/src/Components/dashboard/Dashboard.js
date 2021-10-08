@@ -35,7 +35,7 @@ class Dashboard extends React.Component {
         return <h4>Loading</h4>; // NOTE: This can be changed to render a <Loading /> Component for a better user experience
       }else{
         if (this.state.user._id){
-          console.log()
+          //console.log(this.state.user);
           return (
             <div>
               <div className="container rounded bg-white mt-5 mb-5">

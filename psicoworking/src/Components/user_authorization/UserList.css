@@ -1,13 +1,15 @@
 .btn-active-dropdown-green .btn-secondary {
-  background-color: #fff !important;
+  background-color: transparent !important;
   border: #fff !important;
   color: green !important;
+  padding: 0;
 }
 
 .btn-active-dropdown-red .btn-secondary {
-  background-color: #fff !important;
+  background-color: transparent !important;
   border: #fff !important;
   color: rgb(202, 29, 29) !important;
+  padding: 0;
 }
 
 .users-filter-tab .nav-link.active {

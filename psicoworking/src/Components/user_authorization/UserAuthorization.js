@@ -1,13 +1,7 @@
-// Use this component to render a table containing user data
-// Accepts the following props:
-//
-// headers: an array of strings with the column titles
-// columns: an array of strings with the DB entities, eg: "crp_no", "zip", "phone" etc..
-//    - special condition for "fullname", which will automatically join first_name,last_name
+// Renders the authorization page component
 
 import React, { useEffect, useState } from "react";
 import {
-  Table,
   Container,
   Dropdown,
   DropdownButton,
@@ -15,15 +9,14 @@ import {
   Tabs,
 } from "react-bootstrap";
 import axios from "axios";
-import SpinnerLoading from "../spinner/SpinnerLoading";
+import SpinnerLoading from "../shared/spinner/SpinnerLoading";
 import ModalMessage from "./modal-message/ModalMessage";
+import TableData from "../shared/table_data/TableData";
 import "./UserList.css";
 import { useHistory } from "react-router";
 
-
-
-const UserList = (props) => {
-  // ------------- FETCH DATA ------------- //
+const UserAuthorization = () => {
+  // ------------- LOADING ------------- //
 
   // check if data was already loaded or not (for loading spinner....)
   const [isLoaded, setIsLoaded] = useState(false);
@@ -120,42 +113,42 @@ const UserList = (props) => {
     }
   }, [userToActivate, key]);
 
-  // This is to handle the GREEN/RED button and DROPDOWN for the Active column
-  // it returns a single <td>
-  const handleActive = (user, index) => {
+  // This is to display the GREEN/RED button and DROPDOWN for the Active column
+  // it returns a single cell component that can be passed inside a row
+  const customActiveColumn = (user) => {
     return (
-      <td key={index}>
-        <Dropdown className="btn-active-dropdown-container">
-          <DropdownButton
-            className={
-              user.active
-                ? "btn-active-dropdown-green"
-                : "btn-active-dropdown-red"
-            }
-            title={<i className="fas fa-circle"></i>}
-            drop="end"
-            size="sm"
-            variant="secondary"
-          >
-            <Dropdown.Item onClick={() => updateActiveOnDB(user, true)}>
-              Authorize
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => updateActiveOnDB(user, false)}>
-              Deny
-            </Dropdown.Item>
-          </DropdownButton>
-        </Dropdown>
-      </td>
+      <Dropdown className="btn-active-dropdown-container">
+        <DropdownButton
+          className={
+            user.active
+              ? "btn-active-dropdown-green"
+              : "btn-active-dropdown-red"
+          }
+          title={<i className="fas fa-circle"></i>}
+          drop="end"
+          size="sm"
+          variant="secondary"
+        >
+          <Dropdown.Item onClick={() => updateActiveOnDB(user, true)}>
+            Authorize
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => updateActiveOnDB(user, false)}>
+            Deny
+          </Dropdown.Item>
+        </DropdownButton>
+      </Dropdown>
     );
   };
+
+  // -------------  REDIRECTION  ------------- //
 
   // Get current URL
   const history = useHistory();
 
   const displayUser = (user) => {
-    const path = `/user/${user._id}`
-    history.push(path)
-  }
+    const path = `/user/${user._id}`;
+    history.push(path);
+  };
 
   // rendering the component...
   // (1) - Check if isLoaded=true (if not show the loading spinner),
@@ -165,9 +158,8 @@ const UserList = (props) => {
   //       and also a callback to let this component know that the modal was closed
   // (3) - Uses react-bootstrap Tabs components. Key is used to track if Tab was changed
   //       with useEffect(), to fetch and filter data accordingly
-  // (4) - Table from react-bootstrap.
-  // (5) - Maps the props to get the column headers and names
-  // (6) - If isLoaded=False, it renders the ModalSpinner component
+  // (4) - Customized table component
+  // (5) - If isLoaded=False, it renders the ModalSpinner component
   //
 
   return (
@@ -212,44 +204,19 @@ const UserList = (props) => {
             </Tabs>
 
             {/* (4) */}
-            <div>
-              <Table bordered hover size="sm" responsive="sm">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    {props.headers.map((head, index) => (
-                      <th key={index}>{head}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {values.map((user, index) => (
-                    <tr style={{ cursor: "pointer" }} key={user._id}>
-                      <td onClick={() => displayUser(user)}>{index + 1}</td>
 
-                      {/* (5) */}
-                      {props.columns.map((colName, index) => {
-                        if (colName === "fullname") {
-                          return (
-                            <td
-                              onClick={() => displayUser(user)}
-                              key={index}
-                            >{`${user.first_name} ${user.last_name}`}</td>
-                          );
-                        } else if (colName === "active") {
-                          return handleActive(user, index);
-                        }
-                        return (
-                          <td onClick={() => displayUser(user)} key={index}>
-                            {user[colName]}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
+            <TableData
+              headers={["Name", "CRP Number", "Email", "Active"]}
+              columns={["fullname", "crp_no", "email", "activeAuthorize"]}
+              values={values}
+              whenClicked={displayUser}
+              customColumn={[
+                {
+                  colDesc: "activeAuthorize",
+                  customColumnComp: customActiveColumn,
+                },
+              ]}
+            />
           </>
         )
       ) : (
@@ -260,4 +227,4 @@ const UserList = (props) => {
   );
 };
 
-export default UserList;
+export default UserAuthorization;

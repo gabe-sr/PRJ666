@@ -10,8 +10,8 @@ import SignUp from "./Components/sign_up/SignUp";
 import Dashboard from "./Components/dashboard/Dashboard";
 import Scheduler from "./Components/scheduler/Scheduler";
 
-// TESTING
-import UserList from "./Components/shared/user-list/UserList";
+// Provisory AUTHORIZATION route
+import UserAuthorization from "./Components/user_authorization/UserAuthorization";
 
 // Main app
 function App() {
@@ -28,20 +28,20 @@ function App() {
           <Route path="/signup">
             <SignUp />
           </Route>
-          <Route exact path="/user/:id" render={(props) => (
-              <Dashboard id={props.match.params.id}/>
-          )} />
+          <Route
+            exact
+            path="/user/:id"
+            render={(props) => <Dashboard id={props.match.params.id} />}
+          />
           <Route path="/scheduler">
             <Scheduler />
           </Route>
 
           {/*for testing...*/}
           <Route path="/authorization">
-            <UserList
-              headers={["Name", "CRP Number", "Email", "Active"]}
-              columns={["fullname", "crp_no", "email", "active"]}
-            />
+            <UserAuthorization />
           </Route>
+
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>
           <Route path="*">

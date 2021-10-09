@@ -66,7 +66,7 @@ router.get("/edit/:id", async (req, res) => {
 // })
 
 // --- POST edit user to db --- //
-router.post("/edit/:id", async (req, res) =>{
+router.post("/edit/:id", async (req, res) => {
   console.log("post route");
   console.log(req.body);
   // to store messages/errors
@@ -80,23 +80,22 @@ router.post("/edit/:id", async (req, res) =>{
     type: "",
   };
 
-  User.findOne({ _id: req.body._id})
-  .then(() =>{
-    console.log("user found");
-    User.updateOne(req.body).catch(
-      error => {
-         console.log(error);
-       })
-    console.log("user updated");
-    // send response to front end, with redirect information
-    messages.push("Success");
-    res.send({ ...response, success: true });
-  })
-  .catch((err) => {
-    console.log(err);
-    messages.push("A problem has occurred...");
-    res.send(response);
-  });
+  User.findOne({ _id: req.body._id })
+    .then(() => {
+      console.log("user found");
+      User.updateOne(req.body).catch((error) => {
+        console.log(error);
+      });
+      console.log("user updated");
+      // send response to front end, with redirect information
+      messages.push("Success");
+      res.send({ ...response, success: true });
+    })
+    .catch((err) => {
+      console.log(err);
+      messages.push("A problem has occurred...");
+      res.send(response);
+    });
 });
 
 // --- POST user to db --- //
@@ -151,7 +150,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// --- USER LOGIN  --- //
+// ------- USER LOGIN  ------- //
 router.post("/login", async (req, res) => {
   // response to be sent back to front end
   const response = {

@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { FormField } from "../shared/form-components/FormField";
 import { state_uf_data } from "../sign_up/sign_up-form/state_uf_data";
-import {Formik, Form } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./UserProfile.css";
 import { useHistory } from "react-router-dom";
@@ -10,12 +10,11 @@ import { useHistory } from "react-router-dom";
 const UserProfile = (props) => {
   // --- This will handle the autocomplete delimiters in form ---/
   const [phoneDelimiter, setPhoneDelimiter] = useState(false);
-  const [user, setUser] = React.useState({...props.user});
-  
+  const [user, setUser] = React.useState({ ...props.user });
+
   React.useEffect(() => {
     setUser(props.user);
-    }, [props.user])
-
+  }, [props.user]);
 
   const phoneDelimiterHandle = () => {
     const { phone } = formRef.current.values;
@@ -76,175 +75,188 @@ const UserProfile = (props) => {
   // enables history object: allows redirection after POST
   let history = useHistory();
 
-    // ---- Handle form submit ---- //
-    const handleSubmitForm = async (values) => {
-      // Fetch data from API
-      try {
-        const response = await axios({
-          method: "post",
-          url: `http://localhost:8080/users/edit/${values._id}`,
-          data: values,
-        });
-  
-        // include display property and set to false
+  // ---- Handle form submit ---- //
+  const handleSubmitForm = async (values) => {
+    // Fetch data from API
+    try {
+      const response = await axios({
+        method: "post",
+        url: `/users/edit/${values._id}`,
+        data: values,
+      });
+
+      // include display property and set to false
       response.data = { ...response.data, display: false };
 
       // destructuring the response data from API
-      const { success,redirectURL } = response.data;
-      console.log(response.data);
+      const { success, redirectURL } = response.data;
+
+      console.log(response);
+
       if (success) {
-          history.push({
-            pathname: redirectURL,
-            state: { ...response.data, display: true },
-          });
+        history.push({
+          pathname: redirectURL,
+          state: { ...response.data, display: true },
+        });
       } else {
         history.push({
           pathname: redirectURL,
           state: { ...response.data, display: true },
         });
       }
-  
-        // if API call fails, shows an error message and redirects
-      } catch (e) {
-        history.push({
-          pathname: `/user/${values._id}`,
-          state: {
-            message: "Something went wrong",
-            display: true,
-          },
-        });
-      }
-    };
-  return (     
+
+      // if API call fails, shows an error message and redirects
+    } catch (e) {
+      history.push({
+        pathname: `/user/${values._id}`,
+        state: {
+          message: "Something went wrong",
+          display: true,
+        },
+      });
+    }
+  };
+  return (
     <div className="p-3 py-5">
-        <div className="d-flex justify-content-between mb-3">
-                    <h4>{user.first_name} {user.last_name}</h4>
-                    {user.active && <div>Account Status: <span className="badge badge-pill badge-success ml-2">Active</span></div>}
-                    {!user.active && <div>Account Status: <span className="badge badge-pill bg-danger ml-2">Inactive</span></div>}
-        </div>
-        
-        <div className="row mt-2">
-                <Formik
-                innerRef={formRef}
-                initialValues={{
-                _id: user._id,
-                crp_no: user.crp_no,
-                phone: user.phone,
-                email: user.email,
-                dob: user.dob,
-                zip: user.zip,
-                city: user.city,
-                state: user.state, 
-                address1: user.address1,
-                address2: user.address2,
-                cpf_no: user.cpf_no
-            }}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmitForm}
-            >
-            {(formik) => (
-                <div className="signup-container">
-                <Form>
-                    <FormField
-                    formType="input"
-                    label="CRP (region/number)"
-                    name="crp_no"
-                    type="text"
-                    maxLength="8"
-                    placeholder="00/00000"
-                    disabled
-                    />
-                    <FormField
-                    formType="input"
-                    label="Email"
-                    name="email"
-                    type="email"
-                    placeholder="example@email.com"
-                    disabled
-                    />
-                    <FormField
-                    formType="input"
-                    label="Phone"
-                    name="phone"
-                    type="text"
-                    maxLength="13"
-                    placeholder="00-00000-0000"
-                    onKeyUp={() => phoneDelimiterHandle()}
-                    />
-                    
-                    
-                    <FormField
-                    formType="input"
-                    label="Date of Birth"
-                    name="dob"
-                    type="date"
-                    />
-                    <div className="form-row">
-                    <div className="form-group col-md-3">
-                        <FormField
-                        formType="input"
-                        label="Zip"
-                        type="text"
-                        maxLength="8"
-                        name="zip"
-                        onKeyUp={(e) => handleFetchZip()}
-                        />
-                    </div>
+      <div className="d-flex justify-content-between mb-3">
+        <h4>
+          {user.first_name} {user.last_name}
+        </h4>
+        {user.active && (
+          <div>
+            Account Status:{" "}
+            <span className="badge badge-pill badge-success ml-2">Active</span>
+          </div>
+        )}
+        {!user.active && (
+          <div>
+            Account Status:{" "}
+            <span className="badge badge-pill bg-danger ml-2">Inactive</span>
+          </div>
+        )}
+      </div>
 
-                    <div className="form-group col-md-5">
-                        <FormField
-                        formType="input"
-                        label="City"
-                        type="text"
-                        maxLength="30"
-                        name="city"
-                        />
-                    </div>
+      <div className="row mt-2">
+        <Formik
+          innerRef={formRef}
+          initialValues={{
+            _id: user._id,
+            crp_no: user.crp_no,
+            phone: user.phone,
+            email: user.email,
+            dob: user.dob,
+            zip: user.zip,
+            city: user.city,
+            state: user.state,
+            address1: user.address1,
+            address2: user.address2,
+            cpf_no: user.cpf_no,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmitForm}
+        >
+          {(formik) => (
+            <div className="signup-container">
+              <Form>
+                <FormField
+                  formType="input"
+                  label="CRP (region/number)"
+                  name="crp_no"
+                  type="text"
+                  maxLength="8"
+                  placeholder="00/00000"
+                  disabled
+                />
+                <FormField
+                  formType="input"
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  disabled
+                />
+                <FormField
+                  formType="input"
+                  label="Phone"
+                  name="phone"
+                  type="text"
+                  maxLength="13"
+                  placeholder="00-00000-0000"
+                  onKeyUp={() => phoneDelimiterHandle()}
+                />
 
-                    <div className="form-group col-md-4">
-                        <FormField
-                        label="State"
-                        formType="select"
-                        formData={state_uf_data}
-                        id="inputState"
-                        className="form-control"
-                        name="state"
-                        />
-                    </div>
-                    </div>
-
+                <FormField
+                  formType="input"
+                  label="Date of Birth"
+                  name="dob"
+                  type="date"
+                />
+                <div className="form-row">
+                  <div className="form-group col-md-3">
                     <FormField
-                    formType="input"
-                    label="Address"
-                    name="address1"
-                    type="text"
-                    placeholder="Main St"
+                      formType="input"
+                      label="Zip"
+                      type="text"
+                      maxLength="8"
+                      name="zip"
+                      onKeyUp={(e) => handleFetchZip()}
                     />
-                    <FormField
-                    formType="input"
-                    label="Address 2"
-                    name="address2"
-                    type="text"
-                    placeholder="Number, Apartment, studio, or floor"
-                    />
+                  </div>
 
-                    <button
-                    className="btn btn-outline-primary mt-3 mr-4 mb-4"
-                    type="submit"
-                    >
-                    Save Changes
-                    </button>
-                    <button
-                    className="btn btn-outline-danger mt-3 ml-3 mb-4"
-                    type="reset"
-                    >
-                    Reset Form
-                    </button>
-                </Form>
+                  <div className="form-group col-md-5">
+                    <FormField
+                      formType="input"
+                      label="City"
+                      type="text"
+                      maxLength="30"
+                      name="city"
+                    />
+                  </div>
+
+                  <div className="form-group col-md-4">
+                    <FormField
+                      label="State"
+                      formType="select"
+                      formData={state_uf_data}
+                      id="inputState"
+                      className="form-control"
+                      name="state"
+                    />
+                  </div>
                 </div>
-            )}
-            </Formik>
-        </div>
+
+                <FormField
+                  formType="input"
+                  label="Address"
+                  name="address1"
+                  type="text"
+                  placeholder="Main St"
+                />
+                <FormField
+                  formType="input"
+                  label="Address 2"
+                  name="address2"
+                  type="text"
+                  placeholder="Number, Apartment, studio, or floor"
+                />
+
+                <button
+                  className="btn btn-outline-primary mt-3 mr-4 mb-4"
+                  type="submit"
+                >
+                  Save Changes
+                </button>
+                <button
+                  className="btn btn-outline-danger mt-3 ml-3 mb-4"
+                  type="reset"
+                >
+                  Reset Form
+                </button>
+              </Form>
+            </div>
+          )}
+        </Formik>
+      </div>
     </div>
   );
 };

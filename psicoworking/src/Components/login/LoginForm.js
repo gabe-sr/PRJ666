@@ -21,33 +21,39 @@ const LoginForm = (props) => {
 
   const handleLoginSubmit = async (values, { setFieldError }) => {
     try {
-      const response = await axios({
-        method: "post",
-        url: "http://localhost:8080/users",
-        data: values,
-      });
+      const response = await axios.post("/users/login", values);
+
       response.data = { ...response.data, display: false };
-      const { success, message, redirectURL, type } = response.data;
-      console.log(response.data);
-      setFieldError("password", message);
-      setFieldError("email", " ");
-      // if (!success) {
-      //   if (type === "email") {
-      //     setApiError(true);
-      //     setFieldError(type, message);
-      //   } else {
-      //     history.push({
-      //       pathname: redirectURL,
-      //       state: { ...response.data, display: true },
-      //     });
-      //   }
-      // } else {
-      //   history.push({
-      //     pathname: redirectURL,
-      //     state: { ...response.data, display: true },
-      //   });
-      // }
+      const { success, message, type } = response.data;
+      console.log(response);
+
+      // If login response is successfull
+      if (success) {
+        props.handlemodal();
+        history.push({
+          pathname: `/user/${response.data.id}`,
+          state: { ...response.data, display: true },
+        });
+
+        // If login response is NOT successfull
+      } else {
+        // if is a email/password problem...
+        if (type === "form") {
+          // setApiError(true);
+          setFieldError("password", message);
+          setFieldError("email", " ");
+
+          // any other error...
+        } else {
+          props.handleModal();
+          history.push({
+            pathname: `/`,
+            state: { ...response.data, display: true },
+          });
+        }
+      }
     } catch (e) {
+      props.handlemodal();
       history.push({
         pathname: "/signup",
         state: {

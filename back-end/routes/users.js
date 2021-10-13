@@ -3,7 +3,7 @@ import express from "express";
 import { User } from "../models/userModel.js";
 const router = express.Router();
 import bcrypt from "bcryptjs"; // to hash passwords
-import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
+import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 import fetch from "node-fetch"; // authentication middlewares
 
 // -------- ROUTES DEFINITIONS -------- //
@@ -34,14 +34,11 @@ router.get("/test/:id", async (req, res) => {
 });
 
 // Get one user by id
-router.get("/:id", isAuthenticated, async (req, res) => {
+router.get("/:id", isLogged, isAuthenticated, async (req, res) => {
   try {
-    console.log(JSON.stringify(req.params.id));
-    // const user = await User.findOne({ user_id: req.params.user_id })
     const user = await User.findById(req.params.id);
-    res.send(user);
-    //link to front end, sending object
     console.log(user);
+    res.send(user);
   } catch (err) {
     console.log(err);
   }
@@ -157,8 +154,9 @@ router.post("/login", async (req, res) => {
     success: false,
     message: "",
     type: "",
+    id: "",
   };
-
+  console.log(req.body);
   // data received from the front end
   const { email: userEmail, password: userPassword } = req.body;
 
@@ -171,8 +169,7 @@ router.post("/login", async (req, res) => {
       return res.send({
         ...response,
         message: "Wrong email and/or password.",
-        type: "email",
-        data: dbUser,
+        type: "form",
       });
     }
 
@@ -184,7 +181,7 @@ router.post("/login", async (req, res) => {
       return res.send({
         ...response,
         message: "Wrong email and/or password.",
-        type: "password",
+        type: "form",
       });
     }
 
@@ -192,11 +189,28 @@ router.post("/login", async (req, res) => {
 
     // if user is a normal user (not an admin)
     if (dbUser.isAdmin === false) {
+      console.log(dbUser._id.toString());
       //add user_id to cookie
-      req.session.userInfo = { user_id: dbUser._id };
+      req.session.userInfo = { user_id: dbUser._id.toString() };
 
       // **** temporary for testing **** //
-      res.redirect(`${dbUser._id}`);
+      // res.redirect(`${dbUser._id}`);
+
+      if (req.session.userInfo) {
+        console.error("Session created");
+        return res.send({
+          success: true,
+          message: "Session created",
+          type: "",
+          id: dbUser._id,
+        });
+      } else {
+        console.error("Authentication error");
+        return res.send({
+          ...response,
+          message: "Authentication error",
+        });
+      }
     }
 
     // TO-DO: crate admin session

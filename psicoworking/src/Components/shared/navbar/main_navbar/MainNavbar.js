@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Navbar, Nav, Modal } from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 import "./MainNavbar.css";
-import LoginForm from "../../../login/LoginForm";
+import LoginModal from "../../../login/LoginModal";
 
 const MainNavbar = () => {
   // tracks the state of the modal (open/closed)
@@ -63,21 +63,7 @@ const MainNavbar = () => {
         </Navbar.Collapse>
       </Navbar>
 
-      <Modal
-        size="sm"
-        show={showModal}
-        fullscreen={"sm-down"}
-        className="text-left text-secondary"
-        onHide={() => setShowModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Login</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <LoginForm />
-        </Modal.Body>
-      </Modal>
+      <LoginModal showmodal={showModal} handlemodal={handleLoginModal} />
     </>
   );
 };

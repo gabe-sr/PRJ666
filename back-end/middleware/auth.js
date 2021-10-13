@@ -1,16 +1,30 @@
 // Authentication
 // to be called as middleware for protected routes
 
-export const isAuthenticated = (req, res, next) => {
-  console.log(req.params.id);
+// Check if user is logged -> req.session.userInfo is not null
+export const isLogged = (req, res, next) => {
   if (req.session.userInfo == null) {
-    return res.send("Not authorized!");
-  } else if (req.session.userInfo.user_id != req.params.id) {
-    return res.send("Can't access this user information");
-  } else {
-    console.log("Session created!");
-    next();
+    console.log(`USER ${req.params.id} IS NOT LOGGED IN`);
+    return res.status(403).send({
+      error: true,
+      redirectTo: { url: `/` },
+    });
   }
+
+  next();
+};
+
+// Check if user is authenticated to access this resource
+export const isAuthenticated = (req, res, next) => {
+  if (req.session.userInfo.user_id != req.params.id) {
+    console.log(`USER ${req.params.id} CAN'T ACCESS THIS RESOURCE`);
+    return res.send({
+      error: true,
+      redirectTo: { url: `/user/${req.session.userInfo.user_id}` },
+    });
+  }
+
+  next();
 };
 
 // const isAdmin = (req, res, next) => {

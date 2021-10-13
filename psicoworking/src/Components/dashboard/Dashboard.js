@@ -1,57 +1,78 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import UserProfile from "./UserProfile";
+import axios from "axios";
+import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
 
-class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { user:{}, loading: true};
-}
+const Dashboard = (props) => {
+  //destructuring props
+  // id is from props.match.params.id ;  setLoading is from the HOC loading
+  const { setLoading, id } = props;
 
-  componentDidMount(){
-    //console.log(`id: ${this.props.id}`);
-    fetch(`http://localhost:8080/users/test/${this.props.id}`)
-        .then(response => {
-        if (response.status >= 200 && response.status <= 299) {
-            return response.json();
-        } else {
-            console.log("error");
-            throw Error(response.statusText);
+  //useState hook: "setState" sets the "state" variable
+  // by default, user is empty obj and loading true
+  const [state, setState] = useState({});
+
+  // hook from react-router-dom: tracks the routing information and provides redirect methods
+  const history = useHistory();
+
+  // Here, similar to componentDidMount, will be triggered when it mounts
+  useEffect(() => {
+    // async function to fetch a User
+    const fetchUser = async () => {
+      try {
+        // using axios instead of fetch
+        const response = await axios.get(`/users/test/${id}`);
+
+        // redirects to error page
+        if (response.data.error) {
+          history.push({
+            pathname: "/Error",
+            state: { redirectTo: response.data.redirectTo.url },
+          });
         }
-        })
-        .then(data => {
-            if(data._id){
-            this.setState({user: data, loading:false});
-            }
-        })
-        .catch(error => {
-        // Handle the error
+
+        // If everything is ok, user _id exists, so setState to retrieved "user" and setLoading as false
+        if (response.data._id) {
+          setState(response.data);
+          setLoading(false);
+        }
+
+        // errors including response.status != 200 to 299
+      } catch (error) {
         console.log(error);
-        this.setState({user: "", loading:false});
+        history.push({
+          pathname: "/Error",
+          state: { redirectTo: "/" },
         });
-    }
-
-    render() {
-      if (this.state.loading){
-        return <h4>Loading</h4>; // NOTE: This can be changed to render a <Loading /> Component for a better user experience
-      }else{
-        if (this.state.user._id){
-          //console.log(this.state.user);
-          return (
-            <div>
-              <div className="container rounded bg-white mt-5 mb-5">
-                <div className="row">
-                <div className="col-md-3 border-right">
-                  <div className="d-flex flex-column align-items-center text-center p-3 py-5">Navbar</div>
-                </div>
-                <div className="col-md-9 border-right"><UserProfile user={this.state.user}/></div>
-                </div>
-              </div>
-              
-          </div>
-        );
-        } 
       }
-    }
-  }
+    };
 
-  export default Dashboard;
+    // call above function here
+    fetchUser();
+  }, [id, history, setLoading]);
+
+  if (state._id) {
+    return (
+      <div>
+        <div className="container rounded bg-white mt-5 mb-5">
+          <div className="row">
+            <div className="col-md-3 border-right">
+              <div className="d-flex flex-column align-items-center text-center p-3 py-5">
+                Navbar
+              </div>
+            </div>
+            <div className="col-md-9 border-right">
+              <UserProfile user={state} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return null;
+  }
+};
+
+// WithLoadingSpinner: HOC for the loading spinner
+export default WithLoadingSpinner(Dashboard, "Retrieving user information");

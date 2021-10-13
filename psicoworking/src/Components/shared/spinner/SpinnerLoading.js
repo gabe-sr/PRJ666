@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner, Modal } from "react-bootstrap";
 import "./SpinnerLoading.css";
 
-const SpinnerLoading = () => {
+const SpinnerLoading = (props) => {
   return (
     <Modal
       className={"data-loading-modal"}
@@ -13,7 +13,7 @@ const SpinnerLoading = () => {
       centered
     >
       <Modal.Body>
-        <p>Loading data...</p>
+        <p>{props.message}</p>
         <Spinner animation="border" className="data-loading-spinner" />
       </Modal.Body>
     </Modal>

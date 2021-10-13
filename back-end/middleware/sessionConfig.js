@@ -8,7 +8,7 @@ const expTime = 1000 * 60 * 60; //1 hour
 
 export const sessionConfig = {
   secret: process.env.SESSION_SECRET,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: { maxAge: expTime },
   resave: false,
   store: MongoStore.create({ mongoUrl: process.env.DB_URL }),

@@ -22,6 +22,7 @@ import { sessionConfig } from "./middleware/sessionConfig.js"; // configuration 
 const app = express();
 
 // enable CORS requests
+//app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(cors());
 
 // Used to parse JSON bodies

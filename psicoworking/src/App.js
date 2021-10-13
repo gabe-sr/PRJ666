@@ -9,9 +9,11 @@ import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
 import Dashboard from "./Components/dashboard/Dashboard";
 import Scheduler from "./Components/scheduler/Scheduler";
+import Error from "./Components/error/Error";
 
 // Provisory AUTHORIZATION route
 import UserAuthorization from "./Components/user_authorization/UserAuthorization";
+import ExampleSpinnerError from "./Components/example-spinner-error/ExampleSpinnerError";
 
 // Main app
 function App() {
@@ -41,12 +43,15 @@ function App() {
           <Route path="/authorization">
             <UserAuthorization />
           </Route>
+          <Route path="/example">
+            <ExampleSpinnerError />
+          </Route>
 
           {/* <Route path="/login"></Route> */}
-          {/* <Route path="/person/:id" children={<Person />}></Route>
-          <Route path="*">
+          {/* <Route path="/person/:id" children={<Person />}></Route>*/}
+          <Route path="/Error">
             <Error />
-          </Route> */}
+          </Route>
         </Switch>
       </Router>
     </div>

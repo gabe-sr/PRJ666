@@ -9,17 +9,17 @@ import {
   Tabs,
 } from "react-bootstrap";
 import axios from "axios";
-import SpinnerLoading from "../shared/spinner/SpinnerLoading";
 import ModalMessage from "./modal-message/ModalMessage";
 import TableData from "../shared/table_data/TableData";
 import "./UserList.css";
 import { useHistory } from "react-router";
+import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
 
-const UserAuthorization = () => {
+const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
 
-  // check if data was already loaded or not (for loading spinner....)
-  const [isLoaded, setIsLoaded] = useState(false);
+  // props from HOC to set loading spinner
+  const { setLoading } = props;
 
   // ------------- FETCH DATA ------------- //
   // to store all user data fetched from DB
@@ -28,7 +28,7 @@ const UserAuthorization = () => {
 
   // (3) get all user data from database
   const fetchData = async (key) => {
-    setIsLoaded(false);
+    setLoading(true);
     try {
       const data = await axios.get("http://localhost:8080/users");
       let sortedData = data.data.sort((a, b) =>
@@ -41,7 +41,7 @@ const UserAuthorization = () => {
       } else {
         setValues(sortedData);
       }
-      setIsLoaded(true);
+      setLoading(false);
 
       // count number of pending values
       let countPending = sortedData.filter(
@@ -151,7 +151,7 @@ const UserAuthorization = () => {
   };
 
   // rendering the component...
-  // (1) - Check if isLoaded=true (if not show the loading spinner),
+  // (1) - Check if there is data (values) to show, otherwise, null
   //       then check if showModalMessage=true (show message "user xxx was authorized....")
   // (2) - This component is a modal with the message ("user xxx authorized...")
   //       it passes as props the user in the row that was clicked (userToActivate)
@@ -159,13 +159,11 @@ const UserAuthorization = () => {
   // (3) - Uses react-bootstrap Tabs components. Key is used to track if Tab was changed
   //       with useEffect(), to fetch and filter data accordingly
   // (4) - Customized table component
-  // (5) - If isLoaded=False, it renders the ModalSpinner component
-  //
 
   return (
     <Container className="m-4 w-75">
       {/* (1) */}
-      {isLoaded ? (
+      {values ? (
         showModalMessage ? (
           /* (2) */
           <ModalMessage
@@ -219,12 +217,12 @@ const UserAuthorization = () => {
             />
           </>
         )
-      ) : (
-        /* (6) */
-        <SpinnerLoading />
-      )}
+      ) : null}
     </Container>
   );
 };
 
-export default UserAuthorization;
+export default WithLoadingSpinner(
+  UserAuthorization,
+  "Loading authorization list"
+);

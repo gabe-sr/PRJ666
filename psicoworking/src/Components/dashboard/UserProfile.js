@@ -4,7 +4,6 @@ import { FormField } from "../shared/form-components/FormField";
 import { state_uf_data } from "../sign_up/sign_up-form/state_uf_data";
 import {Formik, Form } from "formik";
 import * as Yup from "yup";
-import "./UserProfile.css";
 import { useHistory } from "react-router-dom";
 
 const UserProfile = (props) => {
@@ -81,7 +80,7 @@ const UserProfile = (props) => {
       // Fetch data from API
       try {
         const response = await axios({
-          method: "post",
+          method: "put",
           url: `http://localhost:8080/users/edit/${values._id}`,
           data: values,
         });

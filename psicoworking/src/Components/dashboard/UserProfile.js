@@ -90,12 +90,14 @@ const UserProfile = (props) => {
 
       // destructuring the response data from API
       const { success,redirectURL } = response.data;
-      console.log(response.data);
+      //console.log(response.data);
+
       if (success) {
           history.push({
             pathname: redirectURL,
             state: { ...response.data, display: true },
           });
+          window.scrollTo(0, 0);
       } else {
         history.push({
           pathname: redirectURL,
@@ -114,6 +116,7 @@ const UserProfile = (props) => {
         });
       }
     };
+
   return (     
     <div className="p-3 py-5">
         <div className="d-flex justify-content-between mb-3">

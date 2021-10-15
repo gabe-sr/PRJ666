@@ -1,0 +1,34 @@
+.nav-menu-items {
+    height: 100vh;
+    padding: 0 3px;
+  }
+
+  .nav-text {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    padding: 8px 0px 0px 0px;
+    list-style: none;
+    height: 60px;
+  }
+
+  .nav-text a {
+    text-decoration: none;
+    color: #6AA392;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-radius: 4px;
+  }
+
+  .nav-text a:hover {
+    background-color: #F39A71;
+    color: white;
+  }
+
+  span {
+  margin-left: 16px;
+}

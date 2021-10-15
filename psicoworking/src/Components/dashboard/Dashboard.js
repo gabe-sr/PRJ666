@@ -1,5 +1,7 @@
 import React from 'react';
+import Sidebar from './sidebar/Sidebar';
 import UserProfile from "./UserProfile";
+import './Dashboard.css';
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -37,17 +39,14 @@ class Dashboard extends React.Component {
         if (this.state.user._id){
           //console.log(this.state.user);
           return (
-            <div>
-              <div className="container rounded bg-white mt-5 mb-5">
-                <div className="row">
-                <div className="col-md-3 border-right">
-                  <div className="d-flex flex-column align-items-center text-center p-3 py-5">Navbar</div>
-                </div>
-                <div className="col-md-9 border-right"><UserProfile user={this.state.user}/></div>
-                </div>
+            <>
+              <div className="sidebar">
+                <Sidebar id={this.state.user._id} isAdmin={this.state.user.isAdmin}/>
               </div>
-              
-          </div>
+              <div className="content">
+                <UserProfile user={this.state.user}/>
+              </div>
+          </>
         );
         } 
       }

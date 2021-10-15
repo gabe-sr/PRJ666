@@ -14,8 +14,10 @@ import ModalMessage from "./modal-message/ModalMessage";
 import TableData from "../shared/table_data/TableData";
 import "./UserList.css";
 import { useHistory } from "react-router";
+import Sidebar from '../dashboard/sidebar/Sidebar'
+import "../dashboard/sidebar/Sidebar.css";
 
-const UserAuthorization = () => {
+const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
 
   // check if data was already loaded or not (for loading spinner....)
@@ -175,6 +177,10 @@ const UserAuthorization = () => {
         ) : (
           /* (3) */
           <>
+          <div className="sidebar">
+            <Sidebar isAdmin="true" id={props.id}/>
+          </div>
+          <div className="content">
             <Tabs
               className="users-filter-tab mb-4"
               activeKey={key}
@@ -217,6 +223,7 @@ const UserAuthorization = () => {
                 },
               ]}
             />
+            </div>
           </>
         )
       ) : (

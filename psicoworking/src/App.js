@@ -38,9 +38,10 @@ function App() {
           </Route>
 
           {/*for testing...*/}
-          <Route path="/authorization">
-            <UserAuthorization />
-          </Route>
+          <Route path="/:id/authorization"
+            render={(props) => <UserAuthorization id={props.match.params.id} />}
+          />
+            
 
           {/* <Route path="/login"></Route> */}
           {/* <Route path="/person/:id" children={<Person />}></Route>

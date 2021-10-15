@@ -65,10 +65,10 @@ router.get("/edit/:id", async (req, res) => {
 //     }
 // })
 
-// --- POST edit user to db --- //
+// --- PUT edit user to db --- //
 router.put("/edit/:id", async (req, res) => {
   console.log("post route");
-  console.log(req.body);
+  //console.log(req.body);
   // to store messages/errors
   const messages = [];
 
@@ -80,22 +80,33 @@ router.put("/edit/:id", async (req, res) => {
     type: "",
   };
 
-  // User.findOne({ _id: req.body._id })
-  //   .then(() => {
-  //     console.log("user found");
-  //     User.updateOne(req.body).catch((error) => {
-  //       console.log(error);
-  //     });
-  //     console.log("user updated");
-  //     // send response to front end, with redirect information
-  //     messages.push("Success");
-  //     res.send({ ...response, success: true });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     messages.push("A problem has occurred...");
-  //     res.send(response);
-  //   });
+  // var userId = req.body._id;
+
+  // var conditions = {
+  //  _id : userId 
+  // }
+ 
+  var update = {
+    phone: req.body.phone,
+    dob: req.body.dob,
+    zip: req.body.zip,
+    city: req.body.city,
+    state: req.body.state,
+    address1: req.body.address1,
+    address2: req.body.address2
+  }
+ 
+   User.findOneAndUpdate({_id : req.body._id},update,{new: true},function(error,doc){
+     if(error){
+       console.log(`Error on update: ${error}`)
+     }else{
+       console.log("user updated");
+       console.log(doc);
+       // send response to front end, with redirect information
+       messages.push("Success");
+       res.send({ ...response, success: true });
+     }
+   }); 
 
 
 });

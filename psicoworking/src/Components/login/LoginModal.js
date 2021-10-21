@@ -19,6 +19,7 @@ const LoginModal = (props) => {
         <LoginForm
           showmodal={props.showmodal}
           handlemodal={props.handlemodal}
+          handleAuthState={props.handleAuthState}
         />
       </Modal.Body>
     </Modal>

@@ -1,60 +1,56 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-// Navbar
-import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { useState, useMemo } from "react";
+import AuthContext from "./Components/shared/auth-context/AuthContext";
 
 // Routes
-import MainPage from "./Components/main_page/MainPage";
-import SignUp from "./Components/sign_up/SignUp";
-import Dashboard from "./Components/dashboard/Dashboard";
-import Scheduler from "./Components/scheduler/Scheduler";
-import Error from "./Components/error/Error";
+
+import Error from "./Components/error-pages/Error";
 
 // Provisory AUTHORIZATION route
-import UserAuthorization from "./Components/user_authorization/UserAuthorization";
-import ExampleSpinnerError from "./Components/example-spinner-error/ExampleSpinnerError";
+
+import ProtectedRoutes from "./ProtectedRoutes";
+import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
+import MainPage from "./Components/main_page/MainPage";
+import SignUp from "./Components/sign_up/SignUp";
 
 // Main app
 function App() {
+  const [isAuth, setAuth] = useState(false);
+  const value = useMemo(() => ({ isAuth, setAuth }), [isAuth]);
+
   return (
-    <div className="App">
-      <Router>
-        <MainNavbar />
-        <Switch>
-          <Route exact path="/">
-            <MainPage />
-          </Route>
-          <Route path="/about"></Route>
-          <Route path="/pricing"></Route>
-          <Route path="/signup">
-            <SignUp />
-          </Route>
-          <Route
-            exact
-            path="/user/:id"
-            render={(props) => <Dashboard id={props.match.params.id} />}
-          />
-          <Route path="/scheduler">
-            <Scheduler />
-          </Route>
+    <AuthContext.Provider value={value}>
+      <div className="App">
+        <Router>
+          <MainNavbar />
+          <Switch>
+            <Route exact path="/">
+              <MainPage />
+            </Route>
+            <Route exact path="/contact">
+              <h2 className="m-4 text-secondary">Contact us</h2>
+            </Route>
+            <Route exact path="/about">
+              <h2 className="m-4 text-secondary">About us</h2>
+            </Route>
+            <Route exact path="/pricing">
+              <h2 className="m-4 text-secondary">Pricing</h2>
+            </Route>
+            <Route exact path="/signup">
+              <SignUp />
+            </Route>
 
-          {/*for testing...*/}
-          <Route path="/authorization">
-            <UserAuthorization />
-          </Route>
-          <Route path="/example">
-            <ExampleSpinnerError />
-          </Route>
+            <Route path="/dashboard" component={ProtectedRoutes} />
 
-          {/* <Route path="/login"></Route> */}
-          {/* <Route path="/person/:id" children={<Person />}></Route>*/}
-          <Route path="/Error">
-            <Error />
-          </Route>
-        </Switch>
-      </Router>
-    </div>
+            <Route path="/*">
+              <div>PUBLIC ERROR</div>
+              <Error />
+            </Route>
+          </Switch>
+        </Router>
+      </div>
+    </AuthContext.Provider>
   );
 }
 

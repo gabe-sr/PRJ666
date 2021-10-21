@@ -4,23 +4,22 @@
 // Check if user is logged -> req.session.userInfo is not null
 export const isLogged = (req, res, next) => {
   if (req.session.userInfo == null) {
-    console.log(`USER ${req.params.id} IS NOT LOGGED IN`);
-    return res.status(403).send({
+    return res.send({
       error: true,
       redirectTo: { url: `/` },
+      type: "401",
     });
   }
-
   next();
 };
 
 // Check if user is authenticated to access this resource
 export const isAuthenticated = (req, res, next) => {
   if (req.session.userInfo.user_id != req.params.id) {
-    console.log(`USER ${req.params.id} CAN'T ACCESS THIS RESOURCE`);
     return res.send({
       error: true,
       redirectTo: { url: `/user/${req.session.userInfo.user_id}` },
+      type: "403",
     });
   }
 

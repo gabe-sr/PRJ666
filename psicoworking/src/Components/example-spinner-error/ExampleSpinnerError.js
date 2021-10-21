@@ -4,19 +4,19 @@ import WithErrorMessage from "../HOC/error-messages/WithErrorMessage";
 import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
 
 const ExampleSpinnerError = (props) => {
-  const { setErrorMessage, setLoading } = props;
+  const { setErrorMessage, setLoadingSpinner } = props;
   const isLoaded = useRef(false);
 
   useEffect(() => {
     if (!isLoaded.current) {
-      setLoading(false);
+      setLoadingSpinner(false);
       isLoaded.current = true;
     }
-  }, [setLoading]);
+  }, [setLoadingSpinner]);
 
   const handleSpinner = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 2500);
+    setLoadingSpinner(true);
+    setTimeout(() => setLoadingSpinner(false), 2500);
   };
 
   return (

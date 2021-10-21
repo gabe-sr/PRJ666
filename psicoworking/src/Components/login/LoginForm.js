@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { FormField } from "../shared/form-components/FormField";
 import "./LoginForm.css";
 import axios from "axios";
+import WithErrorMessage from "../HOC/error-messages/WithErrorMessage";
+import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
+import AuthContext from "../shared/auth-context/AuthContext";
 
 const LoginForm = (props) => {
   //--- *Yup* validation schema ---//;
@@ -19,48 +22,56 @@ const LoginForm = (props) => {
 
   const history = useHistory();
 
+  const { setAuth } = useContext(AuthContext);
+
+  const { setLoadingSpinner, setErrorMessage } = props;
+
   const handleLoginSubmit = async (values, { setFieldError }) => {
+    setLoadingSpinner(true, "Logging in...");
+
     try {
       const response = await axios.post("/users/login", values);
 
       response.data = { ...response.data, display: false };
       const { success, message, type } = response.data;
-      console.log(response);
+
+      setLoadingSpinner(false);
 
       // If login response is successfull
       if (success) {
         props.handlemodal();
+        setAuth(true);
         history.push({
-          pathname: `/user/${response.data.id}`,
+          pathname: `/dashboard/user/${response.data.id}`,
           state: { ...response.data, display: true },
         });
+        history.go(`/dashboard/user/${response.data.id}`);
 
         // If login response is NOT successfull
       } else {
         // if is a email/password problem...
         if (type === "form") {
-          // setApiError(true);
           setFieldError("password", message);
           setFieldError("email", " ");
 
           // any other error...
         } else {
-          props.handleModal();
-          history.push({
-            pathname: `/`,
-            state: { ...response.data, display: true },
-          });
+          setErrorMessage(
+            true,
+            "Could not log in at this time. Please try again in a few minutes.",
+            "/pricing",
+            { callBack: () => props.handlemodal() }
+          );
         }
       }
     } catch (e) {
-      props.handlemodal();
-      history.push({
-        pathname: "/signup",
-        state: {
-          message: "Something went wrong",
-          display: true,
-        },
-      });
+      setLoadingSpinner(false);
+      setErrorMessage(
+        true,
+        "Could not log in at this time. Please try again in a few minutes.",
+        "/pricing",
+        { callBack: () => props.handlemodal() }
+      );
     }
   };
 
@@ -116,4 +127,4 @@ const LoginForm = (props) => {
   );
 };
 
-export default LoginForm;
+export default WithLoadingSpinner(WithErrorMessage(LoginForm));

@@ -1,6 +1,6 @@
 // Renders the authorization page component
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Container,
   Dropdown,
@@ -14,12 +14,15 @@ import TableData from "../shared/table_data/TableData";
 import "./UserList.css";
 import { useHistory } from "react-router";
 import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
+import WithErrorMessage from "../HOC/error-messages/WithErrorMessage";
 
 const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
 
   // props from HOC to set loading spinner
-  const { setLoading } = props;
+  const { setLoadingSpinner, setErrorMessage } = props;
+
+  const dataIsLoaded = useRef(false);
 
   // ------------- FETCH DATA ------------- //
   // to store all user data fetched from DB
@@ -27,48 +30,66 @@ const UserAuthorization = (props) => {
   const [pendingCount, setPendingCount] = useState();
 
   // (3) get all user data from database
-  const fetchData = async (key) => {
-    setLoading(true);
-    try {
-      const data = await axios.get("http://localhost:8080/users");
-      let sortedData = data.data.sort((a, b) =>
-        a.first_name.toLowerCase() > b.first_name.toLowerCase() ? 1 : -1
-      );
-      if (key === "authorized") {
-        setValues(sortedData.filter((user) => user.active === true));
-      } else if (key === "pending") {
-        setValues(sortedData.filter((user) => user.active === false));
-      } else {
-        setValues(sortedData);
+  const fetchData = useCallback(
+    async (key) => {
+      setLoadingSpinner(true);
+      try {
+        const data = await axios.get("http://localhost:8080/users");
+        let sortedData = data.data.sort((a, b) =>
+          a.first_name.toLowerCase() > b.first_name.toLowerCase() ? 1 : -1
+        );
+        if (key === "authorized") {
+          setValues(sortedData.filter((user) => user.active === true));
+        } else if (key === "pending") {
+          setValues(sortedData.filter((user) => user.active === false));
+        } else {
+          setValues(sortedData);
+        }
+        setLoadingSpinner(false);
+
+        // count number of pending values
+        let countPending = sortedData.filter(
+          (user) => user.active === false
+        ).length;
+        setPendingCount(countPending);
+      } catch (err) {
+        console.log(err);
+        setLoadingSpinner(false);
+        setErrorMessage(
+          true,
+          "The list of users couldn't be retrieved because the server is not responding. Please, try again.",
+          "/"
+        );
       }
-      setLoading(false);
+    },
+    [setLoadingSpinner, setErrorMessage]
+  );
 
-      // count number of pending values
-      let countPending = sortedData.filter(
-        (user) => user.active === false
-      ).length;
-      setPendingCount(countPending);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // will trigger the fetchData() when loading for the first time
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!dataIsLoaded.current) {
+      fetchData();
+      dataIsLoaded.current = true;
+    }
+  }, [fetchData]);
 
   // ------------- TABS COMPONENT ------------- //
   // key is the name of each tab: all users, authorized, pending
   const [key, setKey] = useState("all");
+  const keyChanged = useRef(false);
+
+  const handleKey = (e) => {
+    setKey(e);
+    keyChanged.current = true;
+  };
 
   // re-fetch data each time we change to a different tab, except during initialization
   // because this will be done by the first fetchData call
   useEffect(() => {
-    if (key) {
+    if (keyChanged.current) {
       fetchData(key);
+      keyChanged.current = false;
     }
-  }, [key]);
+  }, [fetchData, key]);
 
   // -------------  AUTHORIZATION/ACTIVE BUTTON  ------------- //
   // this will handle the logic for updating the active status
@@ -98,20 +119,25 @@ const UserAuthorization = (props) => {
   // it checks if user was changed (changeFlag), then send a patch request to the DB
   // then set to true to show the modal message (eg: user <xxx> is authorized...)
   // then fetch the data again to display the updated table
+
+  const userId = userToActivate.user.id;
+  const activeUserStatus = userToActivate.active;
+
+  const patchUser = useCallback(async () => {
+    await axios.patch(
+      `http://localhost:8080/users/update_authorize/${userId}`,
+      { active: activeUserStatus }
+    );
+    setShowModalMessage(true);
+    await fetchData(key);
+  }, [userId, activeUserStatus, key, fetchData]);
+
   useEffect(() => {
     if (!userToActivate.changeFlag) {
-      const patchUser = async () => {
-        await axios.patch(
-          `http://localhost:8080/users/update_authorize/${userToActivate.user._id}`,
-          { active: userToActivate.active }
-        );
-        setShowModalMessage(true);
-        await fetchData(key);
-      };
       patchUser();
       setUserToActivate({ ...userToActivate, changeFlag: true });
     }
-  }, [userToActivate, key]);
+  }, [userToActivate, patchUser]);
 
   // This is to display the GREEN/RED button and DROPDOWN for the Active column
   // it returns a single cell component that can be passed inside a row
@@ -146,7 +172,7 @@ const UserAuthorization = (props) => {
   const history = useHistory();
 
   const displayUser = (user) => {
-    const path = `/user/${user._id}`;
+    const path = `/dashboard/user/${user._id}`;
     history.push(path);
   };
 
@@ -176,7 +202,7 @@ const UserAuthorization = (props) => {
             <Tabs
               className="users-filter-tab mb-4"
               activeKey={key}
-              onSelect={(e) => setKey(e)}
+              onSelect={(e) => handleKey(e)}
             >
               <Tab eventKey="all" title="All users"></Tab>
               <Tab eventKey="authorized" title="Authorized"></Tab>
@@ -223,6 +249,6 @@ const UserAuthorization = (props) => {
 };
 
 export default WithLoadingSpinner(
-  UserAuthorization,
+  WithErrorMessage(UserAuthorization),
   "Loading authorization list"
 );

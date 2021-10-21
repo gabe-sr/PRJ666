@@ -91,8 +91,6 @@ const UserProfile = (props) => {
       // destructuring the response data from API
       const { success, redirectURL } = response.data;
 
-      console.log(response);
-
       if (success) {
         history.push({
           pathname: redirectURL,

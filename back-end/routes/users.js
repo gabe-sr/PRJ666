@@ -41,6 +41,7 @@ router.get("/:id", isLogged, isAuthenticated, async (req, res) => {
     res.send(user);
   } catch (err) {
     console.log(err);
+    res.send(user);
   }
 });
 

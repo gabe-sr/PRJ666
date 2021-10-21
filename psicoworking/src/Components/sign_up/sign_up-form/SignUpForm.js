@@ -6,8 +6,9 @@ import { state_uf_data } from "./state_uf_data";
 import "./Signupform.css";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import WithLoadingSpinner from "../../HOC/loading-spinner/WithLoadingSpinner";
 
-const SignUpForm = () => {
+const SignUpForm = (props) => {
   // --- This will handle the autocomplete delimiters in form ---/
   const [crpDelimiter, setCrpDelimiter] = useState(false);
   const [phoneDelimiter, setPhoneDelimiter] = useState(false);
@@ -120,14 +121,12 @@ const SignUpForm = () => {
   }, [apiError]);
 
   // ---- Handle form submit ---- //
-  const handleSubmitForm = async (values, { setFieldError }) => {
-    // values = {
-    //   ...values,
-    //   address: `${values.address1},${values.address2},${values.city},${values.state},${values.zip}`,
-    // };
+  const { setLoadingSpinner } = props;
 
+  const handleSubmitForm = async (values, { setFieldError }) => {
     // Fetch data from API
     try {
+      setLoadingSpinner(true, "Submitting user information...");
       const response = await axios({
         method: "post",
         url: "http://localhost:8080/users",
@@ -141,11 +140,12 @@ const SignUpForm = () => {
       const { success, message, redirectURL, type } = response.data;
       console.log(response.data);
 
+      setLoadingSpinner(false);
+
       // if response is not success
       // in case of an "email" error, it setApiError to true, which will call the scroll up function
       // if any other error, it redirects to "redirectURL", using history.push()
       if (!success) {
-        //
         if (type === "email") {
           setApiError(true);
           setFieldError(type, message);
@@ -166,6 +166,7 @@ const SignUpForm = () => {
 
       // if API call fails, shows an error message and redirects to /signup
     } catch (e) {
+      setLoadingSpinner(false);
       history.push({
         pathname: "/signup",
         state: {
@@ -324,4 +325,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default WithLoadingSpinner(SignUpForm);

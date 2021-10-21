@@ -82,8 +82,8 @@ const SignUpModal = (props) => {
               </p>
             ) : (
               <p>
-                We could not proccess your registration this time. Please, try
-                again or contact us for more information.
+                We could not proccess your registration at this time. Please,
+                try again or contact us for more information.
               </p>
             )}
           </Modal.Body>

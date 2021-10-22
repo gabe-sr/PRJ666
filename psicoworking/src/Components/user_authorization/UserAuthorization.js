@@ -34,7 +34,7 @@ const UserAuthorization = (props) => {
     async (key) => {
       setLoadingSpinner(true);
       try {
-        const data = await axios.get("http://localhost:8080/users");
+        const data = await axios.get("/users");
         let sortedData = data.data.sort((a, b) =>
           a.first_name.toLowerCase() > b.first_name.toLowerCase() ? 1 : -1
         );
@@ -187,7 +187,7 @@ const UserAuthorization = (props) => {
   // (4) - Customized table component
 
   return (
-    <Container className="m-4 w-75">
+    <Container>
       {/* (1) */}
       {values ? (
         showModalMessage ? (

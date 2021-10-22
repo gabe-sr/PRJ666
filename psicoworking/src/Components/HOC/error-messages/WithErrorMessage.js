@@ -27,7 +27,9 @@ const WithErrorMessage = (WrappedComponent) => {
           callBack.callBack();
         } else if (redirectUrl) {
           history.push(redirectUrl);
-        } else setShowError(false);
+        } else {
+          setShowError(false);
+        }
       };
 
       if (showError) {

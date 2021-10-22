@@ -9,7 +9,7 @@ import fetch from "node-fetch"; // authentication middlewares
 // -------- ROUTES DEFINITIONS -------- //
 
 // Get all users in DB
-router.get("/", async (req, res) => {
+router.get("/", isLogged, isAuthenticated, async (req, res) => {
   try {
     const users = await User.find().sort({ fist_name: "desc" });
     res.send(users);
@@ -41,7 +41,7 @@ router.get("/:id", isLogged, isAuthenticated, async (req, res) => {
     res.send(user);
   } catch (err) {
     console.log(err);
-    res.send(user);
+    res.send(err.response.message);
   }
 });
 
@@ -50,23 +50,55 @@ router.get("/edit/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
 });
 
-// Get one user by user_id (!=id) (WIP)
-// router.get('/:first_name', async (req,res) =>{
-//     try {
-//         console.log( req.params.user_id )
-//         // const user = await User.findOne({ user_id: req.params.user_id })
-//         const user = await User.findOne( { first_name: req.params.first_name} ) //possible to search by name, but not by user_id
-//         // res.send(user)
-//         console.log(user)
-//     } catch (err) {
-//         console.log(err)
-//     }
-// })
+// --- PUT edit user to db --- //
+router.put("/edit/:id", async (req, res) => {
+  // to store messages/errors
+  const messages = [];
+
+  // the body response to front end
+  const response = {
+    success: false,
+    message: messages,
+    redirectURL: `/dashboard/user/${req.body._id}`,
+    type: "",
+  };
+
+  // var userId = req.body._id;
+
+  // var conditions = {
+  //  _id : userId
+  // }
+
+  var update = {
+    phone: req.body.phone,
+    dob: req.body.dob,
+    zip: req.body.zip,
+    city: req.body.city,
+    state: req.body.state,
+    address1: req.body.address1,
+    address2: req.body.address2,
+  };
+
+  User.findOneAndUpdate(
+    { _id: req.body._id },
+    update,
+    { new: true },
+    function (error, doc) {
+      if (error) {
+        console.log(`Error on update: ${error}`);
+      } else {
+        console.log("user updated");
+        console.log(doc);
+        // send response to front end, with redirect information
+        messages.push("Success");
+        res.send({ ...response, success: true });
+      }
+    }
+  );
+});
 
 // --- POST edit user to db --- //
 router.post("/edit/:id", async (req, res) => {
-  console.log("post route");
-  console.log(req.body);
   // to store messages/errors
   const messages = [];
 
@@ -189,30 +221,27 @@ router.post("/login", async (req, res) => {
     // if email exists and password is correct, proceed with session creation
 
     // if user is a normal user (not an admin)
-    if (dbUser.isAdmin === false) {
-      console.log(dbUser._id.toString());
-      //add user_id to cookie
-      req.session.userInfo = { user_id: dbUser._id.toString() };
+    // if (dbUser.isAdmin === false) {
+    console.log(dbUser._id.toString());
+    //add user_id to cookie
+    req.session.userInfo = { user_id: dbUser._id.toString() };
 
-      // **** temporary for testing **** //
-      // res.redirect(`${dbUser._id}`);
-
-      if (req.session.userInfo) {
-        console.error("Session created");
-        return res.send({
-          success: true,
-          message: "Session created",
-          type: "",
-          id: dbUser._id,
-        });
-      } else {
-        console.error("Authentication error");
-        return res.send({
-          ...response,
-          message: "Authentication error",
-        });
-      }
+    if (req.session.userInfo) {
+      console.error("Session created");
+      return res.send({
+        success: true,
+        message: "Session created",
+        type: "",
+        id: dbUser._id,
+      });
+    } else {
+      console.error("Authentication error");
+      return res.send({
+        ...response,
+        message: "Authentication error",
+      });
     }
+    //// }
 
     // TO-DO: crate admin session
     //....

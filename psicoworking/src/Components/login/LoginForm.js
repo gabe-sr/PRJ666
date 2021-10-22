@@ -30,22 +30,24 @@ const LoginForm = (props) => {
     setLoadingSpinner(true, "Logging in...");
 
     try {
-      const response = await axios.post("/users/login", values);
+      const response = await axios.post("/authentication/login", values);
 
       response.data = { ...response.data, display: false };
       const { success, message, type } = response.data;
 
       setLoadingSpinner(false);
 
+      console.log(response);
+
       // If login response is successfull
       if (success) {
         props.handlemodal();
         setAuth(true);
         history.push({
-          pathname: `/dashboard/user/${response.data.id}`,
+          pathname: `/dashboard`,
           state: { ...response.data, display: true },
         });
-        history.go(`/dashboard/user/${response.data.id}`);
+        history.go(`/dashboard`);
 
         // If login response is NOT successfull
       } else {

@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Navbar, Nav } from "react-bootstrap";
 import { Link, NavLink, useHistory } from "react-router-dom";
 import "./MainNavbar.css";
 import LoginModal from "../../../login/LoginModal";
-import useAuthentication from "../../../../useAuthentication";
+import useAuthentication from "../../hook/useAuthentication";
 import axios from "axios";
 import WithLoadingSpinner from "../../../HOC/loading-spinner/WithLoadingSpinner";
 
@@ -11,15 +11,13 @@ const MainNavbar = (props) => {
   // tracks the state of the modal (open/closed)
   const [showModal, setShowModal] = useState(false);
 
-  // this callback is sent to Child component, so when modal is closed there
-  // it calls this function and set the modal status back to closed
-  // so the modal is ready to be opened again
   const handleLoginModal = () => {
     setShowModal(!showModal);
   };
 
   const history = useHistory();
 
+  // custom hook to check if user is/not authenticated (render different navbar links)
   const { isAuth, isLoading } = useAuthentication();
 
   const handleLogout = async () => {
@@ -54,9 +52,17 @@ const MainNavbar = (props) => {
           <Navbar.Collapse className="justify-content-end">
             <Nav>
               <Nav.Link
-                key={"Contact"}
+                key={"Home"}
                 as={NavLink}
-                to="/contact"
+                to="/"
+                className="nav-template pb-0 customColor"
+              >
+                {!isLoading ? `Home` : null}
+              </Nav.Link>
+              <Nav.Link
+                key={"Dashboard"}
+                as={NavLink}
+                to="/dashboard"
                 className="nav-template pb-0 customColor"
               >
                 {!isLoading ? `My Dashboard` : null}

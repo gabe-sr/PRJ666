@@ -1,6 +1,6 @@
 .nav-template {
   background-color: #f39a71;
-  padding: 3% 12% 3vw 15%;
+  padding: 3% 12% 3vw 8%;
 }
 .nav-username {
   font-size: 1.5rem;
@@ -24,5 +24,7 @@
 @media (min-width: 992px) {
   .nav-template-link {
     width: 9vw;
+    padding-right: 0.5rem;
+    padding-left: 2.5rem;
   }
 }

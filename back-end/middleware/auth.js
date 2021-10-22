@@ -10,12 +10,29 @@ export const isLogged = (req, res, next) => {
       type: "401",
     });
   }
+
   next();
 };
 
 // Check if user is authenticated to access this resource
 export const isAuthenticated = (req, res, next) => {
   if (req.session.userInfo.user_id != req.params.id) {
+    if (req.session.userInfo.isAdmin === true) {
+      next();
+    } else {
+      return res.send({
+        error: true,
+        redirectTo: { url: `/dashboard/user/${req.session.userInfo.user_id}` },
+        type: "403",
+      });
+    }
+  } else {
+    next();
+  }
+};
+
+const isAdmin = (req, res, next) => {
+  if (req.session.userInfo.isAdmin === false) {
     return res.send({
       error: true,
       redirectTo: { url: `/user/${req.session.userInfo.user_id}` },
@@ -25,15 +42,6 @@ export const isAuthenticated = (req, res, next) => {
 
   next();
 };
-
-// const isAdmin = (req, res, next) => {
-//   if (req.session.userInfo.type.toLowerCase() != "admin") {
-//     res.redirect(`/user/404`);
-//   } else {
-//     //console.log(`Logged as ${req.session.userInfo.first_name} ADMIN!`);
-//     next();
-//   }
-// };
 
 // const isUser = (req, res, next) => {
 //   if (req.session.userInfo.type.toLowerCase() != "user") {

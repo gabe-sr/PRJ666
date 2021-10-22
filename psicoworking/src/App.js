@@ -4,18 +4,15 @@ import { useState, useMemo } from "react";
 import AuthContext from "./Components/shared/auth-context/AuthContext";
 
 // Routes
-
-import Error from "./Components/error-pages/Error";
-
-// Provisory AUTHORIZATION route
-
-import ProtectedRoutes from "./ProtectedRoutes";
+import ProtectedRoutes from "./Components/routes/ProtectedRoutes";
 import MainNavbar from "./Components/shared/navbar/main_navbar/MainNavbar";
 import MainPage from "./Components/main_page/MainPage";
 import SignUp from "./Components/sign_up/SignUp";
+import Error from "./Components/error-pages/Error";
 
 // Main app
 function App() {
+  // useContext to pass auth status to all child components from <App/>
   const [isAuth, setAuth] = useState(false);
   const value = useMemo(() => ({ isAuth, setAuth }), [isAuth]);
 

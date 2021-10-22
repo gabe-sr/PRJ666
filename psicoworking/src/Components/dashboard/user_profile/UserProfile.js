@@ -1,20 +1,21 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
-import { FormField } from "../shared/form-components/FormField";
-import { state_uf_data } from "../sign_up/sign_up-form/state_uf_data";
+import { FormField } from "../../shared/form-components/FormField";
+import { state_uf_data } from "../../sign_up/sign_up-form/state_uf_data";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./UserProfile.css";
 import { useHistory } from "react-router-dom";
+import useFetchUser from "../../shared/hook/useFetchUser";
+import SpinnerLoading from "../../shared/spinner/SpinnerLoading";
+import Error from "../../error-pages/Error";
+import WithErrorMessage from "../../HOC/error-messages/WithErrorMessage";
 
 const UserProfile = (props) => {
   // --- This will handle the autocomplete delimiters in form ---/
   const [phoneDelimiter, setPhoneDelimiter] = useState(false);
-  const [user, setUser] = React.useState({ ...props.user });
 
-  React.useEffect(() => {
-    setUser(props.user);
-  }, [props.user]);
+  const { fetchedUser, isLoading, error } = useFetchUser(props.id);
 
   const phoneDelimiterHandle = () => {
     const { phone } = formRef.current.values;
@@ -75,12 +76,14 @@ const UserProfile = (props) => {
   // enables history object: allows redirection after POST
   let history = useHistory();
 
+  const { setErrorMessage } = props;
+
   // ---- Handle form submit ---- //
   const handleSubmitForm = async (values) => {
     // Fetch data from API
     try {
       const response = await axios({
-        method: "post",
+        method: "put",
         url: `/users/edit/${values._id}`,
         data: values,
       });
@@ -92,10 +95,8 @@ const UserProfile = (props) => {
       const { success, redirectURL } = response.data;
 
       if (success) {
-        history.push({
-          pathname: redirectURL,
-          state: { ...response.data, display: true },
-        });
+        setErrorMessage(true, "User successfully updated.");
+        //window.scrollTo(0, 0);
       } else {
         history.push({
           pathname: redirectURL,
@@ -106,7 +107,7 @@ const UserProfile = (props) => {
       // if API call fails, shows an error message and redirects
     } catch (e) {
       history.push({
-        pathname: `/user/${values._id}`,
+        pathname: `dashboard/user/${values._id}`,
         state: {
           message: "Something went wrong",
           display: true,
@@ -114,19 +115,37 @@ const UserProfile = (props) => {
       });
     }
   };
+
+  const handleAdminDisabled = () => {
+    if (fetchedUser._id === props.user._id) {
+      return false;
+    } else if (props.user.isAdmin && fetchedUser._id === props.user._id) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  if (isLoading) {
+    return <SpinnerLoading message="Loading profile..." />;
+  }
+  if (error.status === true) {
+    return <Error type={error.type} />;
+  }
+
   return (
     <div className="p-3 py-5">
       <div className="d-flex justify-content-between mb-3">
         <h4>
-          {user.first_name} {user.last_name}
+          {fetchedUser.first_name} {fetchedUser.last_name}
         </h4>
-        {user.active && (
+        {fetchedUser.active && (
           <div>
             Account Status:{" "}
             <span className="badge badge-pill badge-success ml-2">Active</span>
           </div>
         )}
-        {!user.active && (
+        {!fetchedUser.active && (
           <div>
             Account Status:{" "}
             <span className="badge badge-pill bg-danger ml-2">Inactive</span>
@@ -138,17 +157,17 @@ const UserProfile = (props) => {
         <Formik
           innerRef={formRef}
           initialValues={{
-            _id: user._id,
-            crp_no: user.crp_no,
-            phone: user.phone,
-            email: user.email,
-            dob: user.dob,
-            zip: user.zip,
-            city: user.city,
-            state: user.state,
-            address1: user.address1,
-            address2: user.address2,
-            cpf_no: user.cpf_no,
+            _id: fetchedUser._id,
+            crp_no: fetchedUser.crp_no,
+            phone: fetchedUser.phone,
+            email: fetchedUser.email,
+            dob: fetchedUser.dob,
+            zip: fetchedUser.zip,
+            city: fetchedUser.city,
+            state: fetchedUser.state,
+            address1: fetchedUser.address1,
+            address2: fetchedUser.address2,
+            cpf_no: fetchedUser.cpf_no,
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmitForm}
@@ -181,6 +200,7 @@ const UserProfile = (props) => {
                   maxLength="13"
                   placeholder="00-00000-0000"
                   onKeyUp={() => phoneDelimiterHandle()}
+                  disabled={handleAdminDisabled()}
                 />
 
                 <FormField
@@ -188,6 +208,7 @@ const UserProfile = (props) => {
                   label="Date of Birth"
                   name="dob"
                   type="date"
+                  disabled={handleAdminDisabled()}
                 />
                 <div className="form-row">
                   <div className="form-group col-md-3">
@@ -198,6 +219,7 @@ const UserProfile = (props) => {
                       maxLength="8"
                       name="zip"
                       onKeyUp={(e) => handleFetchZip()}
+                      disabled={handleAdminDisabled()}
                     />
                   </div>
 
@@ -208,6 +230,7 @@ const UserProfile = (props) => {
                       type="text"
                       maxLength="30"
                       name="city"
+                      disabled={handleAdminDisabled()}
                     />
                   </div>
 
@@ -219,6 +242,7 @@ const UserProfile = (props) => {
                       id="inputState"
                       className="form-control"
                       name="state"
+                      disabled={handleAdminDisabled()}
                     />
                   </div>
                 </div>
@@ -229,6 +253,7 @@ const UserProfile = (props) => {
                   name="address1"
                   type="text"
                   placeholder="Main St"
+                  disabled={handleAdminDisabled()}
                 />
                 <FormField
                   formType="input"
@@ -236,20 +261,25 @@ const UserProfile = (props) => {
                   name="address2"
                   type="text"
                   placeholder="Number, Apartment, studio, or floor"
+                  disabled={handleAdminDisabled()}
                 />
 
-                <button
-                  className="btn btn-outline-primary mt-3 mr-4 mb-4"
-                  type="submit"
-                >
-                  Save Changes
-                </button>
-                <button
-                  className="btn btn-outline-danger mt-3 ml-3 mb-4"
-                  type="reset"
-                >
-                  Reset Form
-                </button>
+                {handleAdminDisabled() === true ? null : (
+                  <>
+                    <button
+                      className="btn btn-outline-primary mt-3 mr-4 mb-4"
+                      type="submit"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      className="btn btn-outline-danger mt-3 ml-3 mb-4"
+                      type="reset"
+                    >
+                      Reset Form
+                    </button>
+                  </>
+                )}
               </Form>
             </div>
           )}
@@ -259,4 +289,4 @@ const UserProfile = (props) => {
   );
 };
 
-export default UserProfile;
+export default WithErrorMessage(UserProfile);

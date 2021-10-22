@@ -9,11 +9,14 @@
     "axios": "^0.21.4",
     "bootstrap": "^5.1.2",
     "date-fns": "^2.25.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-rc.0",
-    "react-calendar": "^3.4.0",
+    "react-day-picker": "^7.4.10",
     "react-dom": "^17.0.2",
+    "react-icons": "^4.3.1",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "string-mask": "^0.3.0",
@@ -29,7 +32,8 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:react-hooks/recommended"
     ]
   },
   "browserslist": {

@@ -9,9 +9,9 @@ router.get("/:slug", async (req, res) => {
   try {
     const room = await Room.findOne({ slug: req.params.slug });
     // inform user if not fount etc...
-    req.send(room);
+    res.send(room);
   } catch (err) {
-    Console.log(err);
+    console.log(err);
   }
 });
 

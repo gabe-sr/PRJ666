@@ -5,10 +5,12 @@ const router = express.Router();
 import bcrypt from "bcryptjs"; // to hash passwords
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 import fetch from "node-fetch"; // authentication middlewares
+import { transporter } from "../email-notification/email.js";
+import { mailOptionsReview } from "../email-notification/email.js";
 
 // -------- ROUTES DEFINITIONS -------- //
 
-// Get all users in DB
+// ----- GET ALL USERS IN DB ------ //
 router.get("/", isLogged, isAuthenticated, async (req, res) => {
   try {
     const users = await User.find().sort({ fist_name: "desc" });
@@ -19,21 +21,7 @@ router.get("/", isLogged, isAuthenticated, async (req, res) => {
   }
 });
 
-// **** USE THIS FOR TESTING, NO AUTH **** //
-router.get("/test/:id", async (req, res) => {
-  try {
-    console.log(JSON.stringify(req.params.id));
-    // const user = await User.findOne({ user_id: req.params.user_id })
-    const user = await User.findById(req.params.id);
-    res.send(user);
-    //link to front end, sending object
-    console.log(user);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-// Get one user by id
+// ----- GET ONE USER BY ID ------ //
 router.get("/:id", isLogged, isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -50,7 +38,7 @@ router.get("/edit/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
 });
 
-// --- PUT edit user to db --- //
+// ----- PUT: EDIT USER TO DB ------ //
 router.put("/edit/:id", async (req, res) => {
   // to store messages/errors
   const messages = [];
@@ -97,7 +85,7 @@ router.put("/edit/:id", async (req, res) => {
   );
 });
 
-// --- POST edit user to db --- //
+// ----- POST EDIT USER TO DB ------ //
 router.post("/edit/:id", async (req, res) => {
   // to store messages/errors
   const messages = [];
@@ -128,7 +116,7 @@ router.post("/edit/:id", async (req, res) => {
     });
 });
 
-// --- POST user to db --- //
+// ----- POST USER TO DB ------ //
 router.post("/", async (req, res) => {
   // to store messages/errors
   const messages = [];
@@ -166,6 +154,17 @@ router.post("/", async (req, res) => {
       // save user in DB
       user = await user.save();
       console.log(user);
+
+      // SEND EMAIL NOTIFICATION
+      transporter.sendMail(
+        mailOptionsReview(`${user.email}`),
+        (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+          console.log("Message sent: %s", info.messageId);
+        }
+      );
 
       // send response to front end, with redirect information
       messages.push("Success");
@@ -263,31 +262,6 @@ router.patch("/update_authorize/:id", async (req, res) => {
     res.send({ success: true, activeStatus: user.active });
   } catch (err) {
     res.send({ success: false });
-    console.log(err);
-  }
-});
-
-router.put("/:id", async (req, res) => {
-  try {
-    let user = await User.findById(req.params.id);
-    (user.user_id = req.body.user_id),
-      (user.active = req.body.active),
-      (user.first_name = req.body.first_name),
-      (user.last_name = req.body.last_name),
-      (user.loginStatus = req.body.loginStatus),
-      (user.crp_no = req.body.crp_no),
-      (user.email = req.body.email),
-      (user.phone = req.body.phone),
-      (user.address = req.body.address),
-      (user.dob = req.body.dob),
-      (user.password = req.body.password),
-      (user.dateCreated = req.body.dateCreated),
-      (user.cpf_no = req.body.cpf_no),
-      (user.methodology = req.body.methodology);
-
-    user = await user.save();
-    res.redirect(`/users/${user._id}`);
-  } catch (err) {
     console.log(err);
   }
 });

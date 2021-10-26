@@ -61,6 +61,19 @@ mongoose
     console.log(`MongoDB connection failed: ${err}`);
   });
 
+// import { transporter } from "./email.js";
+// import { mailOptionsReview } from "./email.js";
+
+// transporter.sendMail(
+//   mailOptionsReview("guilherme@email.com"),
+//   (error, info) => {
+//     if (error) {
+//       return console.log(error);
+//     }
+//     console.log("Message sent: %s", info.messageId);
+//   }
+// );
+
 // Set server to listen at specific port
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

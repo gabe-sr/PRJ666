@@ -13,6 +13,7 @@ router.post("/login", async (req, res) => {
     message: "",
     type: "",
     id: "",
+    isActive: false,
   };
   console.log(req.body);
   // data received from the front end
@@ -43,10 +44,18 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // if email exists and password is correct, proceed with session creation
+    // if user is not activated, a message will be displayed
+    if (dbUser.active === false) {
+      return res.send({
+        success: true,
+        message: "User is not activated",
+        type: "",
+        id: dbUser._id,
+        active: false,
+      });
+    }
 
-    // if user is a normal user (not an admin)
-    // if (dbUser.isAdmin === false) {
+    // if email exists and password is correct, proceed with session creation
     console.log(dbUser._id.toString());
     //add user info to the cookie
     req.session.userInfo = {
@@ -61,6 +70,7 @@ router.post("/login", async (req, res) => {
         message: "Session created",
         type: "",
         id: dbUser._id,
+        active: true,
       });
     } else {
       console.error("Authentication error");
@@ -69,10 +79,6 @@ router.post("/login", async (req, res) => {
         message: "Authentication error",
       });
     }
-    //// }
-
-    // TO-DO: crate admin session
-    //....
   } catch (err) {
     console.log(err);
   }

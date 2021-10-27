@@ -2,23 +2,31 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 
-const WithErrorMessage = (WrappedComponent) => {
+const WithMessage = (WrappedComponent) => {
   const HOC = (props) => {
-    const [showError, setShowError] = useState(false);
-    const [message, setMessage] = useState();
+    const [showMessage, setShowMessage] = useState(false);
+    const [messageHeader, setMessageHeader] = useState();
+    const [messageBody, setMessageBody] = useState();
     const [redirectUrl, setRedirect] = useState();
     const [callBack, setCallBack] = useState();
 
     const history = useHistory();
 
-    const setErrorMessage = (isError, message, redirect, callback) => {
-      setShowError(isError);
-      setMessage(message);
+    const setModalMessage = (
+      showMessage,
+      header,
+      message,
+      redirect,
+      callback
+    ) => {
+      setShowMessage(showMessage);
+      setMessageHeader(header);
+      setMessageBody(message);
       setRedirect(redirect);
       setCallBack(callback);
     };
 
-    const ErrorModal = () => {
+    const MessageModal = () => {
       const handleButton = () => {
         if (callBack) {
           if (redirectUrl) {
@@ -28,15 +36,15 @@ const WithErrorMessage = (WrappedComponent) => {
         } else if (redirectUrl) {
           history.push(redirectUrl);
         } else {
-          setShowError(false);
+          setShowMessage(false);
         }
       };
 
-      if (showError) {
+      if (showMessage) {
         return (
           <Modal
             size="lg"
-            show={showError}
+            show={showMessage}
             fullscreen={"lg-down"}
             backdrop="static"
             keyboard={false}
@@ -44,10 +52,10 @@ const WithErrorMessage = (WrappedComponent) => {
           >
             <Modal.Header>
               <Modal.Title className="text-secondary">
-                Something went wrong
+                {messageHeader}
               </Modal.Title>
             </Modal.Header>
-            <Modal.Body>{message}</Modal.Body>
+            <Modal.Body>{messageBody}</Modal.Body>
             <Modal.Footer className="justify-content-center">
               <Button variant="secondary" onClick={handleButton}>
                 Continue
@@ -60,12 +68,12 @@ const WithErrorMessage = (WrappedComponent) => {
 
     return (
       <>
-        {showError && <ErrorModal />}
-        <WrappedComponent {...props} setErrorMessage={setErrorMessage} />
+        {showMessage && <MessageModal />}
+        <WrappedComponent {...props} setModalMessage={setModalMessage} />
       </>
     );
   };
   return HOC;
 };
 
-export default WithErrorMessage;
+export default WithMessage;

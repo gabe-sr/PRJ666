@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 import useFetchUser from "../../shared/hook/useFetchUser";
 import SpinnerLoading from "../../shared/spinner/SpinnerLoading";
 import Error from "../../error-pages/Error";
-import WithErrorMessage from "../../HOC/error-messages/WithErrorMessage";
+import WithMessage from "../../HOC/modal-messages/WithMessage";
 
 const UserProfile = (props) => {
   // --- This will handle the autocomplete delimiters in form ---/
@@ -76,7 +76,7 @@ const UserProfile = (props) => {
   // enables history object: allows redirection after POST
   let history = useHistory();
 
-  const { setErrorMessage } = props;
+  const { setModalMessage } = props;
 
   // ---- Handle form submit ---- //
   const handleSubmitForm = async (values) => {
@@ -95,7 +95,7 @@ const UserProfile = (props) => {
       const { success, redirectURL } = response.data;
 
       if (success) {
-        setErrorMessage(true, "User successfully updated.");
+        setModalMessage(true, "Success", "User successfully updated.");
         //window.scrollTo(0, 0);
       } else {
         history.push({
@@ -289,4 +289,4 @@ const UserProfile = (props) => {
   );
 };
 
-export default WithErrorMessage(UserProfile);
+export default WithMessage(UserProfile);

@@ -14,13 +14,13 @@ import TableData from "../shared/table_data/TableData";
 import "./UserList.css";
 import { useHistory } from "react-router";
 import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
-import WithErrorMessage from "../HOC/error-messages/WithErrorMessage";
+import WithMessage from "../HOC/modal-messages/WithMessage";
 
 const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
 
   // props from HOC to set loading spinner
-  const { setLoadingSpinner, setErrorMessage } = props;
+  const { setLoadingSpinner, setModalMessage } = props;
 
   const dataIsLoaded = useRef(false);
 
@@ -55,14 +55,15 @@ const UserAuthorization = (props) => {
       } catch (err) {
         console.log(err);
         setLoadingSpinner(false);
-        setErrorMessage(
+        setModalMessage(
           true,
+          "Something went wrong",
           "The list of users couldn't be retrieved because the server is not responding. Please, try again.",
           "/"
         );
       }
     },
-    [setLoadingSpinner, setErrorMessage]
+    [setLoadingSpinner, setModalMessage]
   );
 
   useEffect(() => {
@@ -249,6 +250,6 @@ const UserAuthorization = (props) => {
 };
 
 export default WithLoadingSpinner(
-  WithErrorMessage(UserAuthorization),
+  WithMessage(UserAuthorization),
   "Loading authorization list"
 );

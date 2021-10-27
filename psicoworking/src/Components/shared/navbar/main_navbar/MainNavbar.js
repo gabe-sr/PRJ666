@@ -51,21 +51,46 @@ const MainNavbar = (props) => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="justify-content-end">
             <Nav>
-              <Nav.Link
+              {/* <Nav.Link
                 key={"Home"}
                 as={NavLink}
                 to="/"
                 className="nav-template pb-0 customColor"
               >
                 {!isLoading ? `Home` : null}
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 key={"Dashboard"}
                 as={NavLink}
                 to="/dashboard"
-                className="nav-template pb-0 customColor"
+                className="nav-template-link md-auto customColor"
               >
-                {!isLoading ? `My Dashboard` : null}
+                {!isLoading ? `Dashboard` : null}
+              </Nav.Link>
+
+              <Nav.Link
+                key={"Contact"}
+                as={NavLink}
+                to="/contact"
+                className="nav-template-link md-auto customColor"
+              >
+                Contact
+              </Nav.Link>
+              <Nav.Link
+                key={"About us"}
+                as={NavLink}
+                to="/about"
+                className="nav-template-link md-auto customColor"
+              >
+                About us
+              </Nav.Link>
+              <Nav.Link
+                key={"Pricing"}
+                as={NavLink}
+                to="/pricing"
+                className="nav-template-link md-auto customColor"
+              >
+                Pricing
               </Nav.Link>
 
               <Nav.Link
@@ -73,7 +98,7 @@ const MainNavbar = (props) => {
                 className="nav-template-link pb-0 customColor"
                 onClick={handleLogout}
               >
-                Logout
+                Sign Out
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -129,14 +154,14 @@ const MainNavbar = (props) => {
                 to="/signup"
                 className="nav-template-link md-auto customColor"
               >
-                Sign Up
+                Sign up
               </Nav.Link>
               <Nav.Link
                 key={"Login"}
                 className="nav-template-link md-auto customColor"
                 onClick={handleLoginModal}
               >
-                Login
+                Log in
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>

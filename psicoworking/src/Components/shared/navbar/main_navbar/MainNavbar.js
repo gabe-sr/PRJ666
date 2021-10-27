@@ -168,17 +168,7 @@ const MainNavbar = (props) => {
     );
   };
 
-  // if (isAuth) {
-  //   return <ProtectedNavbar />;
-  // }
-  // return <PublicNavbar />;
-
   if (isLoading) {
-    // if (isAuth) {
-    //   return <ProtectedNavbar />;
-    // } else {
-    //   return <PublicNavbar />;
-    // }
     return <EmptyNavbar />;
   } else {
     return <>{isAuth ? <ProtectedNavbar /> : <PublicNavbar />}</>;

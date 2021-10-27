@@ -7,6 +7,7 @@ import Error from "../error-pages/Error";
 import useAuthentication from "../shared/hook/useAuthentication";
 import Sidebar from "../dashboard/sidebar/Sidebar";
 import UserProfile from "../dashboard/user_profile/UserProfile";
+import axios from "axios";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -24,6 +25,8 @@ const ProtectedRoutes = ({ match }) => {
   // Otherwise, load protected routes
   if (!isAuth) {
     return <Error type="401" />;
+  } else if (!data.active) {
+    return <div>User not activated!</div>;
   } else {
     //
     return (

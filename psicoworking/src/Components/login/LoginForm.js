@@ -1,13 +1,11 @@
-import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { FormField } from "../shared/form-components/FormField";
 import "./LoginForm.css";
 import axios from "axios";
-import WithErrorMessage from "../HOC/error-messages/WithErrorMessage";
+import WithMessage from "../HOC/modal-messages/WithMessage";
 import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
-import AuthContext from "../shared/auth-context/AuthContext";
 
 const LoginForm = (props) => {
   //--- *Yup* validation schema ---//;
@@ -22,9 +20,7 @@ const LoginForm = (props) => {
 
   const history = useHistory();
 
-  const { setAuth } = useContext(AuthContext);
-
-  const { setLoadingSpinner, setErrorMessage } = props;
+  const { setLoadingSpinner, setModalMessage } = props;
 
   const handleLoginSubmit = async (values, { setFieldError }) => {
     setLoadingSpinner(true, "Logging in...");
@@ -33,16 +29,24 @@ const LoginForm = (props) => {
       const response = await axios.post("/authentication/login", values);
 
       response.data = { ...response.data, display: false };
-      const { success, message, type } = response.data;
+      const { success, message, type, active } = response.data;
 
       setLoadingSpinner(false);
 
-      console.log(response);
+      // if login response is successfull but user is NOT activated
+      if (!active && success) {
+        setModalMessage(
+          true,
+          "User is not Activated",
+          "Your application is currently under review by our team. This process may take up to 48 hours to be concluded. Please, try again later.",
+          "/",
+          { callBack: () => props.handlemodal() }
+        );
 
-      // If login response is successfull
-      if (success) {
+        // If login response is successfull and user IS ACTIVATED
+      } else if (success) {
         props.handlemodal();
-        setAuth(true);
+
         history.push({
           pathname: `/dashboard`,
           state: { ...response.data, display: true },
@@ -58,18 +62,20 @@ const LoginForm = (props) => {
 
           // any other error...
         } else {
-          setErrorMessage(
+          setModalMessage(
             true,
+            "Something went wrong",
             "Could not log in at this time. Please try again in a few minutes.",
-            "/pricing",
+            "/",
             { callBack: () => props.handlemodal() }
           );
         }
       }
     } catch (e) {
       setLoadingSpinner(false);
-      setErrorMessage(
+      setModalMessage(
         true,
+        "Something went wrong",
         "Could not log in at this time. Please try again in a few minutes.",
         "/pricing",
         { callBack: () => props.handlemodal() }
@@ -129,4 +135,4 @@ const LoginForm = (props) => {
   );
 };
 
-export default WithLoadingSpinner(WithErrorMessage(LoginForm));
+export default WithLoadingSpinner(WithMessage(LoginForm));

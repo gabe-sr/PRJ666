@@ -121,13 +121,15 @@ const UserAuthorization = (props) => {
   // then set to true to show the modal message (eg: user <xxx> is authorized...)
   // then fetch the data again to display the updated table
 
-  const userId = userToActivate.user.id;
+  const userId = userToActivate.user._id;
   const activeUserStatus = userToActivate.active;
 
   const patchUser = useCallback(async () => {
     await axios.patch(
       `http://localhost:8080/users/update_authorize/${userId}`,
-      { active: activeUserStatus }
+      {
+        active: activeUserStatus,
+      }
     );
     setShowModalMessage(true);
     await fetchData(key);

@@ -23,3 +23,18 @@ export let mailOptionsReview = (email) => ({
         <h4>Psicoworking Team</h4>
         <p><small>Visit us at <a href="https://psicoworking.herokuapp.com">psicoworking.com</a></small><p>`,
 });
+
+export let mailOptionsApprove = (email) => ({
+  from: '"Psicoworking Team" <psicoworking@gmail.com>',
+  to: `${email}`,
+  subject: "PSICOWORKING: Your application has been approved!",
+  text: "Your application was approved!",
+  html: `<h3>Welcome to Psicoworking! </h3>
+        <p>This is to inform that your application has been approved.</p>
+        <p>You can now visit <a href="https://psicoworking.herokuapp.com">psicoworking.com</a> and sign in into your account.</p>
+        <p>If you have any questions, please contact us at <a href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>.</p>
+        <br/>
+        <p>Thanks,<br/>
+        <h4>Psicoworking Team</h4>
+        <p><small>Visit us at <a href="https://psicoworking.herokuapp.com">psicoworking.com</a></small><p>`,
+});

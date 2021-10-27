@@ -6,7 +6,10 @@ import bcrypt from "bcryptjs"; // to hash passwords
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 import fetch from "node-fetch"; // authentication middlewares
 import { transporter } from "../email-notification/email.js";
-import { mailOptionsReview } from "../email-notification/email.js";
+import {
+  mailOptionsReview,
+  mailOptionsApprove,
+} from "../email-notification/email.js";
 
 // -------- ROUTES DEFINITIONS -------- //
 
@@ -259,6 +262,16 @@ router.patch("/update_authorize/:id", async (req, res) => {
       { active: req.body.active },
       { new: true }
     );
+    console.log(user);
+
+    // SEND EMAIL NOTIFICATION
+    transporter.sendMail(mailOptionsApprove(`${user.email}`), (error, info) => {
+      if (error) {
+        return console.log(error);
+      }
+      console.log("Message sent: %s", info.messageId);
+    });
+
     res.send({ success: true, activeStatus: user.active });
   } catch (err) {
     res.send({ success: false });

@@ -4,9 +4,10 @@ import { User } from "../models/userModel.js";
 const router = express.Router();
 import bcrypt from "bcryptjs"; // to hash passwords
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
-import fetch from "node-fetch"; // authentication middlewares
-import { transporter } from "../email-notification/email.js";
+import fetch from "node-fetch"; // authentication middlewaresimport { transporter } from "../email-notification/email.js";
+import { RedefinePassword } from "../models/redefinePasswordModel.js";
 import {
+  transporter,
   mailOptionsReview,
   mailOptionsApprove,
 } from "../email-notification/email.js";
@@ -53,12 +54,6 @@ router.put("/edit/:id", async (req, res) => {
     redirectURL: `/dashboard/user/${req.body._id}`,
     type: "",
   };
-
-  // var userId = req.body._id;
-
-  // var conditions = {
-  //  _id : userId
-  // }
 
   var update = {
     phone: req.body.phone,
@@ -243,10 +238,6 @@ router.post("/login", async (req, res) => {
         message: "Authentication error",
       });
     }
-    //// }
-
-    // TO-DO: crate admin session
-    //....
   } catch (err) {
     console.log(err);
   }
@@ -273,6 +264,42 @@ router.patch("/update_authorize/:id", async (req, res) => {
     });
 
     res.send({ success: true, activeStatus: user.active });
+  } catch (err) {
+    res.send({ success: false });
+    console.log(err);
+  }
+});
+
+// --- REDEFINE USER PASSWORD  --- //
+
+router.patch("/redefine_password", async (req, res) => {
+  let { password, email, confirmPassword } = req.body.values;
+
+  if (password !== confirmPassword) {
+    return res.send({ success: false });
+  }
+
+  try {
+    // generate salt to hash password
+    const salt = await bcrypt.genSalt(10);
+
+    // hash password
+    password = await bcrypt.hash(password, salt);
+
+    let user = await User.findOneAndUpdate(
+      { email: email },
+      { password: password },
+      { new: true }
+    );
+
+    if (!user) {
+      res.send({ success: false });
+    } else {
+      // try to de-activate "reset password" link (remove from DB), if exists
+      await RedefinePassword.findOneAndDelete({ email: email });
+
+      res.send({ success: true });
+    }
   } catch (err) {
     res.send({ success: false });
     console.log(err);

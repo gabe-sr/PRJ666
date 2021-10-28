@@ -42,27 +42,3 @@ const isAdmin = (req, res, next) => {
 
   next();
 };
-
-// const isUser = (req, res, next) => {
-//   if (req.session.userInfo.type.toLowerCase() != "user") {
-//     res.redirect(`/user/404`);
-//   } else {
-//     //console.log(`Logged as ${req.session.userInfo.first_name} USER!`);
-//     next();
-//   }
-// };
-
-// const isLogged = (req, res, next) => {
-//   const errors = [];
-//   if (req.session.userInfo == null) {
-//     errors.push(
-//       "Sorry, you must be logged-in in order to book rooms! Please, login first."
-//     );
-//     res.render(`General/404`, {
-//       errors: errors,
-//     });
-//   } else {
-//     console.log(`Logged as ${req.session.userInfo.first_name} USER!`);
-//     next();
-//   }
-// };

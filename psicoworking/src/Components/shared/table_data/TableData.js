@@ -11,7 +11,7 @@ import { Table } from "react-bootstrap";
 
 const TableData = ({ values, whenClicked, customColumn, ...props }) => {
   return (
-    <Table bordered hover size="sm">
+    <Table bordered responsive hover size="sm">
       <thead>
         <tr>
           <th>#</th>
@@ -22,7 +22,7 @@ const TableData = ({ values, whenClicked, customColumn, ...props }) => {
       </thead>
       <tbody>
         {values.map((user, index) => (
-          <tr style={{ cursor: "pointer" }} key={user._id}>
+          <tr style={{ cursor: "pointer" }} key={index}>
             <td onClick={() => whenClicked(user)}>{index + 1}</td>
 
             {props.columns.map((colName, index) => {

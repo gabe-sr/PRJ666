@@ -253,15 +253,20 @@ router.patch("/update_authorize/:id", async (req, res) => {
       { active: req.body.active },
       { new: true }
     );
-    console.log(user);
 
-    // SEND EMAIL NOTIFICATION
-    transporter.sendMail(mailOptionsApprove(`${user.email}`), (error, info) => {
-      if (error) {
-        return console.log(error);
-      }
-      console.log("Message sent: %s", info.messageId);
-    });
+    // send email if user has been approved (status changed from inactive to active)
+    if (user.active) {
+      // SEND EMAIL NOTIFICATION
+      transporter.sendMail(
+        mailOptionsApprove(`${user.email}`),
+        (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+          console.log("Message sent: %s", info.messageId);
+        }
+      );
+    }
 
     res.send({ success: true, activeStatus: user.active });
   } catch (err) {

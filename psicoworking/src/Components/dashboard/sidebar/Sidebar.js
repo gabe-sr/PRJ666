@@ -59,7 +59,7 @@ function Sidebar(props) {
           </Link>
         </li>
         <li className="nav-text">
-          <Link to="/dashboard">
+          <Link to={`/dashboard/user/${props.id}/changePassword`}>
             <MdIcons.MdOutlinePassword />
             <span>Security</span>
           </Link>

@@ -1,85 +1,169 @@
-import React, { useState, useEffect } from 'react'
-import { ListGroup } from 'react-bootstrap'
-import { format } from 'date-fns'
+import React, { useReducer, useEffect } from "react";
+import {
+  Container,
+  Row,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-bootstrap";
 
-export default function TimePicker({date}) {
-    const curr = date
+// available hours
+const HOURS = [8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19];
 
-    const [label, setLabel] = useState("")
+// These are the actions that can be executed upon a timeslot
+export const ACTIONS = {
+  TOGGLE: "toggle",
+  SELECT: "select",
+  OCCUPY: "occupy",
+  SELF: "self",
+};
 
-    const [ tslots, setTslots] = useState(new Array(11).fill(false))
-
-    const times = [ "8:00AM","9:00AM","10:00AM","11:00AM","1:00PM","2:00PM","3:00PM","4:00PM"
-                    ,"5:00PM","6:00PM","7:00PM" ]
-
-    useEffect(()=>{
-        setLabel(format(curr,"do MMM yyyy"))
-        // console.log(label)
-    },[])
-    
-    useEffect(()=>{
-        setLabel(format(curr,"do MMM yyyy"))
-        // console.log(label)
-    },[curr])
-    
-    const handleClick = (value)=>{
-        const newts = [...tslots]
-        newts[value] = !newts[value]
-        // for(let ts in newts){
-        //     if(newts[ts]!=newts[value] && newts[ts]){
-        //         newts[ts]=false
-        //     }
-        // }
-        for(let i= 0; i<newts.length;i++){
-            if(i!=value && newts[i] == true){
-                newts[i]=false
-            }
+// this reducer function acts upon the timeslot array
+const reducer = (timeslots, action) => {
+  switch (action.type) {
+    case ACTIONS.TOGGLE:
+      //toggle radio button if selected, only one at a time
+      // console.log('toggle executed')
+      return timeslots.map((ts) => {
+        if (ts.id === action.payload.id) {
+          return { ...ts, active: !ts.active };
+        } else if (ts.disabled === false) {
+          return { ...ts, active: false };
         }
-        setTslots(newts)
-        if(newts[value]){alert(`Your chosen booking is: ${format(curr,"MMM do yyyy")} at ${times[value]}`)}
-        
-    }
+        return ts;
+      });
+    case ACTIONS.OCCUPY:
+      //make timeslots received from scheduler active and disabled
+      let idx = 0;
+      // console.log('occupy executed')
+      return timeslots.map((ts) => {
+        if (ts.id == action.payload.id[idx]) {
+          // console.log(ts)
+          idx++;
+          return { ...ts, disabled: true, active: true, variant: "secondary" };
+        } else {
+          return {
+            ...ts,
+            disabled: false,
+            active: false,
+            variant: "outline-primary",
+          };
+        }
+        // console.log(ts)
+      });
 
-    return (
-        <div>
-            <div>{label}</div>
-            {/* <div>{format(mess,"do MMM yyyy")}</div> */}
-            {/* <div>{msg}</div> */}
-            <ListGroup>
-                <ListGroup.Item id={0} key={0} action active={tslots[0]} variant="" onClick={()=>handleClick(0)}>
-                    8:00 AM
-                </ListGroup.Item>
-                <ListGroup.Item  key={1} action active={tslots[1]} variant="secondary" onClick={()=>handleClick(1)}>
-                    9:00 AM
-                </ListGroup.Item>
-                <ListGroup.Item  key={2} action active={tslots[2]} variant="" onClick={()=>handleClick(2)}>
-                    10:00 AM
-                </ListGroup.Item>
-                <ListGroup.Item  key={3} action active={tslots[3]} variant="secondary" onClick={()=>handleClick(3)}>
-                    11:00 AM
-                </ListGroup.Item>
-                <ListGroup.Item  key={4} action active={tslots[4]} variant="" onClick={()=>handleClick(4)}>
-                    1:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={5} action active={tslots[5]} variant="secondary" onClick={()=>handleClick(5)}>
-                    2:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={6} action active={tslots[6]} variant="" onClick={()=>handleClick(6)}>
-                    3:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={7} action active={tslots[7]} variant="secondary" onClick={()=>handleClick(7)}>
-                    4:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={8} action active={tslots[8]} variant="" onClick={()=>handleClick(8)}>
-                    5:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={9} action active={tslots[9]} variant="secondary" onClick={()=>handleClick(9)}>
-                    6:00 PM
-                </ListGroup.Item>
-                <ListGroup.Item  key={10} action active={tslots[10]} variant="" onClick={()=>handleClick(10)}>
-                    7:00 PM
-                </ListGroup.Item>
-            </ListGroup>
-        </div>
-    )
-}
+    default:
+      // console.log("default reduce")
+      return timeslots;
+  }
+};
+
+// this function uses the HOURS array to map an initialize an array of objects (timeslots)
+const createTs = () => {
+  let ts = [];
+  HOURS.forEach((t, idx) => {
+    // if(idx%2 === 0){ ts.push({ id:t, disabled:false, variant:"outline-info", active:false, value:t }) }
+    // else{ ts.push({ id:t, disabled:false, variant:"outline-primary", active:false, value:t }) }
+    ts.push({
+      id: t,
+      disabled: "false",
+      variant: "outline-primary",
+      active: "false",
+    });
+  });
+  return ts;
+};
+const TimePicker = ({ bookings, timeSelected }) => {
+  const [timeslots, dispatch] = useReducer(reducer, createTs());
+  useEffect(() => {
+    // console.log(timeslots)
+  }, []);
+  useEffect(() => {
+    const b = bookings.map((b) => {
+      return b.booking_date.substring(11, 13);
+    });
+    dispatch({ type: ACTIONS.OCCUPY, payload: { id: b } });
+    // console.log(timeslots)
+    return () => {};
+  }, [bookings]);
+
+  return (
+    <Container>
+      {/* <Row>{bookings.map((b)=>{return b.booking_date.substring(11,13)})} </Row> */}
+      <ToggleButtonGroup type={"radio"} name={"hourselect"} vertical>
+        {timeslots.map((timeslot) => {
+          return (
+            <ToggleButton
+              key={timeslot.id}
+              id={`btn-${timeslot.id}`}
+              disabled={timeslot.disabled}
+              variant={timeslot.variant}
+              active={timeslot.active}
+              onChange={() => {
+                dispatch({
+                  type: ACTIONS.TOGGLE,
+                  payload: { id: timeslot.id },
+                });
+                timeSelected(timeslot.id);
+              }}
+              size="lg"
+            >
+              {`${timeslot.id}:00`}
+            </ToggleButton>
+          );
+        })}
+      </ToggleButtonGroup>
+
+      {/* <div className="btn-group-vertical">
+                {timeslots.map(timeslot=>{
+                    return <div>
+                        {!timeslot.disabled ?  
+                            <input  type="radio" className="btn-check" 
+                                    name={`radio-${timeslot.id}`} 
+                                    id={`btn-${timeslot.id}`} 
+                                    autocomplete="off"
+                                    />
+                            :
+                            <input  type="radio" className="btn-check" 
+                                    name={`radio-${timeslot.id}`} 
+                                    id={`btn-${timeslot.id}`} 
+                                    autocomplete="off"
+                                    disabled
+                                    />
+                        }
+                            <lable  className={`btn ${timeslot.variant}`}
+                                    for={`btn-${timeslot.id}`}>
+                                        {`${timeslot.id}`}
+                            </lable>
+                            </div>
+                })}
+
+            </div> */}
+      {/* with timeslots component(logic may become more convoluted)
+            <Col>
+                {timeslots.map(timeslot=>{
+                    // console.log(`timeslot ${timeslot.id} is disabled= ${timeslot.disabled}`)
+
+                    return <TimeSlot key={timeslot.id} timeslot={timeslot} dispatch={dispatch}/>
+                    
+                    
+                })}
+            </Col> */}
+
+      {/* <ToggleButtonGroup type={'radio'} name={'hourselect'} vertical>
+                <ToggleButton   id={['btn-',timeslot.id].join('')} 
+                                            // disabled={timeslot.disabled} 
+                                            variant={timeslot.variant} 
+                                            active={timeslot.active} 
+                                            onChange={()=>{
+                                                dispatch({ type: ACTIONS.TOGGLE, payload:{ id:timeslot.id } })
+                                            }}
+                            >
+                                {[timeslot.id, ':00'].join('')}
+                            </ToggleButton>
+                </ToggleButtonGroup> */}
+      {/* {JSON.stringify(bookings)} */}
+    </Container>
+  );
+};
+
+export default TimePicker;

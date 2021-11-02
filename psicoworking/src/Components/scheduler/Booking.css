@@ -1,0 +1,11 @@
+.booking-btn {
+  background-color: #f39a71;
+  color: #fff;
+  border-color: #f06f33;
+}
+
+.booking-btn:hover {
+  background-color: #fff;
+  color: #f06f33;
+  border-color: #f06f33;
+}

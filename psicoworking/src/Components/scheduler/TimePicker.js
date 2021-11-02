@@ -17,7 +17,7 @@ const reducer = (timeslots, action)=>{
     switch(action.type){
         case ACTIONS.TOGGLE:
             //toggle radio button if selected, only one at a time
-            console.log('toggle executed')
+            // console.log('toggle executed')
             return timeslots.map( ts =>{
                 if(ts.id === action.payload.id){
                     return {...ts, active: !ts.active}
@@ -30,7 +30,7 @@ const reducer = (timeslots, action)=>{
         case ACTIONS.OCCUPY:
             //make timeslots received from scheduler active and disabled
             let idx =0;
-            console.log('occupy executed')
+            // console.log('occupy executed')
             return timeslots.map( ts =>{
                 if( ts.id == action.payload.id[idx]){
                     // console.log(ts)
@@ -44,7 +44,7 @@ const reducer = (timeslots, action)=>{
             })
 
         default:
-            console.log("default reduce")
+            // console.log("default reduce")
             return timeslots;
     }
 }
@@ -75,7 +75,7 @@ const TimePicker = ({bookings, timeSelected}) => {
 
     return (
         <Container>
-            <Row>{bookings.map((b)=>{return b.booking_date.substring(11,13)})} </Row>
+            {/* <Row>{bookings.map((b)=>{return b.booking_date.substring(11,13)})} </Row> */}
             <ToggleButtonGroup type={'radio'} name={'hourselect'} vertical>
                 {timeslots.map(timeslot=>{    
                     return  <ToggleButton   key={timeslot.id}

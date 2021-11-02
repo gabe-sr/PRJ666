@@ -8,14 +8,14 @@ import TimePicker from './TimePicker'
 
 const Scheduler = ({userid,roomid}) => {
     const [ day, setDay ] = useState(startOfDay(new Date()))
-    const [bookings, setBookings] = useState([])
+    const [ bookings, setBookings ] = useState([])
     const [ selected, setSelec ] = useState(null)
+    const [ price , setPrice ] = useState(0)
     const currDay = useRef(startOfDay(new Date()))
     const maxDay = useRef(addDays(startOfDay(new Date()),7))
-    const price = useRef(0)
     // const render = useRef(0)
-    console.log(userid)
-    console.log(roomid)
+    // console.log(userid)
+    // console.log(roomid)
     const timeSelected = (time)=>{
         setSelec(setHours(day,time))
     }
@@ -36,7 +36,8 @@ const Scheduler = ({userid,roomid}) => {
             const res = await axios.get("http://localhost:8080/book",
                                     {params:{
                                         begin: startOfDay(day).toDateString(), // remove startOfDay (unecessary extra processing, already start of day)
-                                        end: addDays(startOfDay(day),1).toDateString() // remove startOfDay (unecessary extra processing, already start of day)
+                                        end: addDays(startOfDay(day),1).toDateString(), // remove startOfDay (unecessary extra processing, already start of day)
+                                        roomid: roomid
                                     }})
             const fetchedbkns = await res.data
             setBookings(fetchedbkns)
@@ -47,22 +48,37 @@ const Scheduler = ({userid,roomid}) => {
             console.log(err)
         }
         
-    }, [])
-
-    const fetchRoomPrice = useCallback(async()=>{
-        try {
-            const res = await axios.get(`http://localhost:8080/rooms/${roomid}`)
-            const fetchedroom = await res.data
-
-            price.current = fetchedroom.price
-        } catch (err) {
-            console.log(err)
-        }
     }, [roomid])
 
+    // const fetchRoomPrice = useCallback(async()=>{
+    //     try {
+    //         const res = await axios.get(`http://localhost:8080/rooms/${roomid}`)
+    //         const fetchedroom = await res.data
+    //         console.log(fetchedroom.price)
+    //         setPrice(fetchedroom.price)
+    //     } catch (err) {
+    //         console.log(err)
+    //     }
+    // }, [roomid])
+
+    // useEffect(() => {
+    //     fetchRoomPrice()
+    // }, [fetchRoomPrice])
+
     useEffect(() => {
+        const fetchRoomPrice = async()=>{
+            try {
+                const res = await axios.get(`http://localhost:8080/rooms/${roomid}`)
+                const fetchedroom = await res.data
+                console.log(fetchedroom.price)
+                setPrice(fetchedroom.price)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
         fetchRoomPrice()
-    }, [fetchRoomPrice])
+    }, [roomid])
 
     // on day change trigger fetch function to get bookings for the day
     // (useState garantees that )
@@ -81,26 +97,27 @@ const Scheduler = ({userid,roomid}) => {
                                         booking_date: selected,
                                         user_id: userid,
                                         room_id: roomid,
-                                        price_at_booking: price.current
+                                        price_at_booking: price
                                     })
             fetchBookings(day)
             alert(res.data.message)
         } catch (err) {
             console.log(err)
         }
-    },[roomid, selected, userid])
+    },[day, fetchBookings, price, roomid, selected, userid])
 
-    const onCancel = () =>{
-        console.log("Cancelled"+ day)
-    }
-    console.log(differenceInDays(startOfMonth(addMonths(day,1)),day))
+    const onCancel = useCallback(() =>{
+        setSelec(null)
+        fetchBookings(day)
+    },[day, fetchBookings])
+    console.log(differenceInDays(startOfMonth(maxDay.current),currDay.current))
     // render.current = render.current+1
     // console.log(render.current)
     return (
         <Container>
             <Row>
                 <Col>
-                    {differenceInDays(startOfMonth(maxDay.current),currDay.current) >7 ? 
+                    {differenceInDays(startOfMonth(maxDay.current),currDay.current) < 0 ? 
                     <DayPicker 
                     canChangeMonth={false}
                     selectedDays={day}
@@ -127,7 +144,7 @@ const Scheduler = ({userid,roomid}) => {
                     {day.toDateString()}
                 </Col>
                 <Col className="mt-4">
-                    {price.current}
+                    {price}
                     <TimePicker bookings={bookings} timeSelected={timeSelected}/>
                 </Col>
             </Row>

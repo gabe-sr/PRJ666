@@ -7,8 +7,10 @@ import Error from "../error-pages/Error";
 import useAuthentication from "../shared/hook/useAuthentication";
 import Sidebar from "../dashboard/sidebar/Sidebar";
 import UserProfile from "../dashboard/user_profile/UserProfile";
+import ChangePasswordForm from "../dashboard/change_pw/ChangePasswordForm";
 import UserReport from "../reports/user-report/UserReport";
 import Booking from "../scheduler/Booking";
+
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -48,6 +50,17 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route
               exact
+
+              path={`${match.url}/user/:id/changePassword`}
+              render={(props) => (
+                <ChangePasswordForm id={props.match.params.id} user={data} />
+              )}
+            />
+
+            <Route exact path={`${match.url}/scheduler`}>
+              <Scheduler />
+            </Route>
+
               path={`${match.url}/book`}
               render={(props) => (
                 <Booking userid={data._id} roomid={props.match.params.roomid} />

@@ -159,6 +159,52 @@ router.post("/redefine", async (req, res) => {
   }
 });
 
+// ----- PUT: EDIT PASSWORD TO DB ------ //
+router.put("/:id/changePassword", isLogged, async (req, res) => {
+  // to store messages/errors
+  const messages = [];
+
+  // the body response to front end
+  const response = {
+    success: false,
+    message: messages,
+    redirectURL: `/dashboard/user/${req.body._id}/changePassword`,
+    type: "",
+  };
+
+  // generate salt to hash password
+  const salt = await bcrypt.genSalt(10);
+
+  // hash password
+  const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+  console.log(`hash: ${hashPassword}`);
+
+  var update = {
+    password: hashPassword
+  };
+
+  
+
+  User.findOneAndUpdate(
+    { _id: req.body._id },
+    update,
+    { new: true },
+    function (error, doc) {
+      if (error) {
+        console.log(`Error on update: ${error}`);
+      } else {
+        console.log("user updated");
+        console.log(doc);
+        // send response to front end, with redirect information
+        messages.push("Success");
+        res.send({ ...response, success: true });
+      }
+    }
+  );
+});
+
+
 // ------- REDEFINE PASSWORD (Get valid link)   ------- //
 router.get("/redefine/:linkId", async (req, res) => {
   if (mongoose.isValidObjectId(req.params.linkId) === false) {

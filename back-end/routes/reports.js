@@ -8,113 +8,193 @@ const router = express.Router();
 
 // ----- GENERATE USER REPORTS ------ //
 // far from being efficient... but it works
-router.get("/users", async (req, res) => {
-  let { name, startDate, endDate, room, sort } = req.query;
-  var sDate, eDate;
-  if (name) {
-    name = req.query.name.toLowerCase();
-  }
-
-  if (!startDate) {
-    sDate = new Date("2021-01-01");
-  } else {
-    sDate = new Date(startDate);
-  }
-
-  if (!endDate) {
-    eDate = new Date("2100-01-01");
-  } else {
-    eDate = new Date(endDate);
-    eDate.setTime(
-      eDate.getTime() + 23 * 60 * 60 * 1000 + 59 * 60 * 1000 + 59 * 1000 + 999
-    );
-  }
-
-  if (!sort) {
-    sort = "byUser";
-  }
-
-  let fetchedUsers = [];
-  let fetchedRooms = [];
-  let users = [];
-  let data = [];
-
-  // attempt to fetch users based on query params
+router.get("/users", isLogged, isAuthenticated, async (req, res) => {
   try {
-    fetchedUsers = await User.find({
-      $or: [
-        { first_name: { $regex: new RegExp(name, "gi") } },
-        { last_name: { $regex: new RegExp(name, "gi") } },
-      ],
-    });
+    let {
+      name,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      room: roomQuery,
+      sort,
+    } = req.query;
 
-    // get only some data from user
-    fetchedUsers.map((u) => {
-      const { _id: user_id, first_name, last_name, email } = u;
-      users.push({ user_id, first_name, last_name, email });
-    });
-  } catch (err) {
-    console.log(err);
-  }
+    // Validate incoming data
+    var sDate, eDate;
 
-  // fetch all rooms
-  try {
-    fetchedRooms = await Room.find();
-  } catch (err) {
-    console.log(err);
-  }
+    if (name) {
+      name = req.query.name.toLowerCase();
+    }
 
-  // fetch user bookings
-  try {
-    users = await Promise.all(
-      users.map(async (u) => {
-        try {
-          let fetchedBookings = await Booking.find({
-            user_id: u.user_id,
-            booking_date: {
-              $gte: sDate,
-              $lte: eDate,
-            },
-          });
+    if (!startDate) {
+      sDate = new Date("2021-01-01");
+    } else {
+      sDate = new Date(startDate);
+    }
 
-          // include room information in the booking object (flatten data)
-          fetchedBookings.map((b) => {
-            let { _id: booking_id, booking_date, room_id } = b;
-            let room = fetchedRooms.find((r) => r._id.equals(room_id));
-            let {
-              description: room_description,
-              price: room_price,
-              name: room_name,
-            } = room;
+    if (!endDate) {
+      eDate = new Date("2100-01-01");
+    } else {
+      eDate = new Date(endDate);
+      eDate.setTime(
+        eDate.getTime() + 23 * 60 * 60 * 1000 + 59 * 60 * 1000 + 59 * 1000 + 999
+      );
+    }
 
-            data.push({
-              ...u,
-              booking_id,
-              booking_date,
-              room_id,
-              room_name,
-              room_description,
-              room_price,
+    startTime = parseInt(startTime);
+    endTime = parseInt(endTime);
+
+    if (!startTime) {
+      startTime = 8;
+    }
+
+    if (!endTime || endTime < startTime) {
+      endTime = 19;
+    }
+
+    if (!sort || (sort != "byName" && sort !== "byDate")) {
+      sort = "byName";
+    }
+
+    if (!roomQuery) {
+      roomQuery = "0";
+    }
+
+    // Prepare to fetch data...
+    let fetchedUsers = [];
+    let fetchedRooms = [];
+    let users = [];
+    let data = [];
+
+    // attempt to fetch users based on query params
+    try {
+      fetchedUsers = await User.find({
+        $or: [
+          { first_name: { $regex: new RegExp(name, "gi") } },
+          { last_name: { $regex: new RegExp(name, "gi") } },
+        ],
+      });
+
+      // select relevant user data to be displayed
+      fetchedUsers.map((u) => {
+        const { _id: user_id, first_name, last_name, email } = u;
+        users.push({ user_id, first_name, last_name, email });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    // fetch all rooms
+    try {
+      fetchedRooms = await Room.find();
+    } catch (err) {
+      console.log(err);
+    }
+
+    // fetch user bookings
+    try {
+      users = await Promise.all(
+        users.map(async (u) => {
+          try {
+            let fetchedBookings = await Booking.find({
+              user_id: u.user_id,
+              booking_date: {
+                $gte: sDate,
+                $lte: eDate,
+              },
             });
-          });
 
-          // u = { ...u, bookings: bookings };
+            // include room information in the booking object (flatten data)
+            fetchedBookings.map((b) => {
+              let { _id: booking_id, booking_date, room_id } = b;
+              let room = fetchedRooms.find((r) => r._id.equals(room_id));
+              let {
+                description: room_description,
+                price: room_price,
+                name: room_name,
+              } = room;
 
-          // bookings.map((e) => {
-          //   data.push({ ...u, ...bookings });
-          // });
+              // get time and filter
+              let time = new Date(booking_date).getUTCHours();
+              if (time >= startTime && time <= endTime) {
+                if (roomQuery === "0" || roomQuery === room_id.toString())
+                  data.push({
+                    ...u,
+                    booking_id,
+                    booking_date,
+                    time,
+                    room_id,
+                    room_name,
+                    room_description,
+                    room_price,
+                  });
+              }
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    }
 
-          //return u;
-        } catch (err) {
-          console.log(err);
-        }
-      })
-    );
+    // Sorting...
+    if (sort === "byName") {
+      return res.send(
+        data.sort((a, b) => {
+          if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
+            if (a.booking_date === b.booking_date) {
+              return a.time - b.time;
+            }
+
+            return a.booking_date - b.booking_date;
+          }
+          var nameA = a.first_name.toLowerCase();
+          var nameB = b.first_name.toLowerCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          // names must be equal
+          return 0;
+        })
+      );
+    }
+
+    if (sort === "byDate") {
+      return res.send(
+        data.sort((a, b) => {
+          if (a.booking_date === b.booking_date) {
+            var nameA = a.first_name.toLowerCase();
+            var nameB = b.first_name.toLowerCase();
+
+            if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
+              return a.time - b.time;
+            }
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+
+            // names must be equal
+            return 0;
+          }
+
+          return a.booking_date - b.booking_date;
+        })
+      );
+    }
   } catch (err) {
     console.log(err);
+    return res.sendStatus(500);
   }
-
-  return res.send(data);
 });
 
 export { router };

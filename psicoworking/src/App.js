@@ -9,7 +9,6 @@ import SignUp from "./Components/sign_up/SignUp";
 import Error from "./Components/error-pages/Error";
 import RedefinePassword from "./Components/redefine-password/RedefinePassword";
 import RedefinePasswordLink from "./Components/redefine-password/RedefinePasswordLink";
-import UserReport from "./Components/reports/user-report/UserReport";
 
 // Main app
 function App() {
@@ -43,9 +42,7 @@ function App() {
               <RedefinePasswordLink linkId={props.match.params.linkId} />
             )}
           />
-          <Route exact path="/report/user">
-            <UserReport />
-          </Route>
+
           <Route path="/dashboard" component={ProtectedRoutes} />
 
           <Route path="/*">

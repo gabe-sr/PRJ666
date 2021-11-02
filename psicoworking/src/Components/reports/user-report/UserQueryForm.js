@@ -2,22 +2,26 @@ import React from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { Timeslots } from "./Timeslots.js";
 
 const UserQueryForm = ({ values, ...props }) => {
   // Yup validation schema
   const validationSchema = Yup.object().shape({
-    startDate: Yup.date().max(
-      new Date(),
-      "Start date must be today's date or earlier"
+    startDate: Yup.date(),
+    endDate: Yup.date().min(
+      Yup.ref("startDate"),
+      "Date must be equal or after start date"
     ),
-    endDate: Yup.date()
-      .min(Yup.ref("startDate"), "Date must be equal or after start date")
-      .max(new Date(), "End date must be today's date or earlier"),
+    startTime: Yup.number(),
+    endTime: Yup.number().min(
+      Yup.ref("startTime"),
+      "End must be equal or after start time"
+    ),
   });
 
   const handleSubmit = (values) => {
-    const { name, room, startDate, endDate, sort } = values;
-    let query = `name=${name}&room=${room}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`;
+    const { name, room, startDate, startTime, endDate, endTime, sort } = values;
+    let query = `name=${name}&room=${room}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&sort=${sort}`;
     props.setQuery(query);
   };
 
@@ -26,10 +30,12 @@ const UserQueryForm = ({ values, ...props }) => {
       <Formik
         initialValues={{
           name: "",
-          room: "",
+          room: 0,
           startDate: "",
           endDate: "",
-          sort: "",
+          sort: "byName",
+          startTime: 8,
+          endTime: 19,
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -58,10 +64,10 @@ const UserQueryForm = ({ values, ...props }) => {
                     name="room"
                     onChange={handleChange}
                   >
-                    <option>Choose...</option>
-                    <option value="616610f8838d67d1fab083e9">One</option>
-                    <option value="6166134d4eca734cbfd3a412">Two</option>
-                    <option value="6166136e4eca734cbfd3a415">Three</option>
+                    <option value={0}>All rooms</option>
+                    <option value="616610f8838d67d1fab083e9">Room One</option>
+                    <option value="6166134d4eca734cbfd3a412">Room Two</option>
+                    <option value="6166136e4eca734cbfd3a415">Room Three</option>
                   </Form.Select>
                 </Form.Group>
               </Row>
@@ -82,6 +88,32 @@ const UserQueryForm = ({ values, ...props }) => {
                   </Form.Control.Feedback>
                 </Form.Group>
 
+                <Form.Group as={Col} xs={4} controlId="queryStartTime">
+                  <Form.Label>Start time</Form.Label>
+                  <Form.Select
+                    aria-label="Start time select"
+                    size="sm"
+                    name="startTime"
+                    onChange={handleChange}
+                    isInvalid={!!errors.startTime}
+                  >
+                    <option value={8}>Select...</option>
+                    {Timeslots.map((t, index) => {
+                      return (
+                        <option key={index} value={t.time}>
+                          {t.text}
+                        </option>
+                      );
+                    })}
+                  </Form.Select>
+
+                  <Form.Control.Feedback type="invalid">
+                    {errors.startTime}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Row>
+
+              <Row className="mb-3">
                 <Form.Group as={Col} xs={4} controlId="queryEndDate">
                   <Form.Label>End date</Form.Label>
                   <Form.Control
@@ -94,6 +126,29 @@ const UserQueryForm = ({ values, ...props }) => {
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.endDate}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group as={Col} xs={4} controlId="queryEndTime">
+                  <Form.Label>End time</Form.Label>
+                  <Form.Select
+                    aria-label="End time select"
+                    size="sm"
+                    name="endTime"
+                    onChange={handleChange}
+                    isInvalid={!!errors.endTime}
+                  >
+                    <option value={19}>Select...</option>
+                    {Timeslots.map((t, index) => {
+                      return (
+                        <option key={index} value={t.time}>
+                          {t.text}
+                        </option>
+                      );
+                    })}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.endTime}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>
@@ -109,6 +164,7 @@ const UserQueryForm = ({ values, ...props }) => {
                     id="byName"
                     value="byName"
                     onChange={handleChange}
+                    defaultChecked={true}
                   />
                   <Form.Check
                     inline
@@ -117,15 +173,6 @@ const UserQueryForm = ({ values, ...props }) => {
                     type="radio"
                     id="byDate"
                     value="byDate"
-                    onChange={handleChange}
-                  />
-                  <Form.Check
-                    inline
-                    label="Room"
-                    name="sort"
-                    type="radio"
-                    id="byRoom"
-                    value="byRoom"
                     onChange={handleChange}
                   />
                 </Form.Group>

@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
     id: "",
     isActive: false,
   };
-  console.log(req.body);
+
   // data received from the front end
   const { email: userEmail, password: userPassword } = req.body;
 
@@ -62,7 +62,7 @@ router.post("/login", async (req, res) => {
     }
 
     // if email exists and password is correct, proceed with session creation
-    console.log(dbUser._id.toString());
+
     //add user info to the cookie
     req.session.userInfo = {
       user_id: dbUser._id.toString(),
@@ -70,7 +70,7 @@ router.post("/login", async (req, res) => {
     };
 
     if (req.session.userInfo) {
-      console.error("Session created");
+      console.log("Session created");
       return res.send({
         success: true,
         message: "Session created",
@@ -94,7 +94,6 @@ router.post("/login", async (req, res) => {
 router.get("/", isLogged, async (req, res) => {
   try {
     const user = await User.findById(req.session.userInfo.user_id);
-    console.log(user);
     res.send({ error: false, userData: user });
   } catch (err) {
     res.sendStatus(401);

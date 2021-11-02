@@ -1,5 +1,6 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
+import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 const router = express.Router({mergeParams:true});
  
 //  Get bookings
@@ -38,12 +39,13 @@ router.get("/:id", async (req, res) => {
  }
 });
  
-//Post booking to db
-router.post("/", async (req, res) => {
+//Post booking to db (no auth)
+router.post("/test/", async (req, res) => {
  let booking = new Booking({ ...req.body }); //deconstruct request to booking
  //check if booking already exists, inform user (see users.js POST method good practice)
  try {
-   const exists = await Booking.findOne({ booking_date: booking.booking_date })
+  //  const exists = await Booking.findOne({ booking_date: booking.booking_date })
+   const exists = await Booking.findOne({ booking_date: booking.booking_date, _isCancelled: false })
  
    if(exists){
      res.send({  message: "Booking already exists in db. Not possible to book on the same date and time ",
@@ -55,9 +57,33 @@ router.post("/", async (req, res) => {
                    type:"Success"  })
    }
  } catch (err) {
+   res.send(err)
    console.log(err);
  }
 });
+
+//Post booking to db
+router.post("/", isAuthenticated, async (req, res) => {
+  let booking = new Booking({ ...req.body }); //deconstruct request to booking
+  //check if booking already exists, inform user (see users.js POST method good practice)
+  try {
+   //  const exists = await Booking.findOne({ booking_date: booking.booking_date })
+    const exists = await Booking.findOne({ booking_date: booking.booking_date, _isCancelled: false })
+  
+    if(exists){
+      res.send({  message: "Booking already exists in db. Not possible to book on the same date and time ",
+                    type:"alreadyExists"  }) 
+    }else{
+      booking = await booking.save();//validations should be exec in the backend, frontend or both?
+      console.log(booking)
+      res.send({  message: "Booking saved in db.",
+                    type:"Success"  })
+    }
+  } catch (err) {
+    res.send(err)
+    console.log(err);
+  }
+ });
  
 //No route to update booking
  

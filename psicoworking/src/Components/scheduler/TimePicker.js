@@ -1,3 +1,4 @@
+import { id } from 'date-fns/locale'
 import React, { useReducer, useRef, useEffect } from 'react'
 import { Container, Row, Col, ToggleButton, ToggleButtonGroup } from 'react-bootstrap'
 import TimeSlot from './TimeSlot'
@@ -30,13 +31,20 @@ const reducer = (timeslots, action)=>{
             })
         case ACTIONS.OCCUPY:
             //make timeslots received from scheduler active and disabled
+            let idx =0;
             console.log('occupy executed')
             return timeslots.map( ts =>{
-                if(ts.id === action.payload.id){
-                    return {...ts, disabled: "true", active: "true", variant:"outline-secondary"}
+                if( ts.id == action.payload.id[idx]){
+                    // console.log(ts)
+                    idx++
+                    return {...ts, disabled: true, active: true, variant:"secondary"}
                 }
-                return ts;
+                else {
+                    return {...ts, disabled: false, active: false, variant:"outline-primary"}
+                }
+                // console.log(ts)
             })
+
         default:
             console.log("default reduce")
             return timeslots;
@@ -47,23 +55,21 @@ const reducer = (timeslots, action)=>{
 const createTs = ()=>{
     let ts = []
     HOURS.forEach((t,idx) => {
-        if(idx%2 === 0){ ts.push({ id:t, disabled:false, variant:"outline-info", active:false, value:t }) }
-        else{ ts.push({ id:t, disabled:false, variant:"outline-primary", active:false, value:t }) }
-        // ts.push({ id:t, disabled:"false", variant:"outline-light", active:"false" })
+        // if(idx%2 === 0){ ts.push({ id:t, disabled:false, variant:"outline-info", active:false, value:t }) }
+        // else{ ts.push({ id:t, disabled:false, variant:"outline-primary", active:false, value:t }) }
+        ts.push({ id:t, disabled:"false", variant:"outline-primary", active:"false" })
     });
     return ts
 }
-const TimePicker = ({bookings}) => {
+const TimePicker = ({bookings, timeSelected}) => {
     const [timeslots, dispatch] = useReducer(reducer, createTs())
     useEffect(() => {
         // console.log(timeslots)
     }, [])
     useEffect(() => {
         const b = bookings.map(b=>{return b.booking_date.substring(11,13)})
-        console.log(b)
-        b.forEach(() => {
-            dispatch({type: ACTIONS.OCCUPY, payload: { id: b}})
-        });
+        dispatch({type: ACTIONS.OCCUPY, payload: { id: b}})
+        // console.log(timeslots)
         return () => {
             
         }
@@ -81,14 +87,40 @@ const TimePicker = ({bookings}) => {
                                             active={timeslot.active} 
                                             onChange={()=>{
                                                 dispatch({ type: ACTIONS.TOGGLE, payload:{ id:timeslot.id } })
+                                                timeSelected(timeslot.id)
                                             }}
+                                            size="lg"
                             >
                                 {`${timeslot.id}:00`}
                             </ToggleButton>
                     })}
             </ToggleButtonGroup>
 
+            {/* <div className="btn-group-vertical">
+                {timeslots.map(timeslot=>{
+                    return <div>
+                        {!timeslot.disabled ?  
+                            <input  type="radio" className="btn-check" 
+                                    name={`radio-${timeslot.id}`} 
+                                    id={`btn-${timeslot.id}`} 
+                                    autocomplete="off"
+                                    />
+                            :
+                            <input  type="radio" className="btn-check" 
+                                    name={`radio-${timeslot.id}`} 
+                                    id={`btn-${timeslot.id}`} 
+                                    autocomplete="off"
+                                    disabled
+                                    />
+                        }
+                            <lable  className={`btn ${timeslot.variant}`}
+                                    for={`btn-${timeslot.id}`}>
+                                        {`${timeslot.id}`}
+                            </lable>
+                            </div>
+                })}
 
+            </div> */}
             {/* with timeslots component(logic may become more convoluted)
             <Col>
                 {timeslots.map(timeslot=>{

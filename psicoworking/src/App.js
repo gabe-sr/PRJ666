@@ -37,6 +37,12 @@ function App() {
             <Scheduler />
           </Route>
 
+          <Route
+            exact
+            path="/:userid/:roomid/book"
+            render={(props) => <Scheduler userid={props.match.params.userid} roomid={props.match.params.roomid}/>}
+          />
+
           {/*for testing...*/}
           <Route path="/:id/authorization"
             render={(props) => <UserAuthorization id={props.match.params.id} />}

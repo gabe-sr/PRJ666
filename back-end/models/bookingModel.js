@@ -13,6 +13,23 @@ const bookingSchema = new Schema({
     room_id: {
         type: mongoose.Schema.Types.ObjectId, // String,
         required: true
+    },
+    price_at_booking:{
+        type: String,
+        required: true
+    },
+    booking_type: {
+        type: String,
+        required: true,
+        default: "normal"
+    },
+    cancel_request: {
+        type: Boolean,
+        default: false
+    },
+    _isCancelled: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true} );
 

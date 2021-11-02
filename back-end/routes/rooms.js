@@ -5,14 +5,24 @@ const router = express.Router();
 
 //Only one room will be fetched at a time for a web page
 
-router.get("/:slug", async (req, res) => {
+// router.get("/:slug", async (req, res) => {
+//   try {
+//     const room = await Room.findOne({ slug: req.params.slug });
+//     // inform room if not fount etc...
+//     res.send(room);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
+
+router.get("/:id", async (req,res)=>{
   try {
-    const room = await Room.findOne({ slug: req.params.slug });
-    // inform user if not fount etc...
+    const room = await Room.findById(req.params.id);
+    console.log
     res.send(room);
   } catch (err) {
     console.log(err);
   }
-});
+})
 
 export { router };

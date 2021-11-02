@@ -29,11 +29,24 @@ router.get("/", isLogged, isAuthenticated, async (req, res) => {
 router.get("/:id", isLogged, isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    console.log(user);
-    res.send(user);
+
+    if (!user) {
+      return res.send({
+        error: true,
+        type: "404",
+      });
+    } else {
+      res.send(user);
+    }
   } catch (err) {
-    console.log(err);
-    res.send(err.response.message);
+    if (err.name === "CastError") {
+      return res.send({
+        error: true,
+        type: "404",
+      });
+    } else {
+      return res.sendStatus(500);
+    }
   }
 });
 
@@ -82,7 +95,6 @@ router.put("/edit/:id", async (req, res) => {
     }
   );
 });
-
 
 // ----- POST EDIT USER TO DB ------ //
 router.post("/edit/:id", async (req, res) => {

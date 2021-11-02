@@ -35,7 +35,7 @@ const ChangePasswordForm = (props) => {
 
   const { setModalMessage } = props;
   // ---- Handle form submit ---- //
-  const handleSubmitForm = async (values) => {
+  const handleSubmitForm = async (values, { resetForm }) => {
     // Fetch data from API
     try {
       const response = await axios({
@@ -53,6 +53,7 @@ const ChangePasswordForm = (props) => {
       if (success) {
         setModalMessage(true, "Success", "User password successfully updated.");
         //window.scrollTo(0, 0);
+        resetForm();
       } else {
         history.push({
           pathname: redirectURL,

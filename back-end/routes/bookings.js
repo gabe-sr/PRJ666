@@ -15,7 +15,9 @@ router.get("/", async (req, res) => {
      //testing logs - delete on final product
      console.log("bookingget")
    }else if(req.query.begin != null){
-     const bkns = await Booking.find({ booking_date: { $gte: req.query.begin, $lt: req.query.end } }).sort({booking_date: "asc"})
+     const bkns = await Booking.find({ booking_date: { $gte: req.query.begin, $lt: req.query.end } })
+                                .sort({booking_date: "asc"})
+                                .where({room_id: req.query.roomid})
      //testing logs - delete on final product
      console.log(req.query.begin)
      console.log(req.query.end)
@@ -45,7 +47,7 @@ router.post("/test/", async (req, res) => {
  //check if booking already exists, inform user (see users.js POST method good practice)
  try {
   //  const exists = await Booking.findOne({ booking_date: booking.booking_date })
-   const exists = await Booking.findOne({ booking_date: booking.booking_date, _isCancelled: false })
+   const exists = await Booking.findOne({ booking_date: booking.booking_date, _isCancelled: false, room_id: booking.roomid })
  
    if(exists){
      res.send({  message: "Booking already exists in db. Not possible to book on the same date and time ",

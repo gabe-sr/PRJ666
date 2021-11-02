@@ -53,7 +53,7 @@ function Sidebar(props) {
           </Link>
         </li>
         <li className="nav-text">
-          <Link to="/dashboard">
+          <Link to="/dashboard/report/user">
             <IoIcons.IoDocumentTextOutline />
             <span>Reports</span>
           </Link>

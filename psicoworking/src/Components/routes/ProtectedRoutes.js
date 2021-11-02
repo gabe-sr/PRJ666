@@ -7,6 +7,7 @@ import Error from "../error-pages/Error";
 import useAuthentication from "../shared/hook/useAuthentication";
 import Sidebar from "../dashboard/sidebar/Sidebar";
 import UserProfile from "../dashboard/user_profile/UserProfile";
+import UserReport from "../reports/user-report/UserReport";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -50,6 +51,10 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route exact path={`${match.url}/authorization`}>
               <UserAuthorization />
+            </Route>
+
+            <Route exact path={`${match.url}/report/user`}>
+              <UserReport />
             </Route>
 
             <Route exact path={`${match.url}/*`}>

@@ -117,31 +117,34 @@ const Scheduler = ({userid,roomid}) => {
         <Container>
             <Row>
                 <Col>
-                    {differenceInDays(startOfMonth(maxDay.current),currDay.current) < 0 ? 
-                    <DayPicker 
-                    canChangeMonth={false}
-                    selectedDays={day}
-                    onDayClick={handleDayClick}
-                    disabledDays={{
-                        before: currDay.current,
-                        after: maxDay.current
-                    }}
-                    />  
-                    :
-                    <DayPicker 
-                    selectedDays={day}
-                    onDayClick={handleDayClick}
-                    disabledDays={{
-                        before: currDay.current,
-                        after: maxDay.current
-                    }}
-                    fromMonth={currDay.current}
-                    toMonth={maxDay.current}
-                    fixedWeeks
-                    />
-                    }
-                    
-                    {day.toDateString()}
+                    <Row>
+                        {differenceInDays(startOfMonth(maxDay.current),currDay.current) < 0 ? 
+                        <DayPicker 
+                        canChangeMonth={false}
+                        selectedDays={day}
+                        onDayClick={handleDayClick}
+                        disabledDays={{
+                            before: currDay.current,
+                            after: maxDay.current
+                        }}
+                        />  
+                        :
+                        <DayPicker 
+                        selectedDays={day}
+                        onDayClick={handleDayClick}
+                        disabledDays={{
+                            before: currDay.current,
+                            after: maxDay.current
+                        }}
+                        fromMonth={currDay.current}
+                        toMonth={maxDay.current}
+                        fixedWeeks
+                        />
+                        }
+                    </Row>
+                    <Row className="justify-content-md-center">
+                        {day.toDateString()}
+                    </Row>
                 </Col>
                 <Col className="mt-4">
                     {price}

@@ -21,7 +21,7 @@ const Scheduler = ({ userid, roomid }) => {
   const currDay = useRef(startOfDay(new Date()));
   const maxDay = useRef(addDays(startOfDay(new Date()), 7));
   // const render = useRef(0)
-  // console.log(userid)
+  console.log(userid)
   // console.log(roomid)
   const timeSelected = (time) => {
     setSelec(setHours(day, time));
@@ -102,7 +102,7 @@ const Scheduler = ({ userid, roomid }) => {
   const onConfirm = useCallback(async () => {
     console.log("Confirmed @ " + selected);
     try {
-      const res = await axios.post("http://localhost:8080/book/test/", {
+      const res = await axios.post("http://localhost:8080/book/", {
         booking_date: selected,
         user_id: userid,
         room_id: roomid,

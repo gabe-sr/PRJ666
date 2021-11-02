@@ -42,7 +42,7 @@ app.use(session(sessionConfig));
 // Set the router middleware for the user side, only requests to /users/* will be sent to userRouter
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);
-app.use("/rooms/book", bookingRouter);
+app.use("/book", bookingRouter);
 app.use("/authentication", authRouter);
 app.use("/reports", reportRouter);
 

@@ -1,6 +1,6 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
-import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
+import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 const router = express.Router({ mergeParams: true });
 
 //  Get bookings
@@ -72,9 +72,11 @@ router.post("/test/", async (req, res) => {
 });
 
 //Post booking to db
-router.post("/", isAuthenticated, async (req, res) => {
+router.post("/", isLogged, isAuthenticated, async (req, res) => {
   let booking = new Booking({ ...req.body }); //deconstruct request to booking
   //check if booking already exists, inform user (see users.js POST method good practice)
+  console.log("POST")
+  console.log(req.userid)
   try {
     //  const exists = await Booking.findOne({ booking_date: booking.booking_date })
     const exists = await Booking.findOne({

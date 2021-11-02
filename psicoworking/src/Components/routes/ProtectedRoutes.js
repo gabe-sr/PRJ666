@@ -61,6 +61,8 @@ const ProtectedRoutes = ({ match }) => {
               <Scheduler />
             </Route>
 
+            <Route
+              exact
               path={`${match.url}/book`}
               render={(props) => (
                 <Booking userid={data._id} roomid={props.match.params.roomid} />

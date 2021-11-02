@@ -8,6 +8,7 @@ import useAuthentication from "../shared/hook/useAuthentication";
 import Sidebar from "../dashboard/sidebar/Sidebar";
 import UserProfile from "../dashboard/user_profile/UserProfile";
 import UserReport from "../reports/user-report/UserReport";
+import Booking from "../scheduler/Booking";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -45,9 +46,24 @@ const ProtectedRoutes = ({ match }) => {
               )}
             />
 
-            <Route exact path={`${match.url}/scheduler`}>
-              <Scheduler />
-            </Route>
+            <Route
+              exact
+              path={`${match.url}/book`}
+              render={(props) => (
+                <Booking userid={data._id} roomid={props.match.params.roomid} />
+              )}
+            />
+
+            <Route
+              exact
+              path={`${match.url}/:roomid/book`}
+              render={(props) => (
+                <Scheduler
+                  userid={data._id}
+                  roomid={props.match.params.roomid}
+                />
+              )}
+            />
 
             <Route exact path={`${match.url}/authorization`}>
               <UserAuthorization />

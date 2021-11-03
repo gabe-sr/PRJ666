@@ -16,18 +16,32 @@ export const isLogged = (req, res, next) => {
 
 // Check if user is authenticated to access this resource
 export const isAuthenticated = (req, res, next) => {
-  if (req.session.userInfo.user_id != req.params.id) {
-    if (req.session.userInfo.isAdmin === true) {
-      next();
+  // for GET requests
+  if (req.params.id) {
+    if (req.session.userInfo.user_id != req.params.id) {
+      console.log(req.session.userInfo.user_id);
+      console.log(req.params.id);
+      if (req.session.userInfo.isAdmin === true) {
+        next();
+      } else {
+        return res.sendStatus(403);
+      }
     } else {
-      return res.send({
-        error: true,
-        redirectTo: { url: `/dashboard/user/${req.session.userInfo.user_id}` },
-        type: "403",
-      });
+      next();
     }
+    // for POST requests
   } else {
-    next();
+    if (req.session.userInfo.user_id != req.body.user_id) {
+      console.log(req.session.userInfo.user_id);
+      console.log(req.body.user_id);
+      if (req.session.userInfo.isAdmin === true) {
+        next();
+      } else {
+        return res.sendStatus(403);
+      }
+    } else {
+      next();
+    }
   }
 };
 

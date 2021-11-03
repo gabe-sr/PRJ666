@@ -15,6 +15,7 @@ import "./UserList.css";
 import { useHistory } from "react-router";
 import WithLoadingSpinner from "../HOC/loading-spinner/WithLoadingSpinner";
 import WithMessage from "../HOC/modal-messages/WithMessage";
+import Error from "../error-pages/Error";
 
 const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
@@ -28,6 +29,7 @@ const UserAuthorization = (props) => {
   // to store all user data fetched from DB
   const [values, setValues] = useState();
   const [pendingCount, setPendingCount] = useState();
+  const [error, setError] = useState(false);
 
   // (3) get all user data from database
   const fetchData = useCallback(
@@ -53,14 +55,18 @@ const UserAuthorization = (props) => {
         ).length;
         setPendingCount(countPending);
       } catch (err) {
-        console.log(err);
         setLoadingSpinner(false);
-        setModalMessage(
-          true,
-          "Something went wrong",
-          "The list of users couldn't be retrieved because the server is not responding. Please, try again.",
-          "/"
-        );
+
+        if (err.response && err.response.status === 403) {
+          setError(true);
+        } else {
+          setModalMessage(
+            true,
+            "Something went wrong",
+            "The list of users couldn't be retrieved because the server is not responding. Please, try again.",
+            "/"
+          );
+        }
       }
     },
     [setLoadingSpinner, setModalMessage]
@@ -188,6 +194,10 @@ const UserAuthorization = (props) => {
   // (3) - Uses react-bootstrap Tabs components. Key is used to track if Tab was changed
   //       with useEffect(), to fetch and filter data accordingly
   // (4) - Customized table component
+
+  if (error === true) {
+    return <Error />;
+  }
 
   return (
     <Container>

@@ -6,11 +6,11 @@ import Room2Img from "../../images/room2.jpeg";
 import Room3Img from "../../images/room3.jpeg";
 import "./Booking.css";
 
-const Booking = () => {
+const Booking = (props) => {
   const history = useHistory();
 
-  const handleRoom = (room_id) => {
-    history.push({ pathname: `/dashboard/${room_id}/book` });
+  const handleRoom = (rid) => {
+    history.push({ pathname: `/dashboard/${props.userid}/${rid}/book` });
   };
 
   return (

@@ -181,10 +181,8 @@ router.put("/:id/changePassword", isLogged, async (req, res) => {
   console.log(`hash: ${hashPassword}`);
 
   var update = {
-    password: hashPassword
+    password: hashPassword,
   };
-
-  
 
   User.findOneAndUpdate(
     { _id: req.body._id },
@@ -203,7 +201,6 @@ router.put("/:id/changePassword", isLogged, async (req, res) => {
     }
   );
 });
-
 
 // ------- REDEFINE PASSWORD (Get valid link)   ------- //
 router.get("/redefine/:linkId", async (req, res) => {

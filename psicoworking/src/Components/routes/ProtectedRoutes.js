@@ -11,7 +11,6 @@ import ChangePasswordForm from "../dashboard/change_pw/ChangePasswordForm";
 import UserReport from "../reports/user-report/UserReport";
 import Booking from "../scheduler/Booking";
 
-
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
   // isAuth: check in the server if user is authenticated
@@ -50,17 +49,14 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route
               exact
-
               path={`${match.url}/user/:id/changePassword`}
               render={(props) => (
                 <ChangePasswordForm id={props.match.params.id} user={data} />
               )}
             />
 
-            <Route exact path={`${match.url}/scheduler`}>
-              <Scheduler />
-            </Route>
-
+            <Route
+              exact
               path={`${match.url}/book`}
               render={(props) => (
                 <Booking userid={data._id} roomid={props.match.params.roomid} />
@@ -69,7 +65,7 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route
               exact
-              path={`${match.url}/:roomid/book`}
+              path={`${match.url}/:userid/:roomid/book`}
               render={(props) => (
                 <Scheduler
                   userid={data._id}
@@ -78,7 +74,7 @@ const ProtectedRoutes = ({ match }) => {
               )}
             />
 
-            <Route exact path={`${match.url}/authorization`}>
+            <Route exact path={`${match.url}/:id/authorization`}>
               <UserAuthorization />
             </Route>
 

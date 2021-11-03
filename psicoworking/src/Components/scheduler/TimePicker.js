@@ -1,10 +1,5 @@
 import React, { useReducer, useEffect } from "react";
-import {
-  Container,
-  Row,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "react-bootstrap";
+import { Container, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
 // available hours
 const HOURS = [8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19];

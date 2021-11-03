@@ -1,6 +1,6 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
-import { isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
+import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 const router = express.Router({ mergeParams: true });
 
 //  Get bookings
@@ -72,14 +72,21 @@ router.post("/test/", async (req, res) => {
 });
 
 //Post booking to db
-router.post("/", isAuthenticated, async (req, res) => {
+router.post("/", isLogged, isAuthenticated, async (req, res) => {
   let booking = new Booking({ ...req.body }); //deconstruct request to booking
   //check if booking already exists, inform user (see users.js POST method good practice)
+
+  // VERIFY THIS SOLUTION AGAIN (removed 'x' hours of timezone offset )...
+  booking.booking_date = new Date(
+    booking.booking_date - booking.booking_date.getTimezoneOffset() * 60000
+  );
+
   try {
     //  const exists = await Booking.findOne({ booking_date: booking.booking_date })
     const exists = await Booking.findOne({
       booking_date: booking.booking_date,
       _isCancelled: false,
+      room_id: booking.room_id,
     });
 
     if (exists) {

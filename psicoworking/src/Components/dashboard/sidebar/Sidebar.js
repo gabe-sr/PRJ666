@@ -66,7 +66,7 @@ function Sidebar(props) {
         </li>
         {props.isAdmin && (
           <li className="nav-text">
-            <Link to={`/dashboard/authorization`}>
+            <Link to={`/dashboard/${props.id}/authorization`}>
               <FiIcons.FiCheckSquare />
               <span>Authorize</span>
             </Link>

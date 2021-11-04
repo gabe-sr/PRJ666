@@ -9,6 +9,7 @@ import Sidebar from "../dashboard/sidebar/Sidebar";
 import UserProfile from "../dashboard/user_profile/UserProfile";
 import ChangePasswordForm from "../dashboard/change_pw/ChangePasswordForm";
 import UserReport from "../reports/user-report/UserReport";
+import Reports from "../reports/Reports";
 import Booking from "../scheduler/Booking";
 
 const ProtectedRoutes = ({ match }) => {
@@ -76,6 +77,10 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route exact path={`${match.url}/:id/authorization`}>
               <UserAuthorization />
+            </Route>
+
+            <Route exact path={`${match.url}/report/`}>
+              <Reports />
             </Route>
 
             <Route exact path={`${match.url}/report/user`}>

@@ -18,13 +18,23 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
       endTime,
       room: roomQuery,
       sort,
+      maxrows,
+      startpage,
     } = req.query;
 
     // Validate incoming data
-    var sDate, eDate;
+    let sPage = parseInt(startpage);
+    let mRows = parseInt(maxrows);
+    let sDate, eDate;
+    let fullName = null;
+    let hasfullName = false;
 
     if (name) {
-      name = req.query.name.toLowerCase();
+      name = req.query.name.toLowerCase().trim();
+      fullName = name.split(" ");
+      if (fullName.length > 1) {
+        hasfullName = true;
+      }
     }
 
     if (!startDate) {
@@ -69,12 +79,21 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
 
     // attempt to fetch users based on query params
     try {
-      fetchedUsers = await User.find({
-        $or: [
-          { first_name: { $regex: new RegExp(name, "gi") } },
-          { last_name: { $regex: new RegExp(name, "gi") } },
-        ],
-      });
+      if (hasfullName === false) {
+        fetchedUsers = await User.find({
+          $or: [
+            { first_name: { $regex: new RegExp(name, "gi") } },
+            { last_name: { $regex: new RegExp(name, "gi") } },
+          ],
+        });
+      } else {
+        fetchedUsers = await User.find({
+          $and: [
+            { first_name: { $regex: new RegExp(fullName[0], "gi") } },
+            { last_name: { $regex: new RegExp(fullName[1], "gi") } },
+          ],
+        });
+      }
 
       // select relevant user data to be displayed
       fetchedUsers.map((u) => {
@@ -140,19 +159,47 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
       console.log(err);
     }
 
+    // Sorting and Filtering data before sending to front-end
+    const dataTotal = data.length;
+
     // Sorting...
     if (sort === "byName") {
-      return res.send(
-        data.sort((a, b) => {
-          if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
-            if (a.booking_date === b.booking_date) {
-              return a.time - b.time;
-            }
-
-            return a.booking_date - b.booking_date;
+      data = data.sort((a, b) => {
+        if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
+          if (a.booking_date === b.booking_date) {
+            return a.time - b.time;
           }
+
+          return a.booking_date - b.booking_date;
+        }
+        var nameA = a.first_name.toLowerCase();
+        var nameB = b.first_name.toLowerCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      });
+      const dataDB = {
+        values: data.slice(sPage, sPage + mRows),
+        total: dataTotal,
+      };
+      return res.send(dataDB);
+    }
+
+    if (sort === "byDate") {
+      data.sort((a, b) => {
+        if (a.booking_date === b.booking_date) {
           var nameA = a.first_name.toLowerCase();
           var nameB = b.first_name.toLowerCase();
+
+          if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
+            return a.time - b.time;
+          }
           if (nameA < nameB) {
             return -1;
           }
@@ -162,34 +209,15 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
 
           // names must be equal
           return 0;
-        })
-      );
-    }
+        }
 
-    if (sort === "byDate") {
-      return res.send(
-        data.sort((a, b) => {
-          if (a.booking_date === b.booking_date) {
-            var nameA = a.first_name.toLowerCase();
-            var nameB = b.first_name.toLowerCase();
-
-            if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
-              return a.time - b.time;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-
-            // names must be equal
-            return 0;
-          }
-
-          return a.booking_date - b.booking_date;
-        })
-      );
+        return a.booking_date - b.booking_date;
+      });
+      const dataDB = {
+        values: data.slice(sPage, sPage + mRows),
+        total: dataTotal,
+      };
+      return res.send(dataDB);
     }
   } catch (err) {
     console.log(err);

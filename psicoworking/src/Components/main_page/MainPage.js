@@ -1,6 +1,6 @@
 import "./MainPage.css";
-import roomImage from "../../images/room.png";
 import { useHistory } from "react-router-dom";
+import images from "../shared/hook/imagesDataSource"
 
 function MainPage() {
   const history = useHistory()
@@ -70,7 +70,7 @@ function MainPage() {
             <div className="col-lg-6">
               <img
                 className="room-photo"
-                src={roomImage}
+                src={images.roomBeige1}
                 alt={"waiting room img"}
               />
             </div>

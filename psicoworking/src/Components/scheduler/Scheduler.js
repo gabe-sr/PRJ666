@@ -5,82 +5,85 @@ import {
   startOfMonth,
   startOfDay,
   setHours,
+  parseISO,
+  subMinutes
 } from "date-fns";
 import DayPicker from "react-day-picker";
 import "../../../node_modules/react-day-picker/lib/style.css";
 import axios from "axios";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import TimePicker from "./TimePicker";
 
 const Scheduler = ({ userid, roomid }) => {
-  const [day, setDay] = useState(startOfDay(new Date()));
+  const [day, setDay] = useState(setHours(startOfDay(new Date()),2));
   const [bookings, setBookings] = useState([]);
   const [selected, setSelec] = useState(null);
   const [price, setPrice] = useState(0);
+  const [show, setshow] = useState(false);
+  const [data, setData] = useState({});
   const currDay = useRef(startOfDay(new Date()));
   const maxDay = useRef(addDays(startOfDay(new Date()), 7));
-  // const render = useRef(0)
-  console.log(userid);
-  // console.log(roomid)
 
   const timeSelected = (time) => {
-    setSelec(setHours(day, time));
+    /* correct date for timezone. Data should be persisted to db only in UTC time, due to date-fns ver2.x not accepting operations with dates from strings
+        it is parsed, using parseISO, it is adjusted to local browser/system time. When the time is selected since we are using raw numeric values for the
+        time, it needs to be readjusted/corrected to correctly represent the actual timeslot selected. All revolves around time in the coworking location.
+        " SELECTED IS ALWAYS CORRECTED FOR UTC TIME, OR NULL "*/
+    const dateWtime = setHours(day,time);
+    const correctedDate = subMinutes(dateWtime, day.getTimezoneOffset());
+    setSelec(correctedDate);
+    console.log(bookings)
+    // setSelec(setHours(day, (time-(day.getTimezoneOffset()/60))));
   };
 
   const handleDayClick = (date, modifiers = {}) => {
     if (modifiers.disabled) {
       return;
     }
-    setDay(date);
+    setDay(setHours(date, 2));
   };
 
-  // function to fetch bookings for a certain date it uses usecallback so it doesnt get
-  // reconstructed after every render, and to assure that if the function is passed to
-  // children components it will have referential integrity
+  /* function to fetch bookings for a certain date it uses usecallback so it doesnt get
+      reconstructed after every render, and to assure that if the function is passed to
+      children components it will have referential integrity*/
   const fetchBookings = useCallback(
     async (day) => {
       try {
-        // console.log(day)
         const res = await axios.get("/book", {
           params: {
-            begin: startOfDay(day).toDateString(), // remove startOfDay (unecessary extra processing, already start of day)
-            end: addDays(startOfDay(day), 1).toDateString(), // remove startOfDay (unecessary extra processing, already start of day)
-            roomid: roomid,
+            type: 'general',
+            begin: day.toDateString(), 
+            end: addDays(day, 1).toDateString(), 
+            roomid: roomid
           },
         });
         const fetchedbkns = await res.data;
-        setBookings(fetchedbkns);
-        // console.log("this is render no: " + render.current)
-        // console.log({function: "fetch", objects: bookings})
-        // console.log(bookings)
+        
+        /* sanitize data (only valid timeslots are set to bookings)
+            if there are invalid bookings in db this removes it for 
+            display purposes (implement DELETE method to clean DB)*/
+        const newB = fetchedbkns.filter((b)=>{
+          return ((parseISO(b.booking_date).getUTCHours()) >= 8 && 
+                  (parseISO(b.booking_date).getUTCHours()) <= 19 &&
+                  (parseISO(b.booking_date).getUTCHours()) !== 12)
+        })
+        console.log("hello");
+        setBookings(newB);
       } catch (err) {
+        alert(err.message);
         console.log(err);
       }
     },
     [roomid]
   );
 
-  // const fetchRoomPrice = useCallback(async()=>{
-  //     try {
-  //         const res = await axios.get(`http://localhost:8080/rooms/${roomid}`)
-  //         const fetchedroom = await res.data
-  //         console.log(fetchedroom.price)
-  //         setPrice(fetchedroom.price)
-  //     } catch (err) {
-  //         console.log(err)
-  //     }
-  // }, [roomid])
-
-  // useEffect(() => {
-  //     fetchRoomPrice()
-  // }, [fetchRoomPrice])
-
+  /* The price for the room the user is curently booking a room for should be 
+      easily accessible to user */
   useEffect(() => {
     const fetchRoomPrice = async () => {
       try {
         const res = await axios.get(`/rooms/${roomid}`);
         const fetchedroom = await res.data;
-        console.log(fetchedroom.price);
         setPrice(fetchedroom.price);
       } catch (err) {
         console.log(err);
@@ -90,45 +93,50 @@ const Scheduler = ({ userid, roomid }) => {
     fetchRoomPrice();
   }, [roomid]);
 
-  // on day change trigger fetch function to get bookings for the day
-  // (useState garantees that )
+  /* on day change trigger fetch function to get bookings for the day
+      (useEffect garantees that )*/
   useEffect(() => {
-    // console.log("useEffect on day change")
-    // console.log("this is render no: " + render.current)
     fetchBookings(day);
     setSelec(null);
   }, [day, fetchBookings]);
 
+  /* When user clicks the confirm button the data should be sent to database
+      if the data is persisted successfully or not the user should be notified, 
+      one way or the other. Insightful information should be displayed to help
+      user inform helpdesk of the issue*/
   const onConfirm = useCallback(async () => {
-    console.log("Confirmed @ " + selected);
     try {
-      const res = await axios.post("/book", {
+      const req = await axios.post("/book", {
         booking_date: selected,
         user_id: userid,
         room_id: roomid,
         price_at_booking: price,
       });
-      console.log(res.data);
       fetchBookings(day);
-      alert(res.data.message);
+      setData(req.data);
+      setshow(true);
     } catch (err) {
-      console.log(err);
+      setData(err.data);
+      setshow(true);
     }
   }, [day, fetchBookings, price, roomid, selected, userid]);
 
+  const handleClose = ()=> setshow(false);
+
+  /* When user clicks cancel, the current selection should be nullified and 
+      the timeslots cleared*/
   const onCancel = useCallback(() => {
     setSelec(null);
     fetchBookings(day);
   }, [day, fetchBookings]);
-  console.log(differenceInDays(startOfMonth(maxDay.current), currDay.current));
-  // render.current = render.current+1
-  // console.log(render.current)
+
   return (
     <Container>
       <Row>
         <Col>
-          {differenceInDays(startOfMonth(maxDay.current), currDay.current) <
-          0 ? (
+        <Row>
+          {differenceInDays(startOfMonth(maxDay.current), currDay.current) < 0 ? 
+          (
             <DayPicker
               canChangeMonth={false}
               selectedDays={day}
@@ -151,12 +159,21 @@ const Scheduler = ({ userid, roomid }) => {
               fixedWeeks
             />
           )}
-
-          {day.toDateString()}
+        </Row>
+        <Row className="justify-content-md-center">
+                        <span>Selected Day: {day.toDateString()}</span><br/>
+                        <span>Price: ${price}</span><br/>
+        </Row>
+        <Row className="justify-content-md-center">
+                        <p className="font-weight-bold">Selected: </p><br/>
+                        <p className="font-weight-bold ">{!selected ? null : selected.toDateString()}</p>
+                        <p className="font-weight-bold ">{!selected ? null : `at ${selected.getUTCHours()}:00`}</p>
+        </Row>
         </Col>
-        <Col className="mt-4">
-          {price}
-          <TimePicker bookings={bookings} timeSelected={timeSelected} />
+        <Col className="mt-4 justify-content-md-center">
+          <Row className="mb-4"><span className="font-weight-bold">Choose available timeslot below</span></Row>
+          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} /></Row>
+          
         </Col>
       </Row>
 
@@ -187,6 +204,25 @@ const Scheduler = ({ userid, roomid }) => {
           </Col>
         </Row>
       )}
+      <Modal 
+        show={show} 
+        onHide={handleClose}
+        backdrop="static"
+      >
+        <Modal.Header>
+          <p>{data.message}</p><br/>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            {!data.booking ? 
+            data.toString(): 
+            data.booking}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleClose}>Dismiss</Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

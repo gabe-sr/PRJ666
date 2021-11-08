@@ -19,8 +19,6 @@ export const isAuthenticated = (req, res, next) => {
   // for GET requests
   if (req.params.id) {
     if (req.session.userInfo.user_id != req.params.id) {
-      console.log(req.session.userInfo.user_id);
-      console.log(req.params.id);
       if (req.session.userInfo.isAdmin === true) {
         next();
       } else {
@@ -32,8 +30,6 @@ export const isAuthenticated = (req, res, next) => {
     // for POST requests
   } else {
     if (req.session.userInfo.user_id != req.body.user_id) {
-      console.log(req.session.userInfo.user_id);
-      console.log(req.body.user_id);
       if (req.session.userInfo.isAdmin === true) {
         next();
       } else {

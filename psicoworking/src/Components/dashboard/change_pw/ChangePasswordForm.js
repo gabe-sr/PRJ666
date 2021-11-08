@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import axios from "axios";
 import { FormField } from "../../shared/form-components/FormField";
 import { Formik, Form } from "formik";
@@ -10,9 +10,9 @@ import Error from "../../error-pages/Error";
 import WithMessage from "../../HOC/modal-messages/WithMessage";
 
 const ChangePasswordForm = (props) => {
-    const { fetchedUser, isLoading, error } = useFetchUser(props.id);
+  const { fetchedUser, isLoading, error } = useFetchUser(props.id);
 
-      //--- *Yup* validation schema ---/
+  //--- *Yup* validation schema ---/
   const validationSchema = Yup.object().shape({
     password: Yup.string()
       .min(8, "Password must be at least 8 charaters")
@@ -23,7 +23,7 @@ const ChangePasswordForm = (props) => {
       ),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), null], "Password must match")
-      .required("You must confirm your password")
+      .required("You must confirm your password"),
   });
   // --- Handle error response from backend POST --- //
   // uses useRef to scrool up to the field with problems (email, crp, etc...)
@@ -103,7 +103,7 @@ const ChangePasswordForm = (props) => {
           initialValues={{
             _id: fetchedUser._id,
             password: "",
-            confirmPassword: ""
+            confirmPassword: "",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmitForm}
@@ -111,18 +111,18 @@ const ChangePasswordForm = (props) => {
           {(formik) => (
             <div className="signup-container">
               <Form>
-              <FormField
-              formType="input"
-              label="New Password"
-              name="password"
-              type="password"
-            />
-            <FormField
-              formType="input"
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-            />
+                <FormField
+                  formType="input"
+                  label="New Password"
+                  name="password"
+                  type="password"
+                />
+                <FormField
+                  formType="input"
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                />
 
                 {handleAdminDisabled() === true ? null : (
                   <>
@@ -147,7 +147,5 @@ const ChangePasswordForm = (props) => {
       </div>
     </div>
   );
-
-
 };
 export default WithMessage(ChangePasswordForm);

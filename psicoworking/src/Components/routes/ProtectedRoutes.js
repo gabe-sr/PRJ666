@@ -10,6 +10,7 @@ import UserProfile from "../dashboard/user_profile/UserProfile";
 import ChangePasswordForm from "../dashboard/change_pw/ChangePasswordForm";
 import UserReport from "../reports/user-report/UserReport";
 import Booking from "../scheduler/Booking";
+import BookingList from "../dashboard/bookings/BookingList";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -80,6 +81,19 @@ const ProtectedRoutes = ({ match }) => {
 
             <Route exact path={`${match.url}/report/user`}>
               <UserReport />
+            </Route>
+
+            <Route 
+              exact 
+              path={`${match.url}/bookinglist`}
+              render={(props)=>(
+                <BookingList 
+                  // userid={data._id}
+                  user={data}
+                />
+              )}
+            >
+
             </Route>
 
             <Route exact path={`${match.url}/*`}>

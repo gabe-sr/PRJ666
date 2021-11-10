@@ -168,7 +168,7 @@ router.post("/", async (req, res) => {
 
       // SEND EMAIL NOTIFICATION
       transporter.sendMail(
-        mailOptionsReview(`${user.email}`),
+        mailOptionsReview(`${user.email}`, `${user.first_name}`),
         (error, info) => {
           if (error) {
             return console.log(error);
@@ -271,7 +271,7 @@ router.patch("/update_authorize/:id", async (req, res) => {
     if (user.active) {
       // SEND EMAIL NOTIFICATION
       transporter.sendMail(
-        mailOptionsApprove(`${user.email}`),
+        mailOptionsApprove(`${user.email}`, `${user.first_name}`),
         (error, info) => {
           if (error) {
             return console.log(error);

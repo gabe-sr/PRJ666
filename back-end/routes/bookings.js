@@ -1,6 +1,7 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
+import { format } from "date-fns";
 const router = express.Router({ mergeParams: true });
 
  /*Get bookings
@@ -121,7 +122,64 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
   }
 });
 
-//No route to update booking
+//update cancellation request
+router.patch("/cancel_request/:id", async (req,res)=>{
+  const response = {
+    message: '',
+    success: false,
+    booking: {}
+  }
+  console.log(req.body)
+  try {
+    const bkns = await Booking.findByIdAndUpdate(
+      { _id: req.params.id },
+      { cancel_request: req.body.cancel_request},
+      { new: true });
+
+    response.message = (bkns.cancel_request ? 
+      `Cancel request for booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+       has been set. Please wait for processing.`
+      :
+      `Something went wrong, this booking was not found. Cancel request was not updated.`)
+    response.success = bkns.cancel_request
+    response.booking = bkns.booking_date
+    console.log(response)
+    res.send(response)
+    
+  } catch (err) {
+    response.message = `Something went wrong: ${err.message}`
+    response.success = false
+    res.send(response)
+  }
+})
+
+router.patch("/cancel_approve/:id", async (req,res)=>{
+  const response = {
+    message: '',
+    success: false,
+    booking: {}
+  }
+  try {
+    const bkns = await Booking.findByIdAndUpdate(
+      { _id: req.params.id },
+      { _isCancelled: req.body._isCancelled},
+      { new: true });
+
+    response.message = (bkns._isCancelled ? 
+      `Booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+       has been successfully cancelled`
+      :
+      `Something went wrong, this booking was not found. Cancel request was not updated.`)
+    response.success = bkns._isCancelled
+    response.booking = bkns.booking_date
+    res.send(response)
+    
+  } catch (err) {
+    response.message = `Something went wrong: ${err.message}`
+    response.success = false
+    res.send(response)
+  }
+})
 
 //Delete booking on db, we still need to decide wether we are actually deleting bookings, or just flagging as deleted
 router.delete("/:id", async (req, res) => {

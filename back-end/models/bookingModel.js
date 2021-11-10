@@ -7,17 +7,32 @@ const bookingSchema = new Schema(
       type: Date, //Date is supposed to be saved in UTC ISO format
       required: true,
     },
+    // user_id: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   required: true,
+    // },
+    // room_id: {
+    //   type: mongoose.Schema.Types.ObjectId, 
+    //   required: true,
+    // }
     user_id: {
-      type: mongoose.Schema.Types.ObjectId, // String, // Experimenting to see if its better to use this of String and then parse
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user_registration",
     },
     room_id: {
-      type: mongoose.Schema.Types.ObjectId, // String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "room",
+    }
+    ,
+    price_at_booking: {
+      type: Number,
       required: true,
     },
-    price_at_booking: {
-      type: String,
-      required: true,
+    discount:{
+      type: Object,
+      default: {
+        name: "noDiscount",
+        value:0}
     },
     booking_type: {
       type: String,

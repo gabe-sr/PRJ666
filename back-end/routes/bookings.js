@@ -181,14 +181,28 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
   }
 })
 
-//Delete booking on db, we still need to decide wether we are actually deleting bookings, or just flagging as deleted
-router.delete("/:id", async (req, res) => {
+//~~DANGER~~
+//wipe out whole collection
+router.delete("/deleteAll", async (req, res) => {
   try {
-    //inform user (see users.js POST method good practice)
-    await Booking.findByIdAndDelete(req.params.id);
+    //deleteMany with nothing as query params, should delete every single record
+    const deleted = await Booking.deleteMany({});
+    //print the number of deleted records
+    console.log(deleted)
+    res.send(deleted)
   } catch (err) {
-    Console.log(err);
+    console.log(err);
   }
 });
+
+//Delete booking on db, we still need to decide wether we are actually deleting bookings, or just flagging as deleted
+// router.delete("/:id", async (req, res) => {
+//   try {
+//     //
+//     await Booking.findByIdAndDelete(req.params.id);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
 
 export { router };

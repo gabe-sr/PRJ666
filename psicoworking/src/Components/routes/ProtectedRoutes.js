@@ -19,17 +19,19 @@ const ProtectedRoutes = ({ match }) => {
   // isLoading: waiting for server response
   // data: return user object
   const { isAuth, isLoading, data } = useAuthentication();
-
+  
   // waiting for server response...
   if (isLoading) {
     return null;
   }
 
-  // If user is not authenticated, return error page
+  // If user is not authenticated, return login page
   // Otherwise, load protected routes
   if (!isAuth) {
     return <Error type="401" />;
-  } else {
+  }
+  
+  if(isAuth){
     return (
       <>
         <div className="sidebar">

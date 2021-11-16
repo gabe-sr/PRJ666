@@ -1,0 +1,19 @@
+{
+  "name": "prj666",
+  "version": "1.0.0",
+  "description": "*preview*",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabe-sr/PRJ666.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gabe-sr/PRJ666/issues"
+  },
+  "homepage": "https://github.com/gabe-sr/PRJ666#readme"
+}

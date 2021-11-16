@@ -32,7 +32,7 @@ p {
 /* Containers */
 
 .container-fluid {
-  padding: 7% 15%;
+  padding: 5% 15%;
 }
 
 /* Sections */
@@ -82,13 +82,12 @@ p {
 }
 
 #title .container-fluid {
-  padding: 3% 15% 7%;
+  padding: 3% 15% 20%;
 }
 
 /* Title Image */
 
 .title-image {
-  width: 60%;
   position: absolute;
   right: 10%;
 }
@@ -128,9 +127,10 @@ p {
 }
 
 .testimonial-image {
-  width: 10%;
-  border-radius: 100%;
+  width: 25%;
   margin: 20px;
+  position: relative;
+  border-radius: 5;
 }
 
 #press {

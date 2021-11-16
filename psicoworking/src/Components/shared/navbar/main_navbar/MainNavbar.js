@@ -45,7 +45,7 @@ const MainNavbar = (props) => {
           sticky="top"
           expand="lg"
         >
-          <Navbar.Brand className="logo" as={Link} to="/dashboard">
+          <Navbar.Brand className="logo" as={Link} to="/">
             Psicoworking{" "}
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />

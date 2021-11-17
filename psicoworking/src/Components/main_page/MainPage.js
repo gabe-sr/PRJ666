@@ -1,15 +1,15 @@
 import "./MainPage.css";
- import { useHistory } from "react-router-dom";
-import images from "../shared/hook/imagesDataSource"
+import { useHistory } from "react-router-dom";
+import images from "../shared/hook/imagesDataSource";
 import { useState } from "react";
 import LoginModal from "../login/LoginModal.js";
-import useAuthentication from "../shared/hook/useAuthentication"
+import useAuthentication from "../shared/hook/useAuthentication";
 
 function MainPage() {
-    // custom hook to check if user is/not authenticated (render different navbar links)
-    const { isAuth } = useAuthentication();
+  // custom hook to check if user is/not authenticated (render different navbar links)
+  const { isAuth } = useAuthentication();
 
-   const history = useHistory()
+  const history = useHistory();
 
   // const redirect = ()=>{
   //   let path = "/dashboard/book"
@@ -22,19 +22,18 @@ function MainPage() {
 
   // tracks the state of the modal (open/closed)
   const [showModal, setShowModal] = useState(false);
-  
+
   const handleLoginModal = () => {
     setShowModal(!showModal);
   };
 
   const redirect = () => {
-    if(!isAuth){
-      handleLoginModal(); 
-    }
-    else{
+    if (!isAuth) {
+      handleLoginModal();
+    } else {
       //path = "/dashboard"
-      history.push("/dashboard") 
-    } 
+      history.push("/dashboard");
+    }
   };
   return (
     <div className="MainPage">
@@ -144,15 +143,27 @@ function MainPage() {
           <div className="carousel-inner">
             <div className="carousel-item active container-fluid">
               <h2 className="testimonial-text">Room 1</h2>
-              <img className="testimonial-image" src={images.roomBeige1} alt="room1" />
+              <img
+                className="testimonial-image"
+                src={images.roomBeige1}
+                alt="room1"
+              />
             </div>
             <div className="carousel-item container-fluid">
               <h2 className="testimonial-text">Room 2</h2>
-              <img className="testimonial-image" src={images.roomBlue1} alt="Room 2" />
+              <img
+                className="testimonial-image"
+                src={images.roomBlue1}
+                alt="Room 2"
+              />
             </div>
             <div className="carousel-item container-fluid">
               <h2 className="testimonial-text">Room 3</h2>
-              <img className="testimonial-image" src={images.roomGreen1} alt="Room 3" />
+              <img
+                className="testimonial-image"
+                src={images.roomGreen1}
+                alt="Room 3"
+              />
             </div>
           </div>
           <a
@@ -261,7 +272,11 @@ function MainPage() {
           </button>
         </div>
       </section>
-      <LoginModal showmodal={showModal} handlemodal={handleLoginModal} redirectTo={"/dashboard/book"}/>
+      <LoginModal
+        showmodal={showModal}
+        handlemodal={handleLoginModal}
+        redirectTo={"/dashboard/book"}
+      />
       {/* <!-- Footer --> */}
 
       <footer className="white-section" id="footer">

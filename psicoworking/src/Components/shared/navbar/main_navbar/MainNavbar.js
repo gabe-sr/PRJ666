@@ -104,7 +104,11 @@ const MainNavbar = (props) => {
           </Navbar.Collapse>
         </Navbar>
 
-        <LoginModal showmodal={showModal} handlemodal={handleLogout} />
+        <LoginModal
+          showmodal={showModal}
+          handlemodal={handleLogout}
+          redirectTo="/dashboard"
+        />
       </>
     );
   };
@@ -167,7 +171,11 @@ const MainNavbar = (props) => {
           </Navbar.Collapse>
         </Navbar>
 
-        <LoginModal showmodal={showModal} handlemodal={handleLoginModal} />
+        <LoginModal
+          showmodal={showModal}
+          handlemodal={handleLoginModal}
+          redirectTo="/dashboard"
+        />
       </>
     );
   };

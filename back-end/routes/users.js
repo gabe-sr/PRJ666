@@ -29,8 +29,7 @@ router.get("/", isLogged, isAuthenticated, async (req, res) => {
       res.send(users);
     } else {
       const users = await User.find()
-        .select("first_name last_name email")
-        .sort({ fist_name: "desc" });
+      .sort({ fist_name: "desc" });
       res.send(users);
     }
   } catch (err) {

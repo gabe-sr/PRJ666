@@ -45,6 +45,7 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
             {props.columns.map((colName, index) => {
               switch (colName) {
                 case "fullname":
+                case "user.fullname":
                   if (data.user) {
                     return (
                       <td
@@ -63,6 +64,7 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                 case "total":
                 case "price":
                 case "price_at_reservation":
+                case "price_at_booking":
                   return (
                     <td onClick={() => whenClicked(data)} key={index}>
                       {new Intl.NumberFormat("pt-BR", {
@@ -72,9 +74,34 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                     </td>
                   );
 
+                case "active":
+                  let status;
+                  if (Object.byString(data, colName)) {
+                    status = "Active";
+                  } else {
+                    status = "Inactive";
+                  }
+                  return (
+                    <td onClick={() => whenClicked(data)} key={index}>
+                      {status}
+                    </td>
+                  );
+
+                case "_isCancelled":
+                  let cancelled;
+                  if (Object.byString(data, colName) === false) {
+                    cancelled = "Active";
+                  } else {
+                    cancelled = "Cancelled";
+                  }
+                  return (
+                    <td onClick={() => whenClicked(data)} key={index}>
+                      {cancelled}
+                    </td>
+                  );
+
                 case "createdAt":
                 case "date":
-                case "booking_date":
                   return (
                     <td onClick={() => whenClicked(data)} key={index}>
                       {format(
@@ -84,13 +111,26 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                     </td>
                   );
 
+                case "lastBookingDate":
+                case "booking_date":
+                  return (
+                    <td onClick={() => whenClicked(data)} key={index}>
+                      {`${format(
+                        new Date(Object.byString(data, colName)),
+                        "dd-LLL-y, iii"
+                      )} at ${parseISO(
+                        Object.byString(data, colName)
+                      ).getUTCHours()}:00`}
+                    </td>
+                  );
+
                 case "booking_date2":
-                  return(
-                    <td 
-                        key={index} 
-                        onClick={() => whenClicked(data)}
-                    >
-                            {`${format(parseISO(data.booking_date), "iii '-' do 'of' MMMM', ' yyyy")} 
+                  return (
+                    <td key={index} onClick={() => whenClicked(data)}>
+                      {`${format(
+                        parseISO(data.booking_date),
+                        "iii '-' do 'of' MMMM', ' yyyy"
+                      )} 
                             at ${parseISO(data.booking_date).getUTCHours()}:00`}
                     </td>
                   );
@@ -103,11 +143,11 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                   );
                   return <td key={index}>{customColumnComp(data)}</td>;
 
-                //Custom Column data: returns a custom html tag for the table element 
+                //Custom Column data: returns a custom html tag for the table element
                 //containing relevant information about cancellation status
                 case "cancelStatus":
                   const { customColumnComp2 } = customColumn.find(
-                    (fnc)=> fnc.colDesc === "cancelStatus"
+                    (fnc) => fnc.colDesc === "cancelStatus"
                   );
                   return <td key={index}>{customColumnComp2(data)}</td>;
 

@@ -1,0 +1,12 @@
+.total {
+  padding: 1px 16px;
+}
+.total-col {
+  padding: 2px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  border: 2px solid rgba(0, 0, 0, 0.658);
+}
+.result {
+  background-color: #f39a71;
+}

@@ -46,7 +46,8 @@ const LoginForm = (props) => {
         // If login response is successfull and user IS ACTIVATED
       } else if (success) {
         props.handlemodal();
-        console.log(redirectTo)
+        console.log("CHECK");
+        console.log(redirectTo);
         history.push({
           pathname: redirectTo,
           state: { ...response.data, display: true },

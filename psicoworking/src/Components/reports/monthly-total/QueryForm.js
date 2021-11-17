@@ -12,7 +12,6 @@ import {
   endOfYear,
   set,
 } from "date-fns";
-import axios from "axios";
 import "./QueryForm.css";
 
 const QueryForm = ({ ...props }) => {

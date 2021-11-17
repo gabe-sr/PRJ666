@@ -13,7 +13,6 @@ const MonthlyTotalReport = (props) => {
   const [month, setMonth] = useState();
   const [data, setData] = useState();
   const [total, setTotal] = useState();
-  const [textResponse, setTextResponse] = useState(null);
 
   const { setLoadingSpinner, setModalMessage } = props;
 
@@ -37,7 +36,7 @@ const MonthlyTotalReport = (props) => {
           setMonth(format(new Date(response.data[0].lastBookingDate), "MMMM"));
         } catch (err) {
           console.log(err);
-          setTextResponse("Something went wrong. Please, try again later.");
+
           setModalMessage(
             true,
             "Something went wrong",

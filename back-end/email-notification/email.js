@@ -9,34 +9,70 @@ export let transporter = nodemailer.createTransport({
   },
 });
 
-export let mailOptionsReview = (email) => ({
+export let mailOptionsReview = (email, name) => ({
   from: '"Psicoworking Team" <psicoworking@gmail.com>',
   to: `${email}`,
   subject: "PSICOWORKING: Your application is under review",
   text: "Thanks for joining Psicoworking!",
-  html: `<h3>Thanks for joining Psicoworking! </h3>
-        <p>This is to inform that we have received your application.</p>
-        <p>Our team is currently reviewing it and you should receive a confirmation message <b>within 48 hours</b>.</p>
-        <p>If you have any questions, please contact us at <a href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>.</p>
+  html: `
+  ${style}
+  <div class="container">
+    <div class="header-banner">
+      <h1>Psicoworking</h1>
+    </div>
+    <div class="main-body">
+      <h3>Hi ${name}, </h3>
+      <p>Thanks for joining Psicoworking! </p>
+      <p>This is to inform that we have received your application.</p>
+      <p>Our team is currently reviewing it and you should receive a confirmation message <b>within 48 hours</b>.</p>
+      <p>If you have any questions, please contact us at: 
+          <a class="link" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>
+        </p>
         <br/>
-        <p>Thanks,<br/>
-        <h4>Psicoworking Team</h4>
-        <p><small>Visit us at <a href="https://psicoworking.herokuapp.com">psicoworking.com</a></small><p>`,
+        <p>Thanks,
+          <br/>
+          <hr/>
+          <h4>Psicoworking Team</h4>
+          <p>
+            <small>Visit us at 
+              <a class="link" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+            </small>
+          <p>
+    </div>
+  </div>
+  `,
 });
 
-export let mailOptionsApprove = (email) => ({
+export let mailOptionsApprove = (email, name) => ({
   from: '"Psicoworking Team" <psicoworking@gmail.com>',
   to: `${email}`,
   subject: "PSICOWORKING: Your application has been approved!",
   text: "Your application was approved!",
-  html: `<h3>Welcome to Psicoworking! </h3>
-        <p>This is to inform that your application has been approved.</p>
-        <p>You can now visit <a href="https://psicoworking.herokuapp.com">psicoworking.com</a> and sign in into your account.</p>
-        <p>If you have any questions, please contact us at <a href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>.</p>
+  html: `${style}
+  <div class="container">
+    <div class="header-banner">
+      <h1>Psicoworking</h1>
+    </div>
+    <div class="main-body">
+      <h3>Hi ${name}, </h3>
+      <p>This is to inform that your application has been approved.</p>
+      <p>You can now visit <a href="https://psicoworking.herokuapp.com">psicoworking.com</a> and sign in into your account.</p>
+      <p>If you have any questions, please contact us at: 
+        <a class="link" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>
+      </p>
+      <br/>
+      <p>Thanks,
         <br/>
-        <p>Thanks,<br/>
+        <hr/>
         <h4>Psicoworking Team</h4>
-        <p><small>Visit us at <a href="https://psicoworking.herokuapp.com">psicoworking.com</a></small><p>`,
+        <p>
+          <small>Visit us at 
+            <a class="link" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+          </small>
+        <p>
+    </div>
+  </div>
+  `,
 });
 
 export let mailOptionsRedefine = (name, email, link) => ({

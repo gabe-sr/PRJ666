@@ -73,7 +73,7 @@ const UserReport = (props) => {
 
   return (
     <>
-      <h3 className="text-secondary text-left p-3">User report</h3>
+      <h3 className="text-secondary text-left p-3">Booking report</h3>
       <Container className="p-3 text-left">
         <UserQueryForm setQuery={handleQuery} />
         <hr />
@@ -103,6 +103,7 @@ const UserReport = (props) => {
             }}
             paginationQuery={handlePaginationQuery}
             values={data.values}
+            whenClicked={() => null}
           />
         )}
       </Container>

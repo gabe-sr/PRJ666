@@ -1,12 +1,242 @@
 import express from "express";
-import mongoose from "mongoose";
 import { User } from "../models/userModel.js";
 import { Booking } from "../models/bookingModel.js";
 import { Room } from "../models/roomModel.js";
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 const router = express.Router();
 
-// ----- GENERATE USER REPORTS ------ //
+// --------------- GENERATE MONTHLY TOTAL REPORT ----------------- //
+
+router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
+  try {
+    let { name, year, month, sort } = req.query;
+
+    // Validate incoming data
+    year = parseInt(year);
+    month = parseInt(month);
+    let fullName = null;
+    let hasName = false;
+    let fetchedUsers = [];
+
+    // validate name
+    if (name) {
+      name = name.toLowerCase().trim();
+      fullName = name.split(" ");
+      hasName = true;
+    }
+
+    // validate sort by
+    if (!sort || (sort != "byName" && sort !== "byAmount")) {
+      sort = "byName";
+    }
+
+    // validate month/year
+    let sDate = new Date().setUTCFullYear(year, month, 1);
+    sDate = new Date(new Date(sDate).setUTCHours(0, 0, 0, 0));
+    let eDate = new Date().setUTCFullYear(year, month + 1, 0);
+    eDate = new Date(new Date(eDate).setUTCHours(23, 59, 59, 999));
+
+    // fetch users
+    if (hasName === false) {
+      fetchedUsers = await User.find()
+        .select("_id first_name last_name email cpf_no")
+        .sort({ fist_name: "desc" });
+    } else {
+      fetchedUsers = await User.find({
+        $and: [
+          { first_name: { $regex: new RegExp(fullName[0], "gi") } },
+          { last_name: { $regex: new RegExp(fullName[1], "gi") } },
+        ],
+      })
+        .select("_id first_name last_name email cpf_no")
+        .sort({ fist_name: "desc" });
+    }
+
+    // fetch bookings
+    let fetchedBookings = [];
+    await Promise.all(
+      fetchedUsers.map(async (usr) => {
+        let total = 0;
+        let lastDate = sDate;
+        let result = await Booking.find({
+          user_id: usr._id,
+          booking_type: "normal",
+          booking_date: {
+            $gte: sDate,
+            $lte: eDate,
+          },
+        })
+          .select("_id booking_date price_at_booking _isCancelled")
+          .populate({
+            path: "user_id",
+            select: "first_name last_name email cpf_no",
+          })
+          .populate({ path: "room_id", select: "name price" })
+          .exec();
+        result.forEach((b) => {
+          total += b.price_at_booking;
+          if (b.booking_date > lastDate) {
+            lastDate = b.booking_date;
+          }
+        });
+        if (result.length > 0) {
+          fetchedBookings.push({
+            user: usr,
+            bookings: result,
+            total: total,
+            quantity: result.length,
+            lastBookingDate: lastDate,
+          });
+        }
+      })
+    );
+
+    if (sort == "byAmount") {
+      fetchedBookings.sort((a, b) => {
+        return b.total - a.total;
+      });
+    }
+
+    res.send(fetchedBookings);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+// --------------- GENERATE MONTHLY USER REPORTS ----------------- //
+// to get the monthly report by User
+router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
+  try {
+    let { name, year, month, sort, id } = req.query;
+
+    // Validate incoming data
+    year = parseInt(year);
+    month = parseInt(month);
+    let fullName = null;
+    let hasName = false;
+    let hasID = false;
+    let fetchedUsers = [];
+
+    // check if user id was provided
+    if (id) {
+      hasID = true;
+    }
+
+    // validate name
+    if (name) {
+      name = name.toLowerCase().trim();
+      fullName = name.split(" ");
+      hasName = true;
+    }
+
+    // validate sort by
+    if (!sort || (sort != "asc" && sort !== "desc")) {
+      sort = "asc";
+    }
+
+    // validate month/year
+    let sDate = new Date().setUTCFullYear(year, month, 1);
+    sDate = new Date(new Date(sDate).setUTCHours(0, 0, 0, 0));
+    let eDate = new Date().setUTCFullYear(year, month + 1, 0);
+    eDate = new Date(new Date(eDate).setUTCHours(23, 59, 59, 999));
+
+    // fetch users
+    if (hasID) {
+      fetchedUsers = await User.findOne({ _id: id })
+        .select("_id first_name last_name email cpf_no active")
+        .sort({ fist_name: "desc" });
+    } else {
+      if (hasName === false) {
+        fetchedUsers = await User.find()
+          .select("_id first_name last_name email cpf_no active")
+          .sort({ fist_name: "desc" });
+      } else if (fullName.length > 1) {
+        fetchedUsers = await User.find({
+          $and: [
+            { first_name: { $regex: new RegExp(`^${fullName[0]}`, "gi") } },
+            { last_name: { $regex: new RegExp(`^${fullName[1]}`, "gi") } },
+          ],
+        })
+          .select("_id first_name last_name email cpf_no active")
+          .sort({ fist_name: "desc" });
+      } else if (fullName.length === 1) {
+        fetchedUsers = await User.find({
+          first_name: { $regex: new RegExp(`^${fullName[0]}`, "gi") },
+        })
+          .select("_id first_name last_name email cpf_no active")
+          .sort({ fist_name: "desc" });
+      }
+    }
+
+    // returns an error message of "invalid user name"
+    if (fetchedUsers.length === 0) {
+      return res.send({ values: null, multiple: false, hasUser: false });
+    }
+
+    // returns a list of users to be selected
+    // if user ID is present, this means it was already selected, so skip this
+    if (fetchedUsers.length >= 1) {
+      if (hasID === false) {
+        return res.send({
+          values: fetchedUsers,
+          multiple: true,
+          hasUser: true,
+        });
+      }
+    }
+
+    // fetch bookings
+    let fetchedBookings = [];
+
+    let total = 0;
+    let lastDate = sDate;
+    let result = await Booking.find({
+      user_id: fetchedUsers._id,
+      booking_type: "normal",
+      booking_date: {
+        $gte: sDate,
+        $lte: eDate,
+      },
+    })
+      .select("_id booking_date price_at_booking _isCancelled")
+      .sort({ booking_date: sort })
+      .populate({
+        path: "user_id",
+        select: "first_name last_name email cpf_no",
+      })
+      .populate({ path: "room_id", select: "name price" })
+      .exec();
+    result.forEach((b) => {
+      total += b.price_at_booking;
+      if (b.booking_date > lastDate) {
+        lastDate = b.booking_date;
+      }
+    });
+    //   if (result.length > 0) {
+    fetchedBookings.push({
+      user: fetchedUsers,
+      bookings: result,
+      total: total.toFixed(2),
+      quantity: result.length,
+      lastBookingDate: lastDate,
+    });
+    //  }
+
+    if (sort == "byAmount") {
+      fetchedBookings.sort((a, b) => {
+        return b.total - a.total;
+      });
+    }
+
+    res.send(fetchedBookings);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+// --------------- GENERATE USER REPORTS ----------------- //
 // far from being efficient... but it works
 router.get("/users", isLogged, isAuthenticated, async (req, res) => {
   try {

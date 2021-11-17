@@ -16,12 +16,26 @@ import {
 
 // ----- GET ALL USERS IN DB ------ //
 router.get("/", isLogged, isAuthenticated, async (req, res) => {
+  let { name } = req.query;
+
   try {
-    const users = await User.find().sort({ fist_name: "desc" });
-    res.send(users);
-    //link to front end, sending object(array)
+    if (name) {
+      name = name.toLowerCase().trim();
+      const users = await User.find({
+        first_name: { $regex: new RegExp(name, "gi") },
+      })
+        .select("first_name last_name email")
+        .sort({ fist_name: "desc" });
+      res.send(users);
+    } else {
+      const users = await User.find()
+        .select("first_name last_name email")
+        .sort({ fist_name: "desc" });
+      res.send(users);
+    }
   } catch (err) {
     console.log(err);
+    res.sendStatus(500);
   }
 });
 

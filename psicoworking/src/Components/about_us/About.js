@@ -23,7 +23,7 @@ function About() {
           <div className="row align-items-center">
             <div className="col-lg-5 px-5 mx-auto">
               <img
-                src="https://bootstrapious.com/i/snippets/sn-about/img-2.jpg"
+                src={images.pri}
                 alt=""
                 className="img-fluid mb-4 mb-lg-0"
               />

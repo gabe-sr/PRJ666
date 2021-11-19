@@ -9,6 +9,7 @@ import roomGreen1 from "../../../images/room-green-1.jpeg";
 import roomGreen2 from "../../../images/room-green-2.jpeg";
 import roomView from "../../../images/room-view.jpeg";
 import nathalia from "../../../images/nathalia.jpg";
+import pri from "../../../images/pri.jpg";
 
 const images = {
     roomBeige1,
@@ -21,6 +22,7 @@ const images = {
     roomGreen1,
     roomGreen2,
     roomView,
-    nathalia
+    nathalia,
+    pri
 }
 export default images;

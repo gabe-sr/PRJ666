@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import images from "../shared/hook/imagesDataSource";
 import { useState } from "react";
 import LoginModal from "../login/LoginModal.js";
+import Footer from "../footer/Footer";
 import useAuthentication from "../shared/hook/useAuthentication";
 
 function MainPage() {
@@ -278,16 +279,8 @@ function MainPage() {
         redirectTo={"/dashboard/book"}
       />
       {/* <!-- Footer --> */}
-
-      <footer className="white-section" id="footer">
-        <div className="container-fluid">
-          <i className="social-icon fab fa-facebook-f"></i>
-          <i className="social-icon fab fa-twitter"></i>
-          <i className="social-icon fab fa-instagram"></i>
-          <i className="social-icon fas fa-envelope"></i>
-          <p>© Copyright 2021 Psicoworking</p>
-        </div>
-      </footer>
+          <Footer/>
+      
     </div>
   );
 }

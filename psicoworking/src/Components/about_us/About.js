@@ -1,5 +1,6 @@
 import "./About.css";
 import images from "../shared/hook/imagesDataSource";
+import Footer from "../footer/Footer"
 function About() {
   return (
     <>
@@ -57,6 +58,7 @@ function About() {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 }

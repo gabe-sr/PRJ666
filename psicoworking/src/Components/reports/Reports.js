@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { Container, Accordion, Button } from "react-bootstrap";
 import * as AiIcons from "react-icons/ai";
@@ -8,6 +8,10 @@ import "./Reports.css";
 
 const Reports = () => {
   const history = useHistory();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Container className="w-75 ">

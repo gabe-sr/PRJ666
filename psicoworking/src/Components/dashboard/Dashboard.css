@@ -9,14 +9,34 @@
 
 /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
 div.content {
-  margin-left: 200px;
+  margin-left: 40px;
+  /* margin: 0 auto; */
   padding: 1px 16px;
   height: 1000px;
   margin-top: 2rem;
+  transition: 0.3s;
+}
+
+div.content-resize {
+  margin-left: 170px;
+  margin-right: auto;
+  padding: 1px 16px;
+  height: 1000px;
+  margin-top: 2rem;
+  transition: 0.3s;
+}
+
+@media screen and (max-width: 700px) {
+  div.content {
+    margin: 0 40px;
+    padding: 1px 16px;
+    height: 1000px;
+    margin-top: 2rem;
+  }
 }
 
 /* On screens that are less than 700px wide, make the sidebar into a topbar */
-@media screen and (max-width: 700px) {
+/* @media screen and (max-width: 700px) {
   .sidebar {
     width: 100%;
     height: auto;
@@ -28,4 +48,4 @@ div.content {
   div.content {
     margin-left: 0;
   }
-}
+} */

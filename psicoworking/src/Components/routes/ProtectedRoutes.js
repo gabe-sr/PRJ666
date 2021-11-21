@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import Scheduler from "../scheduler/Scheduler";
@@ -21,7 +21,12 @@ const ProtectedRoutes = ({ match }) => {
   // isLoading: waiting for server response
   // data: return user object
   const { isAuth, isLoading, data } = useAuthentication();
-  
+  const [resizeContent, setResizeContent] = useState(false);
+
+  const handleResize = (arg) => {
+    setResizeContent(arg);
+  };
+
   // waiting for server response...
   if (isLoading) {
     return null;
@@ -32,14 +37,14 @@ const ProtectedRoutes = ({ match }) => {
   if (!isAuth) {
     return <Error type="401" />;
   }
-  
-  if(isAuth){
+
+  if (isAuth) {
     return (
       <>
         <div className="sidebar">
-          <Sidebar id={data._id} isAdmin={data.isAdmin} />
+          <Sidebar id={data._id} isAdmin={data.isAdmin} resize={handleResize} />
         </div>
-        <div className="content">
+        <div className={resizeContent ? "content-resize" : "content"}>
           <Switch>
             <Route exact path={`${match.url}`}>
               <Dashboard userData={data} />

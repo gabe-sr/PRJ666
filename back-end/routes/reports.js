@@ -38,18 +38,16 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
 
     // fetch users
     if (hasName === false) {
-      fetchedUsers = await User.find()
-        .select("_id first_name last_name email cpf_no")
-        .sort({ fist_name: "desc" });
+      fetchedUsers = await User.find().select(
+        "_id first_name last_name email cpf_no"
+      );
     } else {
       fetchedUsers = await User.find({
         $and: [
           { first_name: { $regex: new RegExp(fullName[0], "gi") } },
           { last_name: { $regex: new RegExp(fullName[1], "gi") } },
         ],
-      })
-        .select("_id first_name last_name email cpf_no")
-        .sort({ fist_name: "desc" });
+      }).select("_id first_name last_name email cpf_no");
     }
 
     // fetch bookings
@@ -74,9 +72,11 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
           .populate({ path: "room_id", select: "name price" })
           .exec();
         result.forEach((b) => {
-          total += b.price_at_booking;
-          if (b.booking_date > lastDate) {
-            lastDate = b.booking_date;
+          if (b._isCancelled === false) {
+            total += b.price_at_booking;
+            if (b.booking_date > lastDate) {
+              lastDate = b.booking_date;
+            }
           }
         });
         if (result.length > 0) {
@@ -94,6 +94,19 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
     if (sort == "byAmount") {
       fetchedBookings.sort((a, b) => {
         return b.total - a.total;
+      });
+    } else {
+      fetchedBookings = fetchedBookings.sort((a, b) => {
+        var nameA = a.user.first_name.toLowerCase();
+        var nameB = b.user.first_name.toLowerCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
       });
     }
 
@@ -208,9 +221,11 @@ router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
       .populate({ path: "room_id", select: "name price" })
       .exec();
     result.forEach((b) => {
-      total += b.price_at_booking;
-      if (b.booking_date > lastDate) {
-        lastDate = b.booking_date;
+      if (b._isCancelled === false) {
+        total += b.price_at_booking;
+        if (b.booking_date > lastDate) {
+          lastDate = b.booking_date;
+        }
       }
     });
     //   if (result.length > 0) {

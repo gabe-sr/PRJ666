@@ -1,6 +1,7 @@
 .nav-template {
   background-color: #f39a71;
   padding: 3% 12% 3vw 8%;
+  height: 120px;
 }
 .nav-username {
   font-size: 1.5rem;
@@ -19,6 +20,16 @@
 
 .customColor:hover {
   color: #f8f8ffcb !important;
+}
+
+@media (max-width: 992px) {
+  .logo {
+    font-size: 2rem;
+  }
+  .nav-template {
+    min-height: 120px;
+    height: auto;
+  }
 }
 
 @media (min-width: 992px) {

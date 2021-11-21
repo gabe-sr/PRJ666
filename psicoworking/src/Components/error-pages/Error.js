@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Container } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
-import LoginModal from "../login/LoginModal"
+import LoginModal from "../login/LoginModal";
 
 const Error = (props) => {
   const [message, setMessage] = useState();
@@ -11,12 +11,10 @@ const Error = (props) => {
   const state = history.location.state;
 
   const [showModal, setShowModal] = useState(false);
-  
+
   const handleLoginModal = () => {
     setShowModal(!showModal);
   };
-
-
 
   const errorType = useCallback(() => {
     if (props) {
@@ -24,8 +22,8 @@ const Error = (props) => {
         setHeader("404 - Page not found");
         setMessage("We're sorry, we couldn't find the page you requested.");
       } else if (props.type === "401") {
-        console.log("401")
-        setShowModal(true)
+        console.log("401");
+        setShowModal(true);
         // handleLoginModal()
         setHeader("401 - Not Authorized");
         setMessage(
@@ -77,6 +75,10 @@ const Error = (props) => {
     errorType();
   }, [errorType]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Container className="m-4">
       <h2>{header}</h2>
@@ -88,9 +90,12 @@ const Error = (props) => {
       >
         Return
       </Button> */}
-      
-      
-      <LoginModal showmodal={showModal} handlemodal={handleLoginModal} redirectTo={history.location.pathname}/>
+
+      <LoginModal
+        showmodal={showModal}
+        handlemodal={handleLoginModal}
+        redirectTo={history.location.pathname}
+      />
     </Container>
   );
 };

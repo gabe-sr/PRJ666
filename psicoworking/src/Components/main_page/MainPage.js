@@ -1,7 +1,7 @@
 import "./MainPage.css";
 import { useHistory } from "react-router-dom";
 import images from "../shared/hook/imagesDataSource";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoginModal from "../login/LoginModal.js";
 import Footer from "../footer/Footer";
 import useAuthentication from "../shared/hook/useAuthentication";
@@ -20,6 +20,10 @@ function MainPage() {
   //   }
   //   history.push(path)
   // }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // tracks the state of the modal (open/closed)
   const [showModal, setShowModal] = useState(false);

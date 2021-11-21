@@ -1,10 +1,14 @@
-import React from "react";
+import { useEffect } from "react";
 import { Container } from "react-bootstrap";
 import "./Dashboard.css";
 
 const Dashboard = (props) => {
   // user data from protected route component, fetched with isAuthenticated hook
   const { userData } = props;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // welcome page/block for dashboard
   const DashboardHome = (props) => {

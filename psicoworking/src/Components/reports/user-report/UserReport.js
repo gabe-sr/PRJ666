@@ -10,6 +10,10 @@ import { format } from "date-fns";
 const UserReport = (props) => {
   const { setLoadingSpinner, setModalMessage } = props;
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const NUM_OF_ROWS = 20;
 
   const [data, setData] = useState();

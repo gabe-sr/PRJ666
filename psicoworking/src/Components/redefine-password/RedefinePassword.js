@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import { Container } from "react-bootstrap";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
@@ -13,6 +13,10 @@ const RedefinePassword = (props) => {
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Email is invalid").required("Email is required"),
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // GET SPINNER AND MODAL MESSAGE from props
   const { setLoadingSpinner, setModalMessage } = props;

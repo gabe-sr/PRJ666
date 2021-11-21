@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Row, Col } from "react-bootstrap";
+import { useHistory } from "react-router";
+import { Row, Col, Modal, Button } from "react-bootstrap";
 import QueryForm from "./QueryForm";
 import "./MontlyTotalReport.css";
 import NewTableData from "../../shared/table_data_new/NewTableData";
@@ -10,7 +11,8 @@ import { format } from "date-fns";
 
 const MonthlyTotalReport = (props) => {
   const [query, setQuery] = useState();
-  const [month, setMonth] = useState();
+  const [month, setSelectedMonth] = useState();
+  const [year, setSelectedYear] = useState();
   const [data, setData] = useState();
   const [total, setTotal] = useState();
 
@@ -18,8 +20,11 @@ const MonthlyTotalReport = (props) => {
 
   const handleQuery = (_query) => {
     setQuery(_query);
-    console.log(_query);
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (query) {
@@ -33,7 +38,12 @@ const MonthlyTotalReport = (props) => {
             sum += d.total;
           });
           setTotal(sum.toFixed(2));
-          setMonth(format(new Date(response.data[0].lastBookingDate), "MMMM"));
+          setSelectedMonth(
+            format(new Date(response.data[0].lastBookingDate), "M") - 1
+          );
+          setSelectedYear(
+            format(new Date(response.data[0].lastBookingDate), "y")
+          );
         } catch (err) {
           console.log(err);
 
@@ -51,12 +61,60 @@ const MonthlyTotalReport = (props) => {
     }
   }, [query, setModalMessage, setLoadingSpinner]);
 
+  // redirect to user report page
+  const [showModal, setShowModal] = useState(false);
+  const [userData, setUserData] = useState();
+  const history = useHistory();
+
+  const MyModal = (props) => {
+    return (
+      <Modal
+        size="sm"
+        show={showModal}
+        fullscreen={"lg-down"}
+        backdrop="static"
+        keyboard={false}
+        centered
+      >
+        <Modal.Body>
+          Do you want to get the{" "}
+          <span style={{ color: "#f39a71", fontWeight: "bold" }}>
+            monthly report
+          </span>{" "}
+          for user{" "}
+          <strong>{`${props.data.user.user.first_name} ${props.data.user.user.last_name}`}</strong>
+          ?
+        </Modal.Body>
+        <Modal.Footer className="justify-content-center">
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() =>
+              history.push("/dashboard/report/month_user", props.data)
+            }
+          >
+            Get report
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+
+  const redirectUser = (user) => {
+    setShowModal(true);
+    let query = `name=${user.user.first_name} ${user.user.last_name}&year=${year}&month=${month}&sort=byName&id=${user.user._id}`;
+    setUserData({ user: user, month: month, year: year, query: query });
+  };
+
   return (
     <>
       <div className="query-container">
         <h3 className="text-secondary mb-4">Monthly Total Report</h3>
         <QueryForm setQuery={handleQuery} />
       </div>
+      {showModal ? <MyModal data={userData} /> : null}
       {data ? (
         <>
           <NewTableData
@@ -77,7 +135,7 @@ const MonthlyTotalReport = (props) => {
               "total",
             ]}
             values={data}
-            whenClicked={() => null}
+            whenClicked={redirectUser}
           />
           <Row className="total">
             <Col className="total-col" xs={{ span: 3, offset: 7 }}>

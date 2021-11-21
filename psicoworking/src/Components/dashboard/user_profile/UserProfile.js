@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FormField } from "../../shared/form-components/FormField";
 import { state_uf_data } from "../../sign_up/sign_up-form/state_uf_data";
@@ -12,6 +12,9 @@ import Error from "../../error-pages/Error";
 import WithMessage from "../../HOC/modal-messages/WithMessage";
 
 const UserProfile = (props) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // --- This will handle the autocomplete delimiters in form ---/
   const [phoneDelimiter, setPhoneDelimiter] = useState(false);
 

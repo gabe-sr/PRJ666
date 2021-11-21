@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useHistory } from "react-router";
 import { Row, Col, Modal } from "react-bootstrap";
 import QueryForm from "./QueryForm";
 import "./MontlyUserReport.css";
@@ -20,13 +21,22 @@ const MonthlyUserReport = (props) => {
 
   const handleQuery = (_query) => {
     setQuery(_query);
-    console.log(_query);
   };
+
+  const history = useHistory();
+  if (history.location.state) {
+    handleQuery(history.location.state.query);
+    history.replace();
+  }
 
   const getMonthFromQuery = (_query) => {
     let month = _query.split("=")[3].split("&")[0];
     return format(setMonth(new Date(), month), "MMMM");
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (query) {
@@ -40,7 +50,6 @@ const MonthlyUserReport = (props) => {
             setUsers(response.data.values);
             setShowModalUsers(true);
           } else {
-            console.log(response.data);
             if (response.data[0].bookings.length > 0) {
               setData(response.data[0]);
               setChosenMonth(getMonthFromQuery(query));

@@ -8,6 +8,7 @@ import WithLoadingSpinner from "../../HOC/loading-spinner/WithLoadingSpinner";
 import WithMessage from "../../HOC/modal-messages/WithMessage";
 import axios from "axios";
 import { format } from "date-fns";
+import ExcelComponent from "../../shared/excel-export/ExcelComponent";
 
 const MonthlyTotalReport = (props) => {
   const [query, setQuery] = useState();
@@ -15,6 +16,8 @@ const MonthlyTotalReport = (props) => {
   const [year, setSelectedYear] = useState();
   const [data, setData] = useState();
   const [total, setTotal] = useState();
+
+  const [excelButton, setExcelButton] = useState(false);
 
   const { setLoadingSpinner, setModalMessage } = props;
 
@@ -44,6 +47,7 @@ const MonthlyTotalReport = (props) => {
           setSelectedYear(
             format(new Date(response.data[0].lastBookingDate), "y")
           );
+          setExcelButton(true);
         } catch (err) {
           console.log(err);
 
@@ -102,6 +106,41 @@ const MonthlyTotalReport = (props) => {
     );
   };
 
+  const ExcelButton = () => {
+    if (excelButton) {
+      return (
+        <ExcelComponent
+          columns={[
+            { col: "user.fullname", label: "User Name" },
+            { col: "user.email", label: "Email" },
+            { col: "user.cpf_no", label: "CPF" },
+            { col: "lastBookingDate", label: "Last booking at" },
+            { col: "quantity", label: "Quantity" },
+            { col: "total", label: "Total" },
+          ]}
+          values={data}
+          name="Monthly_total_report"
+          fileName={`${format(
+            new Date(data[0].lastBookingDate),
+            "MMMM"
+          )}_total_report`}
+        />
+      );
+    }
+
+    return (
+      <Button
+        type="button"
+        className="mt-4 mb-4"
+        size="sm"
+        variant="outline-secondary"
+        disabled
+      >
+        Export to Excel
+      </Button>
+    );
+  };
+
   const redirectUser = (user) => {
     setShowModal(true);
     let query = `name=${user.user.first_name} ${user.user.last_name}&year=${year}&month=${month}&sort=byName&id=${user.user._id}`;
@@ -112,7 +151,9 @@ const MonthlyTotalReport = (props) => {
     <>
       <div className="query-container">
         <h3 className="text-secondary mb-4">Monthly Total Report</h3>
-        <QueryForm setQuery={handleQuery} />
+        <QueryForm setQuery={handleQuery}>
+          <ExcelButton />
+        </QueryForm>
       </div>
       {showModal ? <MyModal data={userData} /> : null}
       {data ? (

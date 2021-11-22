@@ -228,11 +228,7 @@ const QueryForm = ({ ...props }) => {
               </Row>
 
               <Row className="row">
-                <Form.Group
-                  as={Col}
-                  xs={{ span: 8, offset: 6 }}
-                  className="text-left"
-                >
+                <Form.Group as={Col} xs={2} className="text-left">
                   <Button
                     type="submit"
                     className="mt-4 mb-4"
@@ -241,6 +237,9 @@ const QueryForm = ({ ...props }) => {
                   >
                     Get report
                   </Button>
+                </Form.Group>
+                <Form.Group as={Col} xs={2} className="text-left">
+                  {props.children}
                 </Form.Group>
               </Row>
             </Form>

@@ -9,6 +9,10 @@ import {
   mailOptionsRedefine,
 } from "../email-notification/email.js";
 
+import sendGridMail from "@sendgrid/mail";
+import {} from "dotenv/config";
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 const router = express.Router();
 
 // ------- USER LOGIN  ------- //
@@ -139,15 +143,19 @@ router.post("/redefine", async (req, res) => {
     redefine = await redefine.save();
 
     // SEND EMAIL NOTIFICATION
-    transporter.sendMail(
-      mailOptionsRedefine(dbUser.first_name, dbUser.email, redefine._id),
-      (error, info) => {
-        if (error) {
-          return console.log(error);
-        }
-        console.log("Message sent: %s", info.messageId);
-      }
+    // transporter.sendMail(
+    //   mailOptionsRedefine(dbUser.first_name, dbUser.email, redefine._id),
+    //   (error, info) => {
+    //     if (error) {
+    //       return console.log(error);
+    //     }
+    //     console.log("Message sent: %s", info.messageId);
+    //   }
+    // );
+    await sendGridMail.send(
+      mailOptionsRedefine(dbUser.first_name, dbUser.email, redefine._id)
     );
+    console.log("Message sent: %s", user.email);
 
     response.success = true;
     res.send(response);

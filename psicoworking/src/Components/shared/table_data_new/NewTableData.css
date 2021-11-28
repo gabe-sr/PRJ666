@@ -1,0 +1,12 @@
+#root > div > div.content-resize > div.table-responsive > table th {
+  background-color: #f39a71;
+}
+
+#root
+  > div
+  > div.content-resize
+  > div.table-responsive
+  > table
+  tr:nth-child(even) {
+  background-color: #dddbdbbd;
+}

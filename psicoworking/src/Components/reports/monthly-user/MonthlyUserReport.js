@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router";
-import { Row, Col, Modal } from "react-bootstrap";
+import { Row, Col, Modal, Button } from "react-bootstrap";
 import QueryForm from "./QueryForm";
 import "./MontlyUserReport.css";
 import NewTableData from "../../shared/table_data_new/NewTableData";
 import WithLoadingSpinner from "../../HOC/loading-spinner/WithLoadingSpinner";
 import WithMessage from "../../HOC/modal-messages/WithMessage";
 import axios from "axios";
-import { format, setMonth } from "date-fns";
+import { format } from "date-fns";
+import ExcelComponent from "../../shared/excel-export/ExcelComponent";
 
 const MonthlyUserReport = (props) => {
   const [query, setQuery] = useState();
   const [prevQuery, setPrevQuery] = useState();
-  const [selectedMonth, setChosenMonth] = useState();
+
   const [data, setData] = useState();
   const [users, setUsers] = useState([]);
   const [showModalUsers, setShowModalUsers] = useState(false);
+
+  const [excelButton, setExcelButton] = useState(false);
 
   const { setLoadingSpinner, setModalMessage } = props;
 
@@ -25,14 +28,10 @@ const MonthlyUserReport = (props) => {
 
   const history = useHistory();
   if (history.location.state) {
+    setLoadingSpinner(false);
     handleQuery(history.location.state.query);
     history.replace();
   }
-
-  const getMonthFromQuery = (_query) => {
-    let month = _query.split("=")[3].split("&")[0];
-    return format(setMonth(new Date(), month), "MMMM");
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -52,7 +51,8 @@ const MonthlyUserReport = (props) => {
           } else {
             if (response.data[0].bookings.length > 0) {
               setData(response.data[0]);
-              setChosenMonth(getMonthFromQuery(query));
+
+              setExcelButton(true);
             } else {
               setModalMessage(
                 true,
@@ -116,16 +116,52 @@ const MonthlyUserReport = (props) => {
     );
   };
 
+  const ExcelButton = () => {
+    if (excelButton) {
+      return (
+        <ExcelComponent
+          columns={[
+            { col: "_id", label: "Booking Id" },
+            { col: "booking_date", label: "Booking Date" },
+            { col: "room_id.name", label: "Room Description" },
+            { col: "price_at_booking", label: "Price at Booking (R$)" },
+            { col: "_isCancelled", label: "Booking Status" },
+          ]}
+          values={data.bookings}
+          name="Monthly_user_report"
+          fileName={`${format(new Date(data.lastBookingDate), "MMMM")}_${
+            data.user.first_name
+          }_${data.user.last_name}_report`}
+        />
+      );
+    }
+
+    return (
+      <Button
+        type="button"
+        className="mt-4 mb-4"
+        size="sm"
+        variant="outline-secondary"
+        disabled
+      >
+        Export to Excel
+      </Button>
+    );
+  };
+
   return (
     <>
       <div className="query-container">
         <h3 className="text-secondary mb-4">Monthly Report by User</h3>
-        <QueryForm setQuery={handleQuery} />
+        <QueryForm setQuery={handleQuery}>
+          <ExcelButton />
+        </QueryForm>
       </div>
       {users ? <ModalUsers /> : null}
       {data ? (
         <>
           <NewTableData
+            className="new-table-data"
             headers={[
               "Booking ID",
               "Booking Date",
@@ -145,12 +181,13 @@ const MonthlyUserReport = (props) => {
           />
           <Row className="total">
             <Col className="total-col" xs={{ span: 3, offset: 7 }}>
-              Total for {selectedMonth}
+              Total for {format(new Date(data.lastBookingDate), "MMMM")}
             </Col>
             <Col className="total-col result" xs={{ span: 2 }}>
               R$ {data.total}
             </Col>
           </Row>
+          <span></span>
         </>
       ) : null}
     </>

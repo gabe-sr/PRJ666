@@ -63,6 +63,7 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
             $gte: sDate,
             $lte: eDate,
           },
+          _isCancelled: false,
         })
           .select("_id booking_date price_at_booking _isCancelled")
           .populate({
@@ -121,7 +122,7 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
 // to get the monthly report by User
 router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
   try {
-    let { name, year, month, sort, id } = req.query;
+    let { name, year, month, sort, show_cancel, id } = req.query;
 
     // Validate incoming data
     year = parseInt(year);
@@ -130,6 +131,12 @@ router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
     let hasName = false;
     let hasID = false;
     let fetchedUsers = [];
+
+    if (show_cancel === "true") {
+      show_cancel = true;
+    } else {
+      show_cancel = false;
+    }
 
     // check if user id was provided
     if (id) {
@@ -244,14 +251,21 @@ router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
       });
     }
 
-    res.send(fetchedBookings);
+    if (show_cancel) {
+      res.send(fetchedBookings);
+    } else {
+      fetchedBookings[0].bookings = fetchedBookings[0].bookings.filter(
+        (b) => !b._isCancelled
+      );
+      res.send(fetchedBookings);
+    }
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 });
 
-// --------------- GENERATE USER REPORTS ----------------- //
+// --------------- GENERATE GENERAL BOOKING REPORTS ----------------- //
 // far from being efficient... but it works
 router.get("/users", isLogged, isAuthenticated, async (req, res) => {
   try {
@@ -342,8 +356,8 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
 
       // select relevant user data to be displayed
       fetchedUsers.map((u) => {
-        const { _id: user_id, first_name, last_name, email } = u;
-        users.push({ user_id, first_name, last_name, email });
+        const { _id: user_id, first_name, last_name, email, cpf_no } = u;
+        users.push({ user_id, first_name, last_name, email, cpf_no });
       });
     } catch (err) {
       console.log(err);
@@ -371,27 +385,30 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
 
             // include room information in the booking object (flatten data)
             fetchedBookings.map((b) => {
-              let { _id: booking_id, booking_date, room_id } = b;
-              let room = fetchedRooms.find((r) => r._id.equals(room_id));
               let {
-                description: room_description,
-                price: room_price,
-                name: room_name,
-              } = room;
+                _id: booking_id,
+                booking_date: bookdate,
+                room_id,
+                _isCancelled,
+                price_at_booking,
+              } = b;
+              let room = fetchedRooms.find((r) => r._id.equals(room_id));
+              let { description: room_description, name: room_name } = room;
 
               // get time and filter
-              let time = new Date(booking_date).getUTCHours();
+              let time = new Date(bookdate).getUTCHours();
               if (time >= startTime && time <= endTime) {
                 if (roomQuery === "0" || roomQuery === room_id.toString())
                   data.push({
                     ...u,
                     booking_id,
-                    booking_date,
+                    bookdate,
                     time,
                     room_id,
                     room_name,
                     room_description,
-                    room_price,
+                    price_at_booking,
+                    _isCancelled,
                   });
               }
             });
@@ -411,11 +428,11 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
     if (sort === "byName") {
       data = data.sort((a, b) => {
         if (a.first_name.toLowerCase() === b.first_name.toLowerCase()) {
-          if (a.booking_date === b.booking_date) {
+          if (a.bookdate === b.bookdate) {
             return a.time - b.time;
           }
 
-          return a.booking_date - b.booking_date;
+          return a.bookdate - b.bookdate;
         }
         var nameA = a.first_name.toLowerCase();
         var nameB = b.first_name.toLowerCase();
@@ -432,13 +449,14 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
       const dataDB = {
         values: data.slice(sPage, sPage + mRows),
         total: dataTotal,
+        allData: data,
       };
       return res.send(dataDB);
     }
 
     if (sort === "byDate") {
       data.sort((a, b) => {
-        if (a.booking_date === b.booking_date) {
+        if (a.bookdate === b.bookdate) {
           var nameA = a.first_name.toLowerCase();
           var nameB = b.first_name.toLowerCase();
 
@@ -456,11 +474,12 @@ router.get("/users", isLogged, isAuthenticated, async (req, res) => {
           return 0;
         }
 
-        return a.booking_date - b.booking_date;
+        return a.bookdate - b.bookdate;
       });
       const dataDB = {
         values: data.slice(sPage, sPage + mRows),
         total: dataTotal,
+        allData: data,
       };
       return res.send(dataDB);
     }

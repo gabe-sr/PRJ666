@@ -116,8 +116,8 @@ const QueryForm = ({ ...props }) => {
   });
 
   const handleSubmit = (values) => {
-    const { name, year, month, sort } = values;
-    let query = `name=${name}&year=${year}&month=${month}&sort=${sort}&id=`;
+    const { name, year, month, sort, show_cancel } = values;
+    let query = `name=${name}&year=${year}&month=${month}&sort=${sort}&show_cancel=${show_cancel}&id=`;
     props.setQuery(query);
   };
 
@@ -130,6 +130,7 @@ const QueryForm = ({ ...props }) => {
           year: -1,
           month: -1,
           sort: "asc",
+          show_cancel: false,
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -229,7 +230,7 @@ const QueryForm = ({ ...props }) => {
                 </Form.Label>
                 <Form.Group
                   as={Col}
-                  xs={{ span: 8, offset: 0 }}
+                  xs={{ span: 3, offset: 0 }}
                   controlId="querySortBy"
                   key="radio"
                 >
@@ -253,10 +254,24 @@ const QueryForm = ({ ...props }) => {
                     onChange={handleChange}
                   />
                 </Form.Group>
+                <Form.Group
+                  as={Col}
+                  // xs={{ span: 0, offset: 5 }}
+                  controlId="queryShowCancel"
+                  key="checkbox"
+                >
+                  <Form.Check
+                    inline
+                    label="Show cancelled bookings"
+                    name="show_cancel"
+                    id="show_cancel"
+                    onChange={handleChange}
+                  />
+                </Form.Group>
               </Row>
 
               <Row className="row">
-                <Form.Group as={Col} xs={8} className="text-left">
+                <Form.Group as={Col} xs={2} className="text-left">
                   <Button
                     type="submit"
                     className="mt-4 mb-4"
@@ -265,6 +280,9 @@ const QueryForm = ({ ...props }) => {
                   >
                     Get report
                   </Button>
+                </Form.Group>
+                <Form.Group as={Col} xs={2} className="text-left">
+                  {props.children}
                 </Form.Group>
               </Row>
             </Form>

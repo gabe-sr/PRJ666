@@ -4,11 +4,14 @@ import WithMessage from "../../HOC/modal-messages/WithMessage";
 import UserQueryForm from "./UserQueryForm";
 import TableWithPagination from "../../shared/table_data/TableWithPagination";
 import axios from "axios";
-import { Container } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { format } from "date-fns";
+import ExcelComponent from "../../shared/excel-export/ExcelComponent";
 
 const UserReport = (props) => {
   const { setLoadingSpinner, setModalMessage } = props;
+
+  const [excelButton, setExcelButton] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,15 +48,17 @@ const UserReport = (props) => {
 
           // format date/time
           response.data.values.forEach((b) => {
-            b.time = new Date(b.booking_date).toLocaleTimeString([], {
+            b.time = new Date(b.bookdate).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
               timeZone: "UTC",
             });
-            b.booking_date = format(new Date(b.booking_date), "dd-LLL-y, iii");
+            b.bookdate = format(new Date(b.bookdate), "dd-LLL-y, iii");
           });
           if (response.data.total === 0) {
             setTextResponse("Query returned no results.");
+          } else {
+            setExcelButton(true);
           }
 
           setData(response.data);
@@ -75,11 +80,48 @@ const UserReport = (props) => {
     }
   }, [query, setModalMessage, setLoadingSpinner]);
 
+  const ExcelButton = () => {
+    if (excelButton) {
+      return (
+        <ExcelComponent
+          columns={[
+            { col: "fullname", label: "User Name" },
+            { col: "email", label: "Email" },
+            { col: "cpf_no", label: "CPF" },
+            { col: "booking_id", label: "Booking Id" },
+            { col: "bookdate", label: "Date" },
+            { col: "time", label: "Time" },
+            { col: "room_name", label: "Room Name" },
+            { col: "price_at_booking", label: "Price at Booking" },
+            { col: "_isCancelled", label: "Booking Status" },
+          ]}
+          values={data.allData}
+          name="Booking_General_Report"
+          fileName={`booking_general_report`}
+        />
+      );
+    }
+
+    return (
+      <Button
+        type="button"
+        className="mt-4 mb-4"
+        size="sm"
+        variant="outline-secondary"
+        disabled
+      >
+        Export to Excel
+      </Button>
+    );
+  };
+
   return (
     <>
       <h3 className="text-secondary text-left p-3">Booking report</h3>
       <Container className="p-3 text-left">
-        <UserQueryForm setQuery={handleQuery} />
+        <UserQueryForm setQuery={handleQuery}>
+          <ExcelButton />
+        </UserQueryForm>
         <hr />
         {!data || data.total === 0 ? (
           textResponse
@@ -88,18 +130,24 @@ const UserReport = (props) => {
             headers={[
               "Name",
               "Email",
+              "CPF",
+              "Booking Id",
               "Date",
               "Time slot",
               "Room Name",
               "Price",
+              "Booking Status",
             ]}
             columns={[
               "fullname",
               "email",
-              "booking_date",
+              "cpf_no",
+              "booking_id",
+              "bookdate",
               "time",
               "room_name",
-              "room_price",
+              "price_at_booking",
+              "_isCancelled",
             ]}
             pagination={{
               max_rows: NUM_OF_ROWS,

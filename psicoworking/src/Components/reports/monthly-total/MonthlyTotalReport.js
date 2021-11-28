@@ -35,19 +35,30 @@ const MonthlyTotalReport = (props) => {
       const fetchTotal = async () => {
         try {
           const response = await axios.get(`/reports/monthlytotal?${query}`);
-          setData(response.data);
-          let sum = 0;
-          response.data.forEach((d) => {
-            sum += d.total;
-          });
-          setTotal(sum.toFixed(2));
-          setSelectedMonth(
-            format(new Date(response.data[0].lastBookingDate), "M") - 1
-          );
-          setSelectedYear(
-            format(new Date(response.data[0].lastBookingDate), "y")
-          );
-          setExcelButton(true);
+
+          if (response.data.length > 0) {
+            setData(response.data);
+            let sum = 0;
+            response.data.forEach((d) => {
+              sum += d.total;
+            });
+            setTotal(sum.toFixed(2));
+            setSelectedMonth(
+              (
+                format(new Date(response.data[0].lastBookingDate), "M") - 1
+              ).toString()
+            );
+            setSelectedYear(
+              format(new Date(response.data[0].lastBookingDate), "y")
+            );
+            setExcelButton(true);
+          } else {
+            setModalMessage(
+              true,
+              "Report error",
+              `There are no bookings in the selected month.`
+            );
+          }
         } catch (err) {
           console.log(err);
 
@@ -143,7 +154,7 @@ const MonthlyTotalReport = (props) => {
 
   const redirectUser = (user) => {
     setShowModal(true);
-    let query = `name=${user.user.first_name} ${user.user.last_name}&year=${year}&month=${month}&sort=byName&id=${user.user._id}`;
+    let query = `name=${user.user.first_name} ${user.user.last_name}&year=${year}&month=${month}&sort=byName&show_cancel=false&id=${user.user._id}`;
     setUserData({ user: user, month: month, year: year, query: query });
   };
 
@@ -180,7 +191,7 @@ const MonthlyTotalReport = (props) => {
           />
           <Row className="total">
             <Col className="total-col" xs={{ span: 3, offset: 7 }}>
-              Total for {month}
+              Total for {format(new Date(data[0].lastBookingDate), "MMMM")}
             </Col>
             <Col className="total-col result" xs={{ span: 2 }}>
               R$ {total}

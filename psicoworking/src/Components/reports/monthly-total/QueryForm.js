@@ -81,7 +81,7 @@ const QueryForm = ({ ...props }) => {
 
   const handleSubmit = (values) => {
     const { name, year, month, sort } = values;
-    let query = `name=${name}&year=${year}&month=${month}&sort=${sort}`;
+    let query = `name=${name}&year=${year}&month=${month}&sort=${sort}&show_cancel=false`;
     props.setQuery(query);
   };
 
@@ -111,40 +111,6 @@ const QueryForm = ({ ...props }) => {
           <>
             <Form className="query-form" onSubmit={handleSubmit}>
               <Row className="row mb-4 text-left">
-                {/* <Form.Group as={Col} xs={4} controlId="queryName">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    className="name-input"
-                    name="name"
-                    value={values.name}
-                    type="text"
-                    size="sm"
-                    autoComplete="off"
-                    placeholder="Filter by name"
-                    onChange={(e) => {
-                      handleChange(e);
-                      handleSuggestions(e);
-                    }}
-                    onBlur={() => setSuggestions([])}
-                  />
-                  {suggestions.length > 0 ? (
-                    <div className="suggestions">
-                      {suggestions.map((sug, idx) => {
-                        return (
-                          <li
-                            className="suggestions-item"
-                            type="button"
-                            onClick={() => handleNameClick(sug)}
-                            key={idx}
-                          >
-                            {sug}
-                          </li>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </Form.Group> */}
-
                 <Form.Group as={Col} xs={3} controlId="queryYear">
                   <Form.Label>Year</Form.Label>
                   <Form.Select

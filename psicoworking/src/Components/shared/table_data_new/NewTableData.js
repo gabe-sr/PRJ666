@@ -9,6 +9,7 @@
 import React from "react";
 import { Table } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
+import "./NewTableData.css";
 
 const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
   // helper function to access nested object propertios by string

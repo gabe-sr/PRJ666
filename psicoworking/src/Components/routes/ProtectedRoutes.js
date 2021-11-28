@@ -21,7 +21,7 @@ const ProtectedRoutes = ({ match }) => {
   // isLoading: waiting for server response
   // data: return user object
   const { isAuth, isLoading, data } = useAuthentication();
-  const [resizeContent, setResizeContent] = useState(false);
+  const [resizeContent, setResizeContent] = useState(true);
 
   const handleResize = (arg) => {
     setResizeContent(arg);

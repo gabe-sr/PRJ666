@@ -64,7 +64,7 @@ const Reports = () => {
         <Accordion.Item eventKey="2">
           <Accordion.Header className="acc-header">
             <BsIcons.BsCalendar3 />
-            <span>Bookings</span>
+            <span>All Bookings</span>
           </Accordion.Header>
           <Accordion.Body className="text-left">
             <span className="mr-4">

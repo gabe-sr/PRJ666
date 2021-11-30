@@ -12,16 +12,32 @@ import {
   mailOptionsApprove,
 } from "../email-notification/email.js";
 
+import sendGridMail from "@sendgrid/mail";
+import {} from "dotenv/config";
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 // -------- ROUTES DEFINITIONS -------- //
 
 // ----- GET ALL USERS IN DB ------ //
 router.get("/", isLogged, isAuthenticated, async (req, res) => {
+  let { name } = req.query;
+
   try {
-    const users = await User.find().sort({ fist_name: "desc" });
-    res.send(users);
-    //link to front end, sending object(array)
+    if (name) {
+      name = name.toLowerCase().trim();
+      const users = await User.find({
+        first_name: { $regex: new RegExp(name, "gi") },
+      })
+        .select("first_name last_name email")
+        .sort({ fist_name: "desc" });
+      res.send(users);
+    } else {
+      const users = await User.find().sort({ fist_name: "desc" });
+      res.send(users);
+    }
   } catch (err) {
     console.log(err);
+    res.sendStatus(500);
   }
 });
 
@@ -167,15 +183,20 @@ router.post("/", async (req, res) => {
       console.log(user);
 
       // SEND EMAIL NOTIFICATION
-      transporter.sendMail(
-        mailOptionsReview(`${user.email}`),
-        (error, info) => {
-          if (error) {
-            return console.log(error);
-          }
-          console.log("Message sent: %s", info.messageId);
-        }
+      // transporter.sendMail(
+      //   mailOptionsReview(`${user.email}`, `${user.first_name}`),
+      //   (error, info) => {
+      //     if (error) {
+      //       return console.log(error);
+      //     }
+      //     console.log("Message sent: %s", info.messageId);
+      //   }
+      // );
+
+      await sendGridMail.send(
+        mailOptionsReview(`${user.email}`, `${user.first_name}`)
       );
+      console.log("Message sent: %s", user.email);
 
       // send response to front end, with redirect information
       messages.push("Success");
@@ -270,15 +291,19 @@ router.patch("/update_authorize/:id", async (req, res) => {
     // send email if user has been approved (status changed from inactive to active)
     if (user.active) {
       // SEND EMAIL NOTIFICATION
-      transporter.sendMail(
-        mailOptionsApprove(`${user.email}`),
-        (error, info) => {
-          if (error) {
-            return console.log(error);
-          }
-          console.log("Message sent: %s", info.messageId);
-        }
+      // transporter.sendMail(
+      //   mailOptionsApprove(`${user.email}`, `${user.first_name}`),
+      //   (error, info) => {
+      //     if (error) {
+      //       return console.log(error);
+      //     }
+      //     console.log("Message sent: %s", info.messageId);
+      //   }
+      // );
+      await sendGridMail.send(
+        mailOptionsApprove(`${user.email}`, `${user.first_name}`)
       );
+      console.log("Message was sent: %s", user.email);
     }
 
     res.send({ success: true, activeStatus: user.active });

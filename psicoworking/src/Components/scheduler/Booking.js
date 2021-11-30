@@ -80,8 +80,7 @@ const Booking = (props) => {
           <Card.Body>
             <Card.Title>Room 1</Card.Title>
             <Card.Text>
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
+            Sala espaçosa, com sofá de 3 lugares e poltrona. Ideal para atendimento individuais, de casais ou de família.<br/><br/><br/>
             </Card.Text>
             <Row>
               <Button className="col-md-4 mr-3" variant="secondary" onClick={() => {
@@ -128,8 +127,7 @@ const Booking = (props) => {
           <Card.Body>
             <Card.Title>Room 2</Card.Title>
             <Card.Text>
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
+            Sala espaçosa, com janelas amplas e linda vista. Equipada com duas poltronas confortáveis e uma mesa, ideal para aplicação de testes e atendimentos online. 
             </Card.Text>
             <Row>
               <Button className="col-md-4 mr-3" variant="secondary" onClick={() => {
@@ -175,8 +173,7 @@ const Booking = (props) => {
           <Card.Body>
             <Card.Title>Room 3</Card.Title>
             <Card.Text>
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
+            Sala com linda vista, duas poltronas amplas e confortáveis e divã moderno. <br/><br/><br/><br/>
             </Card.Text>
             <Row>
               <Button className="col-md-4 mr-3" variant="secondary" onClick={() => {

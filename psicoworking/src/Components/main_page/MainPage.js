@@ -1,15 +1,45 @@
 import "./MainPage.css";
 import { useHistory } from "react-router-dom";
-import images from "../shared/hook/imagesDataSource"
+import images from "../shared/hook/imagesDataSource";
+import { useState, useEffect } from "react";
+import LoginModal from "../login/LoginModal.js";
+import Footer from "../footer/Footer";
+import useAuthentication from "../shared/hook/useAuthentication";
 
 function MainPage() {
-  const history = useHistory()
+  // custom hook to check if user is/not authenticated (render different navbar links)
+  const { isAuth } = useAuthentication();
 
-  const redirect = ()=>{
-    let path = "/scheduler"
-    history.push(path)
-  }
+  const history = useHistory();
 
+  // const redirect = ()=>{
+  //   let path = "/dashboard/book"
+  //   if(!isAuth){
+  //     console.log("here");
+  //     //handleLoginModal()
+  //   }
+  //   history.push(path)
+  // }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // tracks the state of the modal (open/closed)
+  const [showModal, setShowModal] = useState(false);
+
+  const handleLoginModal = () => {
+    setShowModal(!showModal);
+  };
+
+  const redirect = () => {
+    if (!isAuth) {
+      handleLoginModal();
+    } else {
+      //path = "/dashboard"
+      history.push("/dashboard");
+    }
+  };
   return (
     <div className="MainPage">
       <section className="colored-section" id="title">
@@ -69,7 +99,7 @@ function MainPage() {
 
             <div className="col-lg-6">
               <img
-                className="room-photo"
+                className="title-image"
                 src={images.roomBeige1}
                 alt={"waiting room img"}
               />
@@ -118,13 +148,27 @@ function MainPage() {
           <div className="carousel-inner">
             <div className="carousel-item active container-fluid">
               <h2 className="testimonial-text">Room 1</h2>
-              <img className="testimonial-image" src="" alt="room1" />
-              <em>Room 2</em>
+              <img
+                className="testimonial-image"
+                src={images.roomBeige1}
+                alt="room1"
+              />
             </div>
             <div className="carousel-item container-fluid">
               <h2 className="testimonial-text">Room 2</h2>
-              <img className="testimonial-image" src="" alt="Room 2" />
-              <em>Room 2</em>
+              <img
+                className="testimonial-image"
+                src={images.roomBlue1}
+                alt="Room 2"
+              />
+            </div>
+            <div className="carousel-item container-fluid">
+              <h2 className="testimonial-text">Room 3</h2>
+              <img
+                className="testimonial-image"
+                src={images.roomGreen1}
+                alt="Room 3"
+              />
             </div>
           </div>
           <a
@@ -145,12 +189,11 @@ function MainPage() {
           </a>
         </div>
       </section>
-
       {/* <!-- Pricing --> */}
 
       <section className="white-section" id="pricing">
         <h2 className="section-heading">
-          A Plan for Every Psychologist's Needs
+          A Room for Every Psychologist's Needs
         </h2>
         <p>Simple and affordable price plans for your and your patients.</p>
 
@@ -158,18 +201,19 @@ function MainPage() {
           <div className="pricing-column col-lg-4 col-md-6">
             <div className="card">
               <div className="card-header">
-                <h3>Plan 1</h3>
+                <h3>Room 1</h3>
               </div>
               <div className="card-body">
-                <h2 className="price-text">$20 / mo</h2>
-                <p>Features</p>
-                <p>Features</p>
-                <p>Features</p>
+                <h2 className="price-text">$20 / hour</h2>
+                <p>Wifi</p>
+                <p>Air Conditioning</p>
+                <p>Comfortable chairs</p>
                 <button
-                  className="btn btn-lg btn-block btn-outline-dark"
+                  className="btn btn-lg btn-block btn-dark"
                   type="button"
+                  onClick={redirect}
                 >
-                  Sign Up
+                  Book this Room
                 </button>
               </div>
             </div>
@@ -178,15 +222,19 @@ function MainPage() {
           <div className="pricing-column col-lg-4 col-md-6">
             <div className="card">
               <div className="card-header">
-                <h3>Plan 2</h3>
+                <h3>Room 2</h3>
               </div>
               <div className="card-body">
-                <h2 className="price-text">$49 / mo</h2>
-                <p>Features</p>
-                <p>Features</p>
-                <p>Features</p>
-                <button className="btn btn-lg btn-block btn-dark" type="button">
-                  Sign Up
+                <h2 className="price-text">$23 / hour</h2>
+                <p>Wifi</p>
+                <p>Air Conditioning</p>
+                <p>Couch and Desk</p>
+                <button
+                  className="btn btn-lg btn-block btn-dark"
+                  type="button"
+                  onClick={redirect}
+                >
+                  Book this Room
                 </button>
               </div>
             </div>
@@ -198,19 +246,22 @@ function MainPage() {
                 <h3>Plan 3</h3>
               </div>
               <div className="card-body">
-                <h2 className="price-text">$99 / mo</h2>
-                <p>Features</p>
-                <p>Features</p>
-                <p>Features</p>
-                <button className="btn btn-lg btn-block btn-dark" type="button">
-                  Sign Up
+                <h2 className="price-text">$25 / hour</h2>
+                <p>Wifi</p>
+                <p>Air Conditioning</p>
+                <p>Comfortable chairs</p>
+                <button
+                  className="btn btn-lg btn-block btn-dark"
+                  type="button"
+                  onClick={redirect}
+                >
+                  Book this Room
                 </button>
               </div>
             </div>
           </div>
         </div>
       </section>
-
       {/* <!-- Call to Action --> */}
 
       <section className="colored-section" id="cta">
@@ -219,25 +270,21 @@ function MainPage() {
             Find the Perfect Office Room for your Needs Today.
           </h3>
           <button
-            className="download-button btn btn-lg brn-light"
+            className="btn btn-outline-light btn-lg download-button"
             type="button"
           >
             Book Now
           </button>
         </div>
       </section>
-
+      <LoginModal
+        showmodal={showModal}
+        handlemodal={handleLoginModal}
+        redirectTo={"/dashboard/book"}
+      />
       {/* <!-- Footer --> */}
-
-      <footer className="white-section" id="footer">
-        <div className="container-fluid">
-          <i className="social-icon fab fa-facebook-f"></i>
-          <i className="social-icon fab fa-twitter"></i>
-          <i className="social-icon fab fa-instagram"></i>
-          <i className="social-icon fas fa-envelope"></i>
-          <p>© Copyright 2021 Psicoworking</p>
-        </div>
-      </footer>
+          <Footer/>
+      
     </div>
   );
 }

@@ -45,7 +45,7 @@ const MainNavbar = (props) => {
           sticky="top"
           expand="lg"
         >
-          <Navbar.Brand className="logo" as={Link} to="/dashboard">
+          <Navbar.Brand className="logo" as={Link} to="/">
             Psicoworking{" "}
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -104,7 +104,11 @@ const MainNavbar = (props) => {
           </Navbar.Collapse>
         </Navbar>
 
-        <LoginModal showmodal={showModal} handlemodal={handleLogout} />
+        <LoginModal
+          showmodal={showModal}
+          handlemodal={handleLogout}
+          redirectTo="/dashboard"
+        />
       </>
     );
   };
@@ -167,7 +171,11 @@ const MainNavbar = (props) => {
           </Navbar.Collapse>
         </Navbar>
 
-        <LoginModal showmodal={showModal} handlemodal={handleLoginModal} />
+        <LoginModal
+          showmodal={showModal}
+          handlemodal={handleLoginModal}
+          redirectTo="/dashboard"
+        />
       </>
     );
   };

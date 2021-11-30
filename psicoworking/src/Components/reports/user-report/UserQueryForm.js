@@ -178,14 +178,21 @@ const UserQueryForm = ({ values, ...props }) => {
                 </Form.Group>
               </Row>
 
-              <Button
-                type="submit"
-                className="mt-4 mb-4"
-                variant="secondary"
-                size="sm"
-              >
-                Get report
-              </Button>
+              <Row className="row">
+                <Form.Group as={Col} xs={2} className="text-left">
+                  <Button
+                    type="submit"
+                    className="mt-4 mb-4"
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Get report
+                  </Button>
+                </Form.Group>
+                <Form.Group as={Col} xs={2} className="text-left">
+                  {props.children}
+                </Form.Group>
+              </Row>
             </Form>
           </>
         )}

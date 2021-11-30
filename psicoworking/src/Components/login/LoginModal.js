@@ -20,6 +20,7 @@ const LoginModal = (props) => {
           showmodal={props.showmodal}
           handlemodal={props.handlemodal}
           handleAuthState={props.handleAuthState}
+          redirectTo={props.redirectTo}
         />
       </Modal.Body>
     </Modal>

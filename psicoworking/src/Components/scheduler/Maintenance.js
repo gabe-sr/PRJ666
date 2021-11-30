@@ -14,16 +14,15 @@ import axios from "axios";
 import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import TimePicker from "./TimePicker";
 
-const Scheduler = ({ userid, roomid }) => {
+const Maintenance = ({ userid, roomid }) => {
   const [day, setDay] = useState(setHours(startOfDay(new Date()),2));
   const [bookings, setBookings] = useState([]);
-  const [selected, setSelec] = useState(null);
+  const [selected, setSelec] = useState([]);
   const [price, setPrice] = useState(0);
   const [show, setshow] = useState(false);
   const [data, setData] = useState({});
   const currDay = useRef(startOfDay(new Date()));
   const maxDay = useRef(addDays(startOfDay(new Date()), 7));
-  const roomName = useRef();
 
   const timeSelected = (time) => {
     /* correct date for timezone. Data should be persisted to db only in UTC time, due to date-fns ver2.x not accepting operations with dates from strings
@@ -32,9 +31,10 @@ const Scheduler = ({ userid, roomid }) => {
         " SELECTED IS ALWAYS CORRECTED FOR UTC TIME, OR NULL "*/
     const dateWtime = setHours(day,time);
     const correctedDate = subMinutes(dateWtime, day.getTimezoneOffset());
-    setSelec(correctedDate);
-    console.log(bookings)
-    // setSelec(setHours(day, (time-(day.getTimezoneOffset()/60))));
+    setSelec(prevSelec => {
+        const newSelec = prevSelec.filter(d => d.getUTCHours() !== correctedDate.getUTCHours());
+        return newSelec.length < prevSelec.length ? newSelec : [...prevSelec, correctedDate ];
+    })
   };
 
   const handleDayClick = (date, modifiers = {}) => {
@@ -68,7 +68,7 @@ const Scheduler = ({ userid, roomid }) => {
                   (parseISO(b.booking_date).getUTCHours()) <= 19 &&
                   (parseISO(b.booking_date).getUTCHours()) !== 12)
         })
-        console.log("hello");
+        // console.log("hello");
         setBookings(newB);
       } catch (err) {
         alert(err.message);
@@ -86,7 +86,6 @@ const Scheduler = ({ userid, roomid }) => {
         const res = await axios.get(`/rooms/${roomid}`);
         const fetchedroom = await res.data;
         setPrice(fetchedroom.price);
-        roomName.current = fetchedroom.name;
       } catch (err) {
         console.log(err);
       }
@@ -99,7 +98,7 @@ const Scheduler = ({ userid, roomid }) => {
       (useEffect garantees that )*/
   useEffect(() => {
     fetchBookings(day);
-    setSelec(null);
+    setSelec([]);
   }, [day, fetchBookings]);
 
   /* When user clicks the confirm button the data should be sent to database
@@ -108,17 +107,18 @@ const Scheduler = ({ userid, roomid }) => {
       user inform helpdesk of the issue*/
   const onConfirm = useCallback(async () => {
     try {
-      const req = await axios.post("/book", {
-        booking_date: selected,
+      const req = await axios.post("/book/maintenance", {
+        booking_dates: selected,
         user_id: userid,
         room_id: roomid,
         price_at_booking: price,
+        booking_type: "maintenance",
       });
-      console.log(req)
+    //   console.log(req)
       fetchBookings(day);
+      setSelec([]);
       setData(req.data);
       setshow(true);
-      // console.log(data)
     } catch (err) {
       setData(err.data);
       setshow(true);
@@ -130,7 +130,7 @@ const Scheduler = ({ userid, roomid }) => {
   /* When user clicks cancel, the current selection should be nullified and 
       the timeslots cleared*/
   const onCancel = useCallback(() => {
-    setSelec(null);
+    setSelec([]);
     fetchBookings(day);
   }, [day, fetchBookings]);
 
@@ -164,24 +164,33 @@ const Scheduler = ({ userid, roomid }) => {
             />
           )}
         </Row>
-        <Row className="justify-content-md-center">
-                        <span>Selected Day: {day.toDateString()}</span><br/>
-                        <span>Price: ${price}</span><br/>
+        <Row>
+              the price for the room: ${price}
         </Row>
         <Row className="justify-content-md-center">
-                        <p className="font-weight-bold">Selected: </p><br/>
-                        <p className="font-weight-bold ">{!selected ? null : selected.toDateString()}</p>
-                        <p className="font-weight-bold ">{!selected ? null : `at ${selected.getUTCHours()}:00`}</p>
+        {selected.length}
         </Row>
+        {selected.length > 0 ? 
+            selected.map((s, idx) =>{
+                return(
+                    <Row key={idx}className="justify-content-md-center">
+                        {s.toString()}
+                    </Row>
+                )
+            }
+            ):(
+                <Row className="justify-content-md-center">No booking selected</Row>
+            )
+        }
         </Col>
         <Col className="mt-4 justify-content-md-center">
           <Row className="mb-4"><span className="font-weight-bold">Choose available timeslot below</span></Row>
-          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={false}/></Row>
+          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={true}/></Row>
           
         </Col>
       </Row>
 
-      {!selected ? (
+      {selected.length === 0 ? (
         <Row className="mt-4">
           <Col className="d-grid gap-2">
             <Button variant="primary" size="lg" disabled>
@@ -214,23 +223,14 @@ const Scheduler = ({ userid, roomid }) => {
         backdrop="static"
       >
         <Modal.Header>
-          <strong>{data.title}</strong><br/>
+          <p>{data.message}</p><br/>
         </Modal.Header>
         <Modal.Body>
-          {data === undefined ?
-            <p>`Application Error, please contact admin. Error: server response undefined`</p>
-            :
-            (data.error ? 
-              <div>
-                <strong>{data.message}, please inform the administrator.</strong>
-                <div class="p-3 mb-2 bg-danger text-white">Booking Error</div> 
-              </div>
-              :
-              <div>
-                <p>{roomName.current} was successfully reserved at {data.message}</p>
-                <div class="p-3 mb-2 bg-success text-white">Booking ok</div>
-              </div>)
-          }
+          <p>
+            {!data.booking ? 
+            data.toString(): 
+            data.booking}
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleClose}>Dismiss</Button>
@@ -240,4 +240,4 @@ const Scheduler = ({ userid, roomid }) => {
   );
 };
 
-export default Scheduler;
+export default Maintenance;

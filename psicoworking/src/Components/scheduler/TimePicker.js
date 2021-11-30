@@ -9,7 +9,7 @@ export const ACTIONS = {
   TOGGLE: "toggle",
   SELECT: "select",
   OCCUPY: "occupy",
-  SELF: "self",
+  MAINTENANCE: "occupy_maintenance",
 };
 
 // this reducer function acts upon the timeslot array
@@ -27,10 +27,10 @@ const reducer = (timeslots, action) => {
       });
     case ACTIONS.OCCUPY:
       //make timeslots received from scheduler active and disabled
-      let idx = 0;
+      let idxm = 0;
       return timeslots.map((ts) => {
-        if ( ts.id === parseInt(action.payload.id[idx]) ) {
-          idx++;
+        if ( ts.id === parseInt(action.payload.id[idxm]) ) {
+          idxm++;
           return { ...ts, disabled: true, active: true, variant: "secondary" };
         } else {
           return {
@@ -41,7 +41,34 @@ const reducer = (timeslots, action) => {
           };
         }
       });
-
+    case ACTIONS.MAINTENANCE:
+      //make timeslots received from scheduler active and disabled
+      let idx = 0;
+      return timeslots.map((ts) => {
+        if ( ts.id === parseInt(action.payload.id[idx]) ) {
+          idx++;
+          return { ...ts, active: true, variant: "secondary" };
+        } else {
+          return {
+            ...ts,
+            disabled: false,
+            active: false,
+            variant: "outline-primary",
+          };
+        }
+      });
+    case ACTIONS.SELECT:
+      //make timeslots received from scheduler active and disabled
+      return timeslots.map((ts) => {
+        if (ts.id === action.payload.id && ts.variant === "secondary"){
+          return {...ts, variant: "outline-info" };
+        }else if(ts.id === action.payload.id && ts.variant === "outline-info"){
+          return {...ts, variant: "secondary" };
+        }else if(ts.id === action.payload.id){
+          return { ...ts, active: !ts.active };
+        }
+        return ts
+      });
     default:
       return timeslots;
   }
@@ -60,7 +87,7 @@ const createTs = () => {
   });
   return ts;
 };
-const TimePicker = ({ bookings, timeSelected }) => {
+const TimePicker = ({ bookings, timeSelected, maintenance }) => {
   const [timeslots, dispatch] = useReducer(reducer, createTs());
   useEffect(() => {
   }, []);
@@ -68,13 +95,16 @@ const TimePicker = ({ bookings, timeSelected }) => {
     const b = bookings.map((b) => {
       return b.booking_date.substring(11, 13);
     });
-    dispatch({ type: ACTIONS.OCCUPY, payload: { id: b } });
+    maintenance ? 
+      dispatch({ type: ACTIONS.MAINTENANCE, payload: { id: b } })
+        : 
+      dispatch({ type: ACTIONS.OCCUPY, payload: { id: b } });
     return () => {};
-  }, [bookings]);
+  }, [bookings, maintenance]);
 
   return (
     <Container>
-      <ToggleButtonGroup type={"radio"} name={"hourselect"} vertical>
+      {/* <ToggleButtonGroup type={"radio"} name={"hourselect"} vertical>
         {timeslots.map((timeslot) => {
           return (
             <ToggleButton
@@ -88,6 +118,53 @@ const TimePicker = ({ bookings, timeSelected }) => {
                   type: ACTIONS.TOGGLE,
                   payload: { id: timeslot.id },
                 });
+                timeSelected(timeslot.id);
+              }}
+              size="lg"
+            >
+              {`${timeslot.id}:00`}
+            </ToggleButton>
+          );
+        })}
+      </ToggleButtonGroup> */}
+
+      <ToggleButtonGroup type={"radio"} name={"hourselect"} vertical>
+        {maintenance ?
+        timeslots.map((timeslot) => {
+          return (
+            <ToggleButton
+              key={timeslot.id}
+              id={`btn-${timeslot.id}`}
+              disabled={timeslot.disabled}
+              variant={timeslot.variant}
+              active={timeslot.active}
+              onChange={() => {
+                dispatch({
+                type: ACTIONS.SELECT,
+                payload: { id: timeslot.id },
+              });
+                timeSelected(timeslot.id);
+              }}
+              size="lg"
+            >
+              {`${timeslot.id}:00`}
+            </ToggleButton>
+          );
+        })
+        :
+        timeslots.map((timeslot) => {
+          return (
+            <ToggleButton
+              key={timeslot.id}
+              id={`btn-${timeslot.id}`}
+              disabled={timeslot.disabled}
+              variant={timeslot.variant}
+              active={timeslot.active}
+              onChange={() => {
+                dispatch({
+                type: ACTIONS.TOGGLE,
+                payload: { id: timeslot.id },
+              });
                 timeSelected(timeslot.id);
               }}
               size="lg"

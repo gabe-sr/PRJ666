@@ -12,6 +12,7 @@ import UserReport from "../reports/user-report/UserReport";
 import Reports from "../reports/Reports";
 import Booking from "../scheduler/Booking";
 import BookingList from "../dashboard/bookings/BookingList";
+import Maintenance from "../scheduler/Maintenance";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -70,6 +71,17 @@ const ProtectedRoutes = ({ match }) => {
               path={`${match.url}/:userid/:roomid/book`}
               render={(props) => (
                 <Scheduler
+                  userid={data._id}
+                  roomid={props.match.params.roomid}
+                />
+              )}
+            />
+
+            <Route
+              exact
+              path={`${match.url}/:userid/:roomid/maintenance`}
+              render={(props) => (
+                <Maintenance
                   userid={data._id}
                   roomid={props.match.params.roomid}
                 />

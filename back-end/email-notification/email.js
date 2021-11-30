@@ -4,8 +4,10 @@ export let transporter = nodemailer.createTransport({
   host: "smtp.mailtrap.io",
   port: 2525,
   auth: {
-    user: "1b860077428227",
-    pass: "9ac1417c0ad4bd",
+    // user: "1b860077428227",
+    // pass: "9ac1417c0ad4bd",
+    user: "65bf9a3142c907",
+    pass: "1a38b4a03b359d"
   },
 });
 
@@ -74,6 +76,77 @@ export let mailOptionsRedefine = (name, email, link) => ({
     </div>
   </div>
   `,
+});
+
+export let mailCancelNotice = (name, email, room, booking_date, reason) =>({
+  from: `"Psicoworking Team" <psicoworking@gmail.com>`,
+  to: `${email}`,
+  subject: `Booking Cancellation - ${booking_date}`,
+  text: `Booking cancellation notification`,
+  html: `${style}
+        <div class="container">
+          <div class="header-banner">
+            <h1>Psicoworking</h1>
+          </div>
+          <div class="main-body">
+            <h3>Hi ${name}, </h3>
+            <p>Booking for ${room} on ${booking_date} has been cancelled</p>
+            <p>Reason for cancellation was: ${reason}</p>
+            <hr/>
+            <p>If you didn't request a cancellation, </p>
+            <ul>
+              <li> Or cancellation reason is other than room maintenance and you had not requested a booking cancellation
+              <li> Or you simply want more information on the cancellation,
+              <li> Or you have any other questions,
+            </ul>
+            <p>feel free to contact us at: <a class="link" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a></p>
+            <hr/>
+            <br/>
+            <br/>
+            <p>Regards,
+              <br/>
+              <h4>Psicoworking Team</h4>
+              <p>
+                <small>Visit us at 
+                  <a class="link" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+                </small>
+              </p>
+          </div>
+        </div>`
+});
+
+export let mailConfirmNotice = (name, email, room, booking_date) =>({
+  from: `"Psicoworking Team" <psicoworking@gmail.com>`,
+  to: `${email}`,
+  subject: `Booking Confirmation - ${booking_date}`,
+  text: `Booking confimation notification`,
+  html: `${style}
+        <div class="container">
+          <div class="header-banner">
+            <h1>Psicoworking</h1>
+          </div>
+          <div class="main-body">
+            <h3>Hi ${name}, </h3>
+            <p>${room} has been booked on ${booking_date} for ${name}</p>
+            <hr/>
+            <p>
+              If you didn't request a room, or there is something wrong with your booking, 
+              or if you simply want more information about your booking, 
+            </p>
+            <p>feel free to contact us at: <a class="link" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a></p>
+            <hr/>
+            <br/>
+            <br/>
+            <p>Regards,
+              <br/>
+              <h4>Psicoworking Team</h4>
+              <p>
+                <small>Visit us at 
+                  <a class="link" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+                </small>
+              <p>
+          </div>
+        </div>`
 });
 
 // Email styling

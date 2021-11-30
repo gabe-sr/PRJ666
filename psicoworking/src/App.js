@@ -9,6 +9,7 @@ import SignUp from "./Components/sign_up/SignUp";
 import Error from "./Components/error-pages/Error";
 import RedefinePassword from "./Components/redefine-password/RedefinePassword";
 import RedefinePasswordLink from "./Components/redefine-password/RedefinePasswordLink";
+import About from "./Components/about_us/About";
 
 // Main app
 function App() {
@@ -24,7 +25,7 @@ function App() {
             <h2 className="m-4 text-secondary">Contact us</h2>
           </Route>
           <Route exact path="/about">
-            <h2 className="m-4 text-secondary">About us</h2>
+            <About/>
           </Route>
           <Route exact path="/pricing">
             <h2 className="m-4 text-secondary">Pricing</h2>

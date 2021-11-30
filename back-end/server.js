@@ -12,11 +12,11 @@
 import mongoose from "mongoose";
 import cors from "cors";
 import express from "express";
-import { router as userRouter } from "../back-end/routes/users.js";
-import { router as roomRouter } from "../back-end/routes/rooms.js";
-import { router as bookingRouter } from "../back-end/routes/bookings.js";
-import { router as authRouter } from "../back-end/routes/authentication.js";
-import { router as reportRouter } from "../back-end/routes/reports.js";
+import { router as userRouter } from "./routes/users.js";
+import { router as roomRouter } from "./routes/rooms.js";
+import { router as bookingRouter } from "./routes/bookings.js";
+import { router as authRouter } from "./routes/authentication.js";
+import { router as reportRouter } from "./routes/reports.js";
 import session from "express-session";
 import { sessionConfig } from "./middleware/sessionConfig.js"; // configuration for session middleware
 

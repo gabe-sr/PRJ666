@@ -20,7 +20,7 @@ const LoginForm = (props) => {
 
   const history = useHistory();
 
-  const { setLoadingSpinner, setModalMessage } = props;
+  const { setLoadingSpinner, setModalMessage, redirectTo } = props;
 
   const handleLoginSubmit = async (values, { setFieldError }) => {
     setLoadingSpinner(true, "Logging in...");
@@ -46,9 +46,10 @@ const LoginForm = (props) => {
         // If login response is successfull and user IS ACTIVATED
       } else if (success) {
         props.handlemodal();
-
+        console.log("CHECK");
+        console.log(redirectTo);
         history.push({
-          pathname: `/dashboard`,
+          pathname: redirectTo,
           state: { ...response.data, display: true },
         });
         history.go(`/dashboard`);

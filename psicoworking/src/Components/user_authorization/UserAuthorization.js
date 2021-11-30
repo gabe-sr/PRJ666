@@ -19,6 +19,9 @@ import Error from "../error-pages/Error";
 
 const UserAuthorization = (props) => {
   // ------------- LOADING ------------- //
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // props from HOC to set loading spinner
   const { setLoadingSpinner, setModalMessage } = props;

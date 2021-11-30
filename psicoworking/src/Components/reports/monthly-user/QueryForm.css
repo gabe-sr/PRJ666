@@ -1,0 +1,22 @@
+.name-input {
+  position: relative;
+}
+.suggestions {
+  font-size: 0.8rem;
+  border: 1px solid rgba(100, 100, 100, 0.404);
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+  position: absolute;
+  width: 60%;
+  max-height: 100px;
+  z-index: 10;
+  background-color: white;
+  overflow-y: auto;
+}
+.suggestions-item:hover {
+  background-color: rgba(207, 207, 207, 0.568);
+}
+
+.query-form .row {
+  justify-content: center;
+}

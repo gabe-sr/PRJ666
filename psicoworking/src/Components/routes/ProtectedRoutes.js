@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import Scheduler from "../scheduler/Scheduler";
@@ -13,6 +13,8 @@ import Reports from "../reports/Reports";
 import Booking from "../scheduler/Booking";
 import BookingList from "../dashboard/bookings/BookingList";
 import Maintenance from "../scheduler/Maintenance";
+import MonthlyTotalReport from "../reports/monthly-total/MonthlyTotalReport";
+import MonthlyUserReport from "../reports/monthly-user/MonthlyUserReport";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -20,23 +22,30 @@ const ProtectedRoutes = ({ match }) => {
   // isLoading: waiting for server response
   // data: return user object
   const { isAuth, isLoading, data } = useAuthentication();
+  const [resizeContent, setResizeContent] = useState(true);
+
+  const handleResize = (arg) => {
+    setResizeContent(arg);
+  };
 
   // waiting for server response...
   if (isLoading) {
     return null;
   }
 
-  // If user is not authenticated, return error page
+  // If user is not authenticated, return login page
   // Otherwise, load protected routes
   if (!isAuth) {
     return <Error type="401" />;
-  } else {
+  }
+
+  if (isAuth) {
     return (
       <>
         <div className="sidebar">
-          <Sidebar id={data._id} isAdmin={data.isAdmin} />
+          <Sidebar id={data._id} isAdmin={data.isAdmin} resize={handleResize} />
         </div>
-        <div className="content">
+        <div className={resizeContent ? "content-resize" : "content"}>
           <Switch>
             <Route exact path={`${match.url}`}>
               <Dashboard userData={data} />
@@ -62,7 +71,11 @@ const ProtectedRoutes = ({ match }) => {
               exact
               path={`${match.url}/book`}
               render={(props) => (
-                <Booking userid={data._id} isAdmin={data.isAdmin} roomid={props.match.params.roomid} />
+                <Booking
+                  userid={data._id}
+                  isAdmin={data.isAdmin}
+                  roomid={props.match.params.roomid}
+                />
               )}
             />
 
@@ -96,22 +109,27 @@ const ProtectedRoutes = ({ match }) => {
               <Reports />
             </Route>
 
-            <Route exact path={`${match.url}/report/user`}>
+            <Route exact path={`${match.url}/report/booking`}>
               <UserReport />
             </Route>
 
-            <Route 
-              exact 
+            <Route exact path={`${match.url}/report/month_total`}>
+              <MonthlyTotalReport />
+            </Route>
+            <Route exact path={`${match.url}/report/month_user`}>
+              <MonthlyUserReport />
+            </Route>
+
+            <Route
+              exact
               path={`${match.url}/bookinglist`}
-              render={(props)=>(
-                <BookingList 
+              render={(props) => (
+                <BookingList
                   // userid={data._id}
                   user={data}
                 />
               )}
-            >
-
-            </Route>
+            ></Route>
 
             <Route exact path={`${match.url}/*`}>
               <div>PROTECTED ERROR 404</div>

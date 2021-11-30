@@ -1,4 +1,5 @@
-import React from "react";
+import { useState } from "react";
+import { Offcanvas, Button } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import WithLoadingSpinner from "../../HOC/loading-spinner/WithLoadingSpinner";
@@ -31,47 +32,52 @@ function Sidebar(props) {
     }
   };
 
-  return (
-    <>
-      <ul className="nav-menu-items">
+  const [show, setShow] = useState(true);
+
+  const handleClose = () => {
+    setShow(false);
+    props.resize(false);
+  };
+  const toggleShow = () => {
+    setShow((s) => !s);
+    props.resize(true);
+  };
+
+  const SideBarBody = () => {
+    return (
+      <ul className="nav-menu-items" onClick={null}>
         <li className="nav-text">
           <Link to={`/dashboard`}>
             <AiIcons.AiFillHome />
             <span>Home</span>
           </Link>
         </li>
-        <li className="nav-text">
+        <li className="nav-text" onClick={null}>
           <Link to={`/dashboard/user/${props.id}`}>
             <AiIcons.AiOutlineUser />
             <span>Profile</span>
           </Link>
         </li>
-        <li className="nav-text">
+        <li className="nav-text" onClick={null}>
           <Link to="/dashboard/book">
             <BsIcons.BsCalendar3 />
             <span>Bookings</span>
           </Link>
         </li>
-        <li className="nav-text">
-          <Link to="/dashboard/bookinglist">
-          <IoIcons.IoList />
-          <span>Booking List</span>
-          </Link>
-        </li>
-        <li className="nav-text">
+        <li className="nav-text" onClick={null}>
           <Link to="/dashboard/report">
             <IoIcons.IoDocumentTextOutline />
             <span>Reports</span>
           </Link>
         </li>
-        <li className="nav-text">
+        <li className="nav-text" onClick={null}>
           <Link to={`/dashboard/user/${props.id}/changePassword`}>
             <MdIcons.MdOutlinePassword />
             <span>Security</span>
           </Link>
         </li>
         {props.isAdmin && (
-          <li className="nav-text">
+          <li className="nav-text" onClick={null}>
             <Link to={`/dashboard/${props.id}/authorization`}>
               <FiIcons.FiCheckSquare />
               <span>Authorize</span>
@@ -85,6 +91,38 @@ function Sidebar(props) {
           </Link>
         </li>
       </ul>
+    );
+  };
+
+  return (
+    <>
+      <div className="dashboard-button-container">
+        <Button
+          variant="secondary"
+          onClick={toggleShow}
+          className="dashboard-button me-2"
+        >
+          Dashboard Menu
+          <BsIcons.BsBoxArrowUp className="dashboard-icon" />
+        </Button>
+      </div>
+      <Offcanvas
+        show={show}
+        onHide={handleClose}
+        scroll={true}
+        backdrop={false}
+        className="offcanvas-container"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title className="dashboard-title text-secondary">
+            Dashboard
+          </Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <hr />
+          <SideBarBody />
+        </Offcanvas.Body>
+      </Offcanvas>
     </>
   );
 }

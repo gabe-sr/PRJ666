@@ -118,6 +118,32 @@ const TableData = ({
                         );
                         return <td key={index}>{customColumnComp(user)}</td>;
 
+                      case "total":
+                      case "price":
+                      case "price_at_reservation":
+                      case "price_at_booking":
+                        return (
+                          <td onClick={() => whenClicked(user)} key={index}>
+                            {new Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            }).format(user[colName])}
+                          </td>
+                        );
+
+                      case "_isCancelled":
+                        let cancelled;
+                        if (user[colName] === false) {
+                          cancelled = "Active";
+                        } else {
+                          cancelled = "Cancelled";
+                        }
+                        return (
+                          <td onClick={() => whenClicked(user)} key={index}>
+                            {cancelled}
+                          </td>
+                        );
+
                       default:
                         return (
                           <td onClick={() => whenClicked(user)} key={index}>

@@ -176,7 +176,7 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
           `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
           cnfrm.user_id.email,
           cnfrm.room_id.name,
-          cnfrm.booking_date)
+          format(cnfrm.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"))
       )
       .then((res)=>{
         console.log(res[0].statusCode)
@@ -282,7 +282,7 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
               `${r.user_id.first_name} ${r.user_id.last_name}`,
               r.user_id.email,
               r.room_id.name,
-              r.booking_date,
+              format(r.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
               `Maintenance needed for ${r.room_id.name}`),
               (error, info)=>{
                 if(error){
@@ -408,11 +408,11 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
     // Send cancellation email notification
     sendGridMail.send(
       mailCancelNotice(
-        `${r.user_id.first_name} ${r.user_id.last_name}`,
-        r.user_id.email,
-        r.room_id.name,
-        r.booking_date,
-        `Maintenance needed for ${r.room_id.name}`),
+        `${bkns.user_id.first_name} ${bkns.user_id.last_name}`,
+        bkns.user_id.email,
+        bkns.room_id.name,
+        format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
+        `Cancellation request was approved.`),
         (error, info)=>{
           if(error){
             return console.log(error)

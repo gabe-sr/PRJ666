@@ -123,7 +123,7 @@ router.get("/monthlytotal", isLogged, isAuthenticated, async (req, res) => {
 router.get("/monthly_user", isLogged, isAuthenticated, async (req, res) => {
   try {
     let { name, year, month, sort, show_cancel, id } = req.query;
-
+    console.log(name)
     // Validate incoming data
     year = parseInt(year);
     month = parseInt(month);

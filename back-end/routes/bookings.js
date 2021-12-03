@@ -3,9 +3,9 @@ import { Booking } from "../models/bookingModel.js";
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
 import { format } from "date-fns";
 import { transporter, mailCancelNotice, mailConfirmNotice } from "../email-notification/email.js";
-import sendGrilMail from "../node_modules/@sendgrid/mail/index.js";
+import sendGridMail from "../node_modules/@sendgrid/mail/index.js";
 import {} from "dotenv/config";
-sendGrilMail.setApiKey(process.env.SENDGRID_API_KEY);
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router({ mergeParams: true });
 
  /*Get bookings
@@ -171,20 +171,20 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
       
       //ResponseError: Forbidden
       // at node_modules/@sendgrid/client/src/classes/client.js:146:29
-      await sendGrilMail.send(
+      await sendGridMail.send(
         mailConfirmNotice(
           `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
           cnfrm.user_id.email,
           cnfrm.room_id.name,
           format(cnfrm.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"))
       )
-      .then((res)=>{
-        console.log(res[0].statusCode)
-        console.log(res[0].headers)
-      })
-      .catch((err)=>{
-        console.log(err)
-      })
+                        .then((res)=>{
+                          console.log(res[0].statusCode)
+                          console.log(res[0].headers)
+                        })
+                        .catch((err)=>{
+                          console.log(err)
+                        })
     // transporter.sendMail(
     //   mailConfirmNotice(
     //     `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
@@ -283,14 +283,15 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
               r.user_id.email,
               r.room_id.name,
               format(r.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
-              `Maintenance needed for ${r.room_id.name}`),
-              (error, info)=>{
-                if(error){
-                  return console.log(error)
-                }
-                console.log(`Message sent: ${info.messageId}`)
-              }
+              `Maintenance needed for ${r.room_id.name}`)
           )
+                      .then((res)=>{
+                        console.log(res[0].statusCode)
+                        console.log(res[0].headers)
+                      })
+                      .catch((err)=>{
+                        console.log(err)
+                      })
         }))
       }
       
@@ -412,14 +413,15 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
         bkns.user_id.email,
         bkns.room_id.name,
         format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
-        `Cancellation request was approved.`),
-        (error, info)=>{
-          if(error){
-            return console.log(error)
-          }
-          console.log(`Message sent: ${info.messageId}`)
-        }
-    )
+        `Cancellation request was approved.`)
+    )    
+                .then((res)=>{
+                  console.log(res[0].statusCode)
+                  console.log(res[0].headers)
+                })
+                .catch((err)=>{
+                  console.log(err)
+                })
     res.send(response)
     
   } catch (err) {

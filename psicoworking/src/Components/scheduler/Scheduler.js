@@ -23,6 +23,7 @@ const Scheduler = ({ userid, roomid }) => {
   const [data, setData] = useState({});
   const currDay = useRef(startOfDay(new Date()));
   const maxDay = useRef(addDays(startOfDay(new Date()), 7));
+  const roomName = useRef();
 
   const timeSelected = (time) => {
     /* correct date for timezone. Data should be persisted to db only in UTC time, due to date-fns ver2.x not accepting operations with dates from strings
@@ -67,7 +68,9 @@ const Scheduler = ({ userid, roomid }) => {
                   (parseISO(b.booking_date).getUTCHours()) <= 19 &&
                   (parseISO(b.booking_date).getUTCHours()) !== 12)
         })
-        console.log("hello");
+        // console.log("hello");
+        console.log(day);
+        console.log(day.getDate())
         setBookings(newB);
       } catch (err) {
         alert(err.message);
@@ -85,6 +88,7 @@ const Scheduler = ({ userid, roomid }) => {
         const res = await axios.get(`/rooms/${roomid}`);
         const fetchedroom = await res.data;
         setPrice(fetchedroom.price);
+        roomName.current = fetchedroom.name;
       } catch (err) {
         console.log(err);
       }
@@ -112,9 +116,11 @@ const Scheduler = ({ userid, roomid }) => {
         room_id: roomid,
         price_at_booking: price,
       });
+      console.log(req)
       fetchBookings(day);
       setData(req.data);
       setshow(true);
+      // console.log(data)
     } catch (err) {
       setData(err.data);
       setshow(true);
@@ -172,7 +178,7 @@ const Scheduler = ({ userid, roomid }) => {
         </Col>
         <Col className="mt-4 justify-content-md-center">
           <Row className="mb-4"><span className="font-weight-bold">Choose available timeslot below</span></Row>
-          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} /></Row>
+          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={false} day={day}/></Row>
           
         </Col>
       </Row>
@@ -210,14 +216,23 @@ const Scheduler = ({ userid, roomid }) => {
         backdrop="static"
       >
         <Modal.Header>
-          <p>{data.message}</p><br/>
+          <strong>{data.title}</strong><br/>
         </Modal.Header>
         <Modal.Body>
-          <p>
-            {!data.booking ? 
-            data.toString(): 
-            data.booking}
-          </p>
+          {data === undefined ?
+            <p>`Application Error, please contact admin. Error: server response undefined`</p>
+            :
+            (data.error ? 
+              <div>
+                <strong>{data.message}, please inform the administrator.</strong>
+                <div className="p-3 mb-2 bg-danger text-white">Booking Error</div> 
+              </div>
+              :
+              <div>
+                <p>{roomName.current} was successfully reserved at {data.message}</p>
+                <div className="p-3 mb-2 bg-success text-white">Booking ok</div>
+              </div>)
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleClose}>Dismiss</Button>

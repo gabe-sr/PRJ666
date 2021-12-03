@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import { transporter, mailCancelNotice, mailConfirmNotice } from "../email-notification/email.js";
 import sendGrilMail from "../node_modules/@sendgrid/mail/index.js";
 import {} from "dotenv/config";
-// sendGrilMail.setApiKey(`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`);
 sendGrilMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router({ mergeParams: true });
 

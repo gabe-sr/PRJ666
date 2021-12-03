@@ -15,6 +15,10 @@ const Booking = (props) => {
     history.push({ pathname: `/dashboard/${props.userid}/${rid}/book` });
   };
 
+  const handleMaintenance = (rid)=>{
+    history.push({ pathname: `/dashboard/${props.userid}/${rid}/maintenance`});
+  };
+
   const [modalShow, setModalShow] = React.useState(false);
   const [modalId, setModalId] = React.useState("");
 
@@ -96,8 +100,8 @@ const Booking = (props) => {
           </Card.Body>
           <Card.Footer>
             {props.isAdmin &&
-              <Button className="col-md-4 mr-3" variant="secondary" onClick={() => { }}>
-                Admin
+              <Button className="mr-3" variant="secondary" onClick={() => handleMaintenance("616610f8838d67d1fab083e9")}>
+                Book Maintenance
               </Button>
             }
           </Card.Footer>
@@ -142,8 +146,8 @@ const Booking = (props) => {
           </Card.Body>
           <Card.Footer>
             {props.isAdmin &&
-              <Button className="col-md-4 mr-3" variant="secondary" onClick={() => { }}>
-                Admin
+              <Button className="mr-3" variant="secondary" onClick={() => handleMaintenance("6166134d4eca734cbfd3a412")}>
+                Book Maintenance
               </Button>
             }
           </Card.Footer>
@@ -188,8 +192,8 @@ const Booking = (props) => {
           </Card.Body>
           <Card.Footer>
             {props.isAdmin &&
-              <Button className="col-md-4 mr-3" variant="secondary" onClick={() => { }}>
-                Admin
+              <Button className="mr-3" variant="secondary" onClick={() => handleMaintenance("6166136e4eca734cbfd3a415")}>
+                Book Maintenance
               </Button>
             }
           </Card.Footer>

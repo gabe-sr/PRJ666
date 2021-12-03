@@ -112,6 +112,79 @@ export let mailOptionsRedefine = (name, email, link) => ({
   `,
 });
 
+export let mailCancelNotice = (name, email, room, booking_date, reason) =>({
+  from: "psicoworking.app@gmail.com",
+  to: `${email}`,
+  subject: `Booking Cancellation - ${booking_date}`,
+  text: `Booking cancellation notification`,
+  html: `${style}
+        <div class="container" style="font-family: Tahoma; margin: 0 auto; border: 1px solid #3f3f3f; width: 95%; background-color: #fff">
+          <div class="header-banner" style="font-weight: bold; background-color: #f39a71; color: #fff; padding: 0.1rem 1rem">
+            <h1>Psicoworking</h1>
+          </div>
+          <div class="main-body" style="margin: 0px 20px; color: #3f3f3f">
+            <h3>Hi ${name}, </h3>
+            <p>Booking for ${room} on ${booking_date} has been cancelled</p>
+            <p>Reason for cancellation was: ${reason}</p>
+            <hr/>
+            <p>If you didn't request a cancellation, </p>
+            <ul>
+              <li> Or cancellation reason is other than room maintenance and you had not requested a booking cancellation
+              <li> Or you simply want more information on the cancellation,
+              <li> Or you have any other questions,
+            </ul>
+            <p>feel free to contact us at: 
+              <a class="link" style="text-decoration: none; color: #f39a71; font-weight: bold" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+            </p>
+            <hr/>
+            <br/>
+            <br/>
+            <p>Regards,
+              <br/>
+              <h4>Psicoworking Team</h4>
+              <p>
+                <small>Visit us at 
+                <a class="link" style="text-decoration: none; color: #f39a71; font-weight: bold" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+                </small>
+              </p>
+          </div>
+        </div>`
+});
+
+export let mailConfirmNotice = (name, email, room, booking_date) =>({
+  from: "psicoworking.app@gmail.com",
+  to: `${email}`,
+  subject: `Booking Confirmation - ${booking_date}`,
+  text: `Booking confimation notification`,
+  html: `${style}
+        <div class="container" style="font-family: Tahoma; margin: 0 auto; border: 1px solid #3f3f3f; width: 95%; background-color: #fff">
+          <div class="header-banner" style="font-weight: bold; background-color: #f39a71; color: #fff; padding: 0.1rem 1rem">
+            <h1>Psicoworking</h1>
+          </div>
+          <div class="main-body" style="margin: 0px 20px; color: #3f3f3f">
+            <h3>Hi ${name}, </h3>
+            <p>${room} has been booked on ${booking_date} for ${name}</p>
+            <hr/>
+            <p>
+              If you didn't request a room, or there is something wrong with your booking, 
+              or if you simply want more information about your booking, 
+            </p>
+            <p>feel free to contact us at: <a class="link" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a></p>
+            <hr/>
+            <br/>
+            <br/>
+            <p>Regards,
+              <br/>
+              <h4>Psicoworking Team</h4>
+              <p>
+                <small>Visit us at 
+                <a class="link" style="text-decoration: none; color: #f39a71; font-weight: bold" href="https://psicoworking.herokuapp.com">psicoworking.com</a>
+                </small>
+              <p>
+          </div>
+        </div>`
+});
+
 // Email styling
 const style = `<style>
 .container {

@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
       // console.log(req.query.end);
       res.send(bkns);
     }else if(req.query.type == 'aftbkns'){
-      console.log(`query date: ${req.query.date}`)
+      // console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $gte: req.query.date}
       })
@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
         .where({ user_id: req.query.userid });
       res.send(bkns);
     }else if(req.query.type == 'bfrbkns'){
-      console.log(`query date: ${req.query.date}`)
+      // console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $lt: req.query.date}
       })

@@ -65,11 +65,19 @@ function Sidebar(props) {
           </Link>
         </li>
         <li className="nav-text" onClick={null}>
-          <Link to="/dashboard/report">
-            <IoIcons.IoDocumentTextOutline />
-            <span>Reports</span>
+          <Link to="/dashboard/bookinglist">
+            <IoIcons.IoList />
+            <span>Booking List</span>
           </Link>
         </li>
+        {props.isAdmin && (
+          <li className="nav-text" onClick={null}>
+            <Link to="/dashboard/report">
+              <IoIcons.IoDocumentTextOutline />
+              <span>Reports</span>
+            </Link>
+          </li>
+        )}
         <li className="nav-text" onClick={null}>
           <Link to={`/dashboard/user/${props.id}/changePassword`}>
             <MdIcons.MdOutlinePassword />

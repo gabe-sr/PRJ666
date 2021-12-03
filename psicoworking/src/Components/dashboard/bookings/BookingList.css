@@ -1,0 +1,14 @@
+.bookings-filter-tab .nav-link.active {
+    color: #d66f3f !important;
+}
+.bookings-filter-tab .nav-link.active:hover {
+    color: #f0966d !important;
+}
+
+.bookings-filter-tab .nav-link {
+    color: #7c7b7b !important;
+}
+
+.bookings-filter-tab .nav-link:hover {
+    color: #f0966d !important;
+}

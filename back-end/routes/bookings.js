@@ -31,6 +31,7 @@ router.get("/", async (req, res) => {
       // console.log(req.query.end);
       res.send(bkns);
     }else if(req.query.type == 'aftbkns'){
+      console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $gte: req.query.date}
       })
@@ -42,6 +43,7 @@ router.get("/", async (req, res) => {
         .where({ user_id: req.query.userid });
       res.send(bkns);
     }else if(req.query.type == 'bfrbkns'){
+      console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $lt: req.query.date}
       })
@@ -170,33 +172,33 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
       
       //ResponseError: Forbidden
       // at node_modules/@sendgrid/client/src/classes/client.js:146:29
-      // await sendGrilMail.send(
-      //   mailConfirmNotice(
-      //     `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
-      //     cnfrm.user_id.email,
-      //     cnfrm.room_id.name,
-      //     cnfrm.booking_date)
-      // )
-      // .then((res)=>{
-      //   console.log(res[0].statusCode)
-      //   console.log(res[0].headers)
-      // })
-      // .catch((err)=>{
-      //   console.log(err)
-      // })
-    transporter.sendMail(
-      mailConfirmNotice(
-        `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
-        cnfrm.user_id.email,
-        cnfrm.room_id.name,
-        cnfrm.booking_date),
-        (error, info) =>{
-          if(error){
-            return console.log(error)
-          }
-          console.log(`Message sent: ${info.messageId}`)
-        }
-      );
+      await sendGrilMail.send(
+        mailConfirmNotice(
+          `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
+          cnfrm.user_id.email,
+          cnfrm.room_id.name,
+          cnfrm.booking_date)
+      )
+      .then((res)=>{
+        console.log(res[0].statusCode)
+        console.log(res[0].headers)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    // transporter.sendMail(
+    //   mailConfirmNotice(
+    //     `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
+    //     cnfrm.user_id.email,
+    //     cnfrm.room_id.name,
+    //     cnfrm.booking_date),
+    //     (error, info) =>{
+    //       if(error){
+    //         return console.log(error)
+    //       }
+    //       console.log(`Message sent: ${info.messageId}`)
+    //     }
+    //   );
     // console.log("this was also executed")
     response.title = "Booking saved in db.";
     response.message = `${format(booking.booking_date, "iii '-' do 'of' MMMM', ' yyyy")}`
@@ -272,11 +274,11 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
       )
 
       // since every message is different, cant use send multiple, etc... 
-
+      // check out personalizations to see if possible to use sendMultiple
       if(cancelled.acknowledged){
         console.log(`acknowledged: ${cancelled.acknowledged}`)
         await Promise.all(records.map((r)=>{
-          transporter.sendMail(
+          sendGridMail.send(
             mailCancelNotice(
               `${r.user_id.first_name} ${r.user_id.last_name}`,
               r.user_id.email,
@@ -289,32 +291,9 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
                 }
                 console.log(`Message sent: ${info.messageId}`)
               }
-            )
+          )
         }))
-      }else{
-        throw new Error(`Update Many operation failed: documents matched - ${cancelled.matchedCount} ; documents modified - ${cancelled.modifiedCount}. Maintenance bookings not saved`)
       }
-
-      // check out personalizations to see if possible to use sendMultiple
-      // if(cancelled.acknowledged){
-      //   console.log(`acknowledged: ${cancelled.acknowledged}`)
-      //   await Promise.all(records.map((r)=>{
-      //     sendGridMail.send(
-      //       mailCancelNotice(
-      //         `${r.user_id.first_name} ${r.user_id.last_name}`,
-      //         r.user_id.email,
-      //         r.room_id.name,
-      //         r.booking_date,
-      //         `Maintenance needed for ${r.room_id.name}`),
-      //         (error, info)=>{
-      //           if(error){
-      //             return console.log(error)
-      //           }
-      //           console.log(`Message sent: ${info.messageId}`)
-      //         }
-      //     )
-      //   }))
-      // }
       
       // update multiple logs
       console.log(`Number of documents upserted (should be 0 always):`)
@@ -428,21 +407,20 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
     console.log(format(bkns.booking_date, "iii '-' do 'of' MMMM',' yyyy '- cancelled'"))
     
     // Send cancellation email notification
-    console.log(`sending email`)
-    transporter.sendMail(
+    sendGridMail.send(
       mailCancelNotice(
-        `${bkns.user_id.first_name} ${bkns.user_id.last_name}`, 
-        bkns.user_id.email, 
-        bkns.room_id.name,
-        bkns.booking_date,
-        `Cancellation Request approved`),
+        `${r.user_id.first_name} ${r.user_id.last_name}`,
+        r.user_id.email,
+        r.room_id.name,
+        r.booking_date,
+        `Maintenance needed for ${r.room_id.name}`),
         (error, info)=>{
           if(error){
             return console.log(error)
           }
           console.log(`Message sent: ${info.messageId}`)
         }
-      );
+    )
     res.send(response)
     
   } catch (err) {

@@ -1,12 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import axios from "axios";
 import NewTableData from "../../shared/table_data_new/NewTableData.js";
-import { Button,ButtonGroup, Card, Container, Modal, Row, ToggleButton } from "react-bootstrap";
+import { Button,ButtonGroup, Card, Container, Modal, Row, ToggleButton, Tabs, Tab } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
+import "./BookingList.css"
 
 const radios =[
-    {name:'before', value:'2'},
-    {name:'after', value:'1'}
+    {name:'past bookings', value:'2'},
+    {name:'upcoming bookings', value:'1'}
 ];
 
 /* Receives a user id as a prop, returns a table containing all the bookings for
@@ -15,69 +16,134 @@ const BookingList = ({user}) => {
     const [data, setData] = useState([]);
     const [radioValue, setRValue] = useState('1');
     const [ show, setShow ] = useState(false);
+    const [ tabKey, setTab ] = useState('mine');
+    // const [ context, setContext ] = useState();
+    const tabChanged = useRef(false);
     // const [ currBkng, setBkng ] = useState({});
     const bk = useRef(null);
     const today = useRef(new Date());
 
     const fetchBookings = useCallback(
-        async () => {
-            if(radioValue === '1'){
-                console.log(`radio value ${radioValue}`)
-                const res = await axios.get('/book',{
-                    params:{
-                        type: 'aftrequest',
-                        date: today.current,
-                        userid: user._id
+        async (key) => {
+            try {
+                console.log(key)
+                if (key==='mine') {
+                    if(radioValue === '1'){
+                        // console.log(`radio value ${radioValue}`)
+                        const res = await axios.get('/book',{
+                            params:{
+                                type: 'aftbkns',
+                                date: today.current,
+                                userid: user._id
+                            }
+                        }) 
+                        const temp = await res.data
+                        console.log(temp)
+                        setData(temp)
+                    } 
+                    else{
+                        // console.log(`radio value ${radioValue}`)
+                        const res = await axios.get('/book',{
+                            params:{
+                                type: 'bfrbkns',
+                                date: today.current,
+                                userid: user._id
+                            }
+                        }) 
+                        const temp = await res.data
+                        console.log(temp)
+                        setData(temp)
                     }
-                }) 
-                const temp = await res.data
-                setData(temp)
-            } 
-            else{
-                console.log(`radio value ${radioValue}`)
-                const res = await axios.get('/book',{
-                    params:{
-                        type: 'bfrequest',
-                        date: today.current,
-                        userid: user._id
+                }else if(key === 'general'){
+                    if(radioValue === '1'){
+                        // console.log(`radio value ${radioValue}`)
+                        const res = await axios.get('/book',{
+                            params:{
+                                type: 'aftrequest',
+                                date: today.current,
+                                userid: user._id
+                            }
+                        }) 
+                        const temp = await res.data
+                        console.log(temp)
+                        setData(temp)
+                    } 
+                    else{
+                        // console.log(`radio value ${radioValue}`)
+                        const res = await axios.get('/book',{
+                            params:{
+                                type: 'bfrequest',
+                                date: today.current,
+                                userid: user._id
+                            }
+                        }) 
+                        const temp = await res.data
+                        console.log(temp)
+                        setData(temp)
                     }
-                }) 
-                const temp = await res.data
-                setData(temp)
+                }
+                
+            } catch (error) {
+                console.log(error)
+                alert(error)
             }
+            // if(radioValue === '1'){
+            //     console.log(`radio value ${radioValue}`)
+            //     const res = await axios.get('/book',{
+            //         params:{
+            //             type: 'aftrequest',
+            //             date: today.current,
+            //             userid: user._id
+            //         }
+            //     }) 
+            //     const temp = await res.data
+            //     setData(temp)
+            // } 
+            // else{
+            //     console.log(`radio value ${radioValue}`)
+            //     const res = await axios.get('/book',{
+            //         params:{
+            //             type: 'bfrequest',
+            //             date: today.current,
+            //             userid: user._id
+            //         }
+            //     }) 
+            //     const temp = await res.data
+            //     setData(temp)
+            // }
         },
         [radioValue, user._id],
     );
 
     const requestCancel = useCallback(async (bk)=>{
         //set cancel request -> set cancel
-        console.log(bk)
+        // console.log(bk)
         if(!bk._isCancelled && user.isAdmin){
             const res = await axios.patch(`http://localhost:8080/book/cancel_approve/${bk._id}`,
             {
                 _isCancelled: true 
             })
-            console.log(res)
+            // console.log(res)
         }else if(!bk.cancel_request){
             const res = await axios.patch(`http://localhost:8080/book/cancel_request/${bk._id}`,
             {
                 cancel_request: true 
             })
-            console.log(res)
+            // console.log(res)
         }
-        fetchBookings();
+        fetchBookings(tabKey);
 
-    }, [user,fetchBookings])
+    }, [user.isAdmin, fetchBookings, tabKey])
 
     const customRequestColumn = (bk)=>{
         const request= {variant:"secondary", text:"Request Cancel", disabled:false};
         if(bk._isCancelled){
-            console.log("custom column if cancelled exec")
+            // console.log("custom column if cancelled exec")
             request.variant = "danger"
             request.text = "Booking cancelled"
             request.disabled = true
         }else if(bk.cancel_request && !user.isAdmin) {
-            console.log("custom column if cancel req exec")
+            // console.log("custom column if cancel req exec")
             request.variant = "warning"
             request.text = "Cancel request sent"
             request.disabled = true
@@ -87,9 +153,9 @@ const BookingList = ({user}) => {
             request.disabled = false
         }
     
-        console.log(bk)
-        console.log(request)
-        console.log("customRequestColumn exec")
+        // console.log(bk)
+        // console.log(request)
+        // console.log("customRequestColumn exec")
         return (
             
                 <Button
@@ -104,8 +170,8 @@ const BookingList = ({user}) => {
     }
 
     useEffect(() => {
-        fetchBookings();
-    }, [radioValue,fetchBookings])
+        fetchBookings(tabKey);
+    }, [radioValue, fetchBookings, tabKey])
 
     const handleModalOpen = (booking)=>{
         bk.current = booking
@@ -115,8 +181,29 @@ const BookingList = ({user}) => {
         bk.current = null
         setShow(false)
     };
+
+    const handleKey = (e=>{
+        setTab(e)
+        tabChanged.current = true;
+    })
+
+    useEffect(() => {
+        if(tabChanged.current){
+            fetchBookings(tabKey)
+            tabChanged.current = false;
+        }
+    }, [tabKey, fetchBookings])
+
     return( 
         <Container>
+            <Tabs className="bookings-filter-tab mb-4" 
+                color="#d66f3f" 
+                activeKey={tabKey} 
+                onSelect={(e)=>handleKey(e)}>
+                    <Tab eventKey="mine" title="My Bookings"></Tab>
+                    {user.isAdmin ? <Tab eventKey="general" title="All requests"></Tab> : null}
+            </Tabs>
+
             <Row>
                 <ButtonGroup>
                     {radios.map((radio, idx)=>(
@@ -143,9 +230,10 @@ const BookingList = ({user}) => {
                     </Card.Title>
                 </Card>
                 :
+                (tabKey === 'mine' ?
                 <NewTableData
-                    headers={["Booking date", "Price", "Type", "Cancellation Request"]}
-                    columns={["booking_date2", "price_at_booking", "booking_type", "cancelStatus"]}
+                    headers={["Booking date", "Room", "Price", "Type", "Cancellation Request"]}
+                    columns={["booking_date2", "room_id", "price_at_booking", "booking_type", "cancelStatus"]}
                     values={data}
                     whenClicked={handleModalOpen}
                     customColumn={[
@@ -155,6 +243,20 @@ const BookingList = ({user}) => {
                         },
                     ]}
                 />
+                :
+                <NewTableData
+                    headers={["User", "Booking date", "Room", "Price", "Type", "Cancellation Request"]}
+                    columns={["fullname2", "booking_date2", "room_id", "price_at_booking", "booking_type", "cancelStatus"]}
+                    values={data}
+                    whenClicked={handleModalOpen}
+                    customColumn={[
+                        {
+                            colDesc: "cancelStatus",
+                            customColumnComp2: customRequestColumn,
+                        },
+                    ]}
+                />
+                )
                 }
             </Row>
             {show &&

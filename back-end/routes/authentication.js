@@ -155,7 +155,7 @@ router.post("/redefine", async (req, res) => {
     await sendGridMail.send(
       mailOptionsRedefine(dbUser.first_name, dbUser.email, redefine._id)
     );
-    console.log("Message sent: %s", user.email);
+    console.log("Message sent: %s", dbUser.email);
 
     response.success = true;
     res.send(response);

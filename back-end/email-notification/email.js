@@ -92,7 +92,7 @@ export let mailOptionsRedefine = (name, email, link) => ({
       <p>If you did not make this request then please ignore this email.</p>
       <p>Otherwise, please click on the button bellow to change your password:</p>
       <br/><br/>
-      <a class="btn" style="margin: 10px 0; text-decoration: none; border-radius: 10px; background-color: #6f6f6f; color: #fff; padding: 6px 13px" href="http://localhost:3000/redefine/${link}">Redefine password</a>
+      <a class="btn" style="margin: 10px 0; text-decoration: none; border-radius: 10px; background-color: #6f6f6f; color: #fff; padding: 6px 13px" href="https://psicoworking.herokuapp.com/redefine/${link}">Redefine password</a>
       <br/><br/>
       <p>If you have any questions, please contact us at: 
         <a class="link" style="text-decoration: none; color: #f39a71; font-weight: bold" href="mailto:psicoworking@gmail.com">psicoworking@gmail.com</a>

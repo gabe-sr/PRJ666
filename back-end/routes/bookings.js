@@ -1,7 +1,7 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
-import { format } from "date-fns";
+import { format, addMinutes } from "date-fns";
 import { transporter, mailCancelNotice, mailConfirmNotice } from "../email-notification/email.js";
 import sendGridMail from "../node_modules/@sendgrid/mail/index.js";
 import {} from "dotenv/config";
@@ -176,7 +176,7 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
           `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
           cnfrm.user_id.email,
           cnfrm.room_id.name,
-          format(cnfrm.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"))
+          format(addMinutes(cnfrm.booking_date, cnfrm.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"))
       )
                         .then((res)=>{
                           console.log(res[0].statusCode)
@@ -200,7 +200,7 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
     //   );
     // console.log("this was also executed")
     response.title = "Booking saved in db.";
-    response.message = `${format(booking.booking_date, "iii '-' do 'of' MMMM', ' yyyy")}`
+    response.message = `${format(addMinutes(cnfrm.booking_date, cnfrm.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm")}`
     response.success = true;
     response.booking = booking.booking_date;
     console.log(response.message)
@@ -282,7 +282,7 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
               `${r.user_id.first_name} ${r.user_id.last_name}`,
               r.user_id.email,
               r.room_id.name,
-              format(r.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
+              format(addMinutes(r.booking_date, r.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
               `Maintenance needed for ${r.room_id.name}`)
           )
                       .then((res)=>{
@@ -341,7 +341,7 @@ router.patch("/cancel_request/:id", async (req,res)=>{
     response.booking = bkns.booking_date
     if(bkns.cancel_request){
       response.title = `Cancel request sent`
-      response.message = `Cancel request for booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+      response.message = `Cancel request for booking on date ${format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
       has been set. Please wait for processing.`
     }else{
       response.title = `Cancel request was not sent`
@@ -391,7 +391,7 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
     response.booking = bkns.booking_date
     if(bkns._isCancelled){
       response.title = `Booking Cancelled`
-      response.message = `Booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+      response.message = `Booking on date ${format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
                           has been successfully cancelled`
     }else{
       response.title = `Cancel request was not updated`
@@ -412,7 +412,7 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
         `${bkns.user_id.first_name} ${bkns.user_id.last_name}`,
         bkns.user_id.email,
         bkns.room_id.name,
-        format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
+        format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
         `Cancellation request was approved.`)
     )    
                 .then((res)=>{

@@ -1,5 +1,6 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer, useEffect, useRef } from "react";
 import { Container, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { isSameDay,addHours } from "date-fns";
 
 // available hours
 const HOURS = [8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19];
@@ -10,6 +11,7 @@ export const ACTIONS = {
   SELECT: "select",
   OCCUPY: "occupy",
   MAINTENANCE: "occupy_maintenance",
+  AVAILABLE: "available"
 };
 
 // this reducer function acts upon the timeslot array
@@ -47,7 +49,7 @@ const reducer = (timeslots, action) => {
       return timeslots.map((ts) => {
         if ( ts.id === parseInt(action.payload.id[idx]) ) {
           idx++;
-          return { ...ts, active: true, variant: "secondary" };
+          return { ...ts, disabled: false, active: true, variant: "secondary" };
         } else {
           return {
             ...ts,
@@ -69,6 +71,15 @@ const reducer = (timeslots, action) => {
         }
         return ts
       });
+      case ACTIONS.AVAILABLE:
+      //make timeslots received from scheduler active and disabled
+      return timeslots.map((ts) => {
+        console.log(action.payload.time)
+        if (ts.id <= action.payload.time){
+          return{...ts, disabled:true}
+        }
+        return ts
+      });
     default:
       return timeslots;
   }
@@ -87,8 +98,9 @@ const createTs = () => {
   });
   return ts;
 };
-const TimePicker = ({ bookings, timeSelected, maintenance }) => {
+const TimePicker = ({ bookings, timeSelected, maintenance, day }) => {
   const [timeslots, dispatch] = useReducer(reducer, createTs());
+  const today = useRef(new Date())
   useEffect(() => {
   }, []);
   useEffect(() => {
@@ -99,8 +111,13 @@ const TimePicker = ({ bookings, timeSelected, maintenance }) => {
       dispatch({ type: ACTIONS.MAINTENANCE, payload: { id: b } })
         : 
       dispatch({ type: ACTIONS.OCCUPY, payload: { id: b } });
+    
+    if(isSameDay(day,today.current)){
+      dispatch({type: ACTIONS.AVAILABLE, payload:{ time: (addHours(today.current,1)).getHours()}})
+    }
+
     return () => {};
-  }, [bookings, maintenance]);
+  }, [bookings, maintenance, day]);
 
   return (
     <Container>

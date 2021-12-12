@@ -15,6 +15,7 @@ import BookingList from "../dashboard/bookings/BookingList";
 import Maintenance from "../scheduler/Maintenance";
 import MonthlyTotalReport from "../reports/monthly-total/MonthlyTotalReport";
 import MonthlyUserReport from "../reports/monthly-user/MonthlyUserReport";
+import Maintenance from "../scheduler/Maintenance";
 
 const ProtectedRoutes = ({ match }) => {
   // custom authentication hook:
@@ -106,11 +107,15 @@ const ProtectedRoutes = ({ match }) => {
             </Route>
 
             <Route exact path={`${match.url}/report/`}>
-              <Reports />
+              <Reports 
+                user={data}
+              />
             </Route>
 
             <Route exact path={`${match.url}/report/booking`}>
-              <UserReport />
+              <UserReport 
+                user={data}
+              />
             </Route>
 
             <Route exact path={`${match.url}/report/month_total`}>

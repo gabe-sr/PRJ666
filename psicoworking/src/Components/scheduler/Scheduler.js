@@ -68,7 +68,9 @@ const Scheduler = ({ userid, roomid }) => {
                   (parseISO(b.booking_date).getUTCHours()) <= 19 &&
                   (parseISO(b.booking_date).getUTCHours()) !== 12)
         })
-        console.log("hello");
+        // console.log("hello");
+        console.log(day);
+        console.log(day.getDate())
         setBookings(newB);
       } catch (err) {
         alert(err.message);
@@ -176,7 +178,7 @@ const Scheduler = ({ userid, roomid }) => {
         </Col>
         <Col className="mt-4 justify-content-md-center">
           <Row className="mb-4"><span className="font-weight-bold">Choose available timeslot below</span></Row>
-          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={false}/></Row>
+          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={false} day={day}/></Row>
           
         </Col>
       </Row>
@@ -223,12 +225,12 @@ const Scheduler = ({ userid, roomid }) => {
             (data.error ? 
               <div>
                 <strong>{data.message}, please inform the administrator.</strong>
-                <div class="p-3 mb-2 bg-danger text-white">Booking Error</div> 
+                <div className="p-3 mb-2 bg-danger text-white">Booking Error</div> 
               </div>
               :
               <div>
                 <p>{roomName.current} was successfully reserved at {data.message}</p>
-                <div class="p-3 mb-2 bg-success text-white">Booking ok</div>
+                <div className="p-3 mb-2 bg-success text-white">Booking ok</div>
               </div>)
           }
         </Modal.Body>

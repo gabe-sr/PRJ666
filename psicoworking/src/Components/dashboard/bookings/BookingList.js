@@ -2,7 +2,8 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import axios from "axios";
 import NewTableData from "../../shared/table_data_new/NewTableData.js";
 import { Button,ButtonGroup, Card, Container, Modal, Row, ToggleButton, Tabs, Tab } from "react-bootstrap";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, subMinutes } from "date-fns";
+import "./BookingList.css"
 
 const radios =[
     {name:'past bookings', value:'2'},
@@ -20,7 +21,7 @@ const BookingList = ({user}) => {
     const tabChanged = useRef(false);
     // const [ currBkng, setBkng ] = useState({});
     const bk = useRef(null);
-    const today = useRef(new Date());
+    const today = useRef(subMinutes(new Date(), (new Date()).getTimezoneOffset()));
 
     const fetchBookings = useCallback(
         async (key) => {
@@ -28,6 +29,7 @@ const BookingList = ({user}) => {
                 console.log(key)
                 if (key==='mine') {
                     if(radioValue === '1'){
+                        // console.log(`sent today.current: ${today.current}`)
                         // console.log(`radio value ${radioValue}`)
                         const res = await axios.get('/book',{
                             params:{
@@ -37,10 +39,12 @@ const BookingList = ({user}) => {
                             }
                         }) 
                         const temp = await res.data
+                        console.log(temp)
                         setData(temp)
                     } 
                     else{
                         // console.log(`radio value ${radioValue}`)
+                        // console.log(`sent today.current: ${today.current}`)
                         const res = await axios.get('/book',{
                             params:{
                                 type: 'bfrbkns',
@@ -49,6 +53,7 @@ const BookingList = ({user}) => {
                             }
                         }) 
                         const temp = await res.data
+                        console.log(temp)
                         setData(temp)
                     }
                 }else if(key === 'general'){
@@ -62,6 +67,7 @@ const BookingList = ({user}) => {
                             }
                         }) 
                         const temp = await res.data
+                        console.log(temp)
                         setData(temp)
                     } 
                     else{
@@ -74,6 +80,7 @@ const BookingList = ({user}) => {
                             }
                         }) 
                         const temp = await res.data
+                        console.log(temp)
                         setData(temp)
                     }
                 }
@@ -191,7 +198,7 @@ const BookingList = ({user}) => {
 
     return( 
         <Container>
-            <Tabs className="mb-4" 
+            <Tabs className="bookings-filter-tab mb-4" 
                 color="#d66f3f" 
                 activeKey={tabKey} 
                 onSelect={(e)=>handleKey(e)}>
@@ -225,9 +232,10 @@ const BookingList = ({user}) => {
                     </Card.Title>
                 </Card>
                 :
+                (tabKey === 'mine' ?
                 <NewTableData
-                    headers={["Booking date", "Price", "Type", "Cancellation Request"]}
-                    columns={["booking_date2", "price_at_booking", "booking_type", "cancelStatus"]}
+                    headers={["Booking date", "Room", "Price", "Type", "Cancellation Request"]}
+                    columns={["booking_date2", "room_id", "price_at_booking", "booking_type", "cancelStatus"]}
                     values={data}
                     whenClicked={handleModalOpen}
                     customColumn={[
@@ -237,6 +245,20 @@ const BookingList = ({user}) => {
                         },
                     ]}
                 />
+                :
+                <NewTableData
+                    headers={["User", "Booking date", "Room", "Price", "Type", "Cancellation Request"]}
+                    columns={["fullname2", "booking_date2", "room_id", "price_at_booking", "booking_type", "cancelStatus"]}
+                    values={data}
+                    whenClicked={handleModalOpen}
+                    customColumn={[
+                        {
+                            colDesc: "cancelStatus",
+                            customColumnComp2: customRequestColumn,
+                        },
+                    ]}
+                />
+                )
                 }
             </Row>
             {show &&

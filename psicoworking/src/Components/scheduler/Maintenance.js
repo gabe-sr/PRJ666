@@ -23,6 +23,7 @@ const Maintenance = ({ userid, roomid }) => {
   const [data, setData] = useState({});
   const currDay = useRef(startOfDay(new Date()));
   const maxDay = useRef(addDays(startOfDay(new Date()), 7));
+  const roomName = useRef();
 
   const timeSelected = (time) => {
     /* correct date for timezone. Data should be persisted to db only in UTC time, due to date-fns ver2.x not accepting operations with dates from strings
@@ -70,6 +71,8 @@ const Maintenance = ({ userid, roomid }) => {
         })
         // console.log("hello");
         setBookings(newB);
+        //console.log(day);
+        //console.log(day.getDate())
       } catch (err) {
         alert(err.message);
         console.log(err);
@@ -86,6 +89,7 @@ const Maintenance = ({ userid, roomid }) => {
         const res = await axios.get(`/rooms/${roomid}`);
         const fetchedroom = await res.data;
         setPrice(fetchedroom.price);
+        roomName.current = fetchedroom.name;
       } catch (err) {
         console.log(err);
       }
@@ -164,8 +168,8 @@ const Maintenance = ({ userid, roomid }) => {
             />
           )}
         </Row>
-        <Row>
-              the price for the room: ${price}
+        <Row className="justify-content-md-center">
+                        <span>Room Price: ${price}</span><br/>
         </Row>
         <Row className="justify-content-md-center">
         {selected.length}
@@ -174,7 +178,8 @@ const Maintenance = ({ userid, roomid }) => {
             selected.map((s, idx) =>{
                 return(
                     <Row key={idx}className="justify-content-md-center">
-                        {s.toString()}
+                        <p className="font-weight-bold ">{idx !== 0 ? null : s.toDateString()}</p>
+                        <p className="font-weight-bold ">{!selected ? null : `at ${s.getUTCHours()}:00`}</p>
                     </Row>
                 )
             }
@@ -185,7 +190,7 @@ const Maintenance = ({ userid, roomid }) => {
         </Col>
         <Col className="mt-4 justify-content-md-center">
           <Row className="mb-4"><span className="font-weight-bold">Choose available timeslot below</span></Row>
-          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={true}/></Row>
+          <Row><TimePicker bookings={bookings} timeSelected={timeSelected} maintenance={true} day={day} /></Row>
           
         </Col>
       </Row>
@@ -223,14 +228,23 @@ const Maintenance = ({ userid, roomid }) => {
         backdrop="static"
       >
         <Modal.Header>
-          <p>{data.message}</p><br/>
+        <strong>{data.title}</strong><br/>
         </Modal.Header>
         <Modal.Body>
-          <p>
-            {!data.booking ? 
-            data.toString(): 
-            data.booking}
-          </p>
+        {data === undefined ?
+            <p>`Application Error, please contact admin. Error: server response undefined`</p>
+            :
+            (data.error ? 
+              <div>
+                <strong>{data.message}, please inform the administrator.</strong>
+                <div className="p-3 mb-2 bg-danger text-white">Booking Error</div> 
+              </div>
+              :
+              <div>
+                <p>{roomName.current} was successfully reserved at {data.message}</p>
+                <div className="p-3 mb-2 bg-success text-white">Booking ok</div>
+              </div>)
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleClose}>Dismiss</Button>

@@ -68,14 +68,14 @@ const MainNavbar = (props) => {
                 {!isLoading ? `Dashboard` : null}
               </Nav.Link>
 
-              <Nav.Link
+              {/* <Nav.Link
                 key={"Contact"}
                 as={NavLink}
                 to="/contact"
                 className="nav-template-link md-auto customColor"
               >
                 Contact
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 key={"About us"}
                 as={NavLink}
@@ -84,14 +84,14 @@ const MainNavbar = (props) => {
               >
                 About us
               </Nav.Link>
-              <Nav.Link
+              {/* <Nav.Link
                 key={"Pricing"}
                 as={NavLink}
                 to="/pricing"
                 className="nav-template-link md-auto customColor"
               >
                 Pricing
-              </Nav.Link>
+              </Nav.Link> */}
 
               <Nav.Link
                 key={"Logout"}
@@ -128,14 +128,14 @@ const MainNavbar = (props) => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="justify-content-end">
             <Nav>
-              <Nav.Link
+              {/* <Nav.Link
                 key={"Contact"}
                 as={NavLink}
                 to="/contact"
                 className="nav-template-link md-auto customColor"
               >
                 Contact
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 key={"About us"}
                 as={NavLink}
@@ -144,14 +144,14 @@ const MainNavbar = (props) => {
               >
                 About us
               </Nav.Link>
-              <Nav.Link
+              {/* <Nav.Link
                 key={"Pricing"}
                 as={NavLink}
                 to="/pricing"
                 className="nav-template-link md-auto customColor"
               >
                 Pricing
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 key={"Sign Up"}
                 as={NavLink}

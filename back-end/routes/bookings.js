@@ -1,12 +1,11 @@
 import express from "express";
 import { Booking } from "../models/bookingModel.js";
 import { isLogged, isAuthenticated } from "../middleware/auth.js"; // authentication middlewares
-import { format } from "date-fns";
+import { format, addMinutes } from "date-fns";
 import { transporter, mailCancelNotice, mailConfirmNotice } from "../email-notification/email.js";
-import sendGrilMail from "../node_modules/@sendgrid/mail/index.js";
+import sendGridMail from "../node_modules/@sendgrid/mail/index.js";
 import {} from "dotenv/config";
-// sendGrilMail.setApiKey(`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`);
-sendGrilMail.setApiKey(process.env.SENDGRID_API_KEY);
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router({ mergeParams: true });
 
  /*Get bookings
@@ -31,23 +30,41 @@ router.get("/", async (req, res) => {
       // console.log(req.query.end);
       res.send(bkns);
     }else if(req.query.type == 'aftbkns'){
+      // console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $gte: req.query.date}
       })
+        .populate({
+          path: "room_id",
+          select: "name"
+        })
         .sort({ booking_date: "asc" })
         .where({ user_id: req.query.userid });
       res.send(bkns);
     }else if(req.query.type == 'bfrbkns'){
+      // console.log(`query date: ${req.query.date}`)
       const bkns = await Booking.find({
         booking_date: { $lt: req.query.date}
       })
-        .sort({ booking_date: "asc" })
+        .populate({
+          path: "room_id",
+          select: "name"
+        })
+        .sort({ booking_date: "desc" })
         .where({ user_id: req.query.userid });
       res.send(bkns);
     }else if(req.query.type == 'aftrequest'){
       const bkns = await Booking.find({
         booking_date: { $gte: req.query.date}
       })
+        .populate({
+          path: "user_id",
+          select: "first_name last_name"
+        })
+        .populate({
+          path: "room_id",
+          select: "name"
+        })
         .sort({ booking_date: "asc" })
         .where({ $or: [{cancel_request:true}, {_isCancelled:true}] });
       res.send(bkns);
@@ -55,7 +72,15 @@ router.get("/", async (req, res) => {
       const bkns = await Booking.find({
         booking_date: { $lt: req.query.date}
       })
-        .sort({ booking_date: "asc" })
+        .populate({
+          path: "user_id",
+          select: "first_name last_name"
+        })
+        .populate({
+          path: "room_id",
+          select: "name"
+        })
+        .sort({ booking_date: "desc" })
         .where({ $or: [{cancel_request:true}, {_isCancelled:true}] });
       res.send(bkns);
     }
@@ -143,39 +168,37 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
         select: "name"
       })
       .exec();
-      
-      //ResponseError: Forbidden
-      // at node_modules/@sendgrid/client/src/classes/client.js:146:29
-      // await sendGrilMail.send(
-      //   mailConfirmNotice(
-      //     `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
-      //     cnfrm.user_id.email,
-      //     cnfrm.room_id.name,
-      //     cnfrm.booking_date)
-      // )
-      // .then((res)=>{
-      //   console.log(res[0].statusCode)
-      //   console.log(res[0].headers)
-      // })
-      // .catch((err)=>{
-      //   console.log(err)
-      // })
-    transporter.sendMail(
-      mailConfirmNotice(
-        `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
-        cnfrm.user_id.email,
-        cnfrm.room_id.name,
-        cnfrm.booking_date),
-        (error, info) =>{
-          if(error){
-            return console.log(error)
-          }
-          console.log(`Message sent: ${info.messageId}`)
-        }
-      );
+
+      await sendGridMail.send(
+        mailConfirmNotice(
+          `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
+          cnfrm.user_id.email,
+          cnfrm.room_id.name,
+          format(addMinutes(cnfrm.booking_date, cnfrm.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"))
+      )
+                        .then((res)=>{
+                          console.log(res[0].statusCode)
+                          console.log(res[0].headers)
+                        })
+                        .catch((err)=>{
+                          console.log(err)
+                        })
+    // transporter.sendMail(
+    //   mailConfirmNotice(
+    //     `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,
+    //     cnfrm.user_id.email,
+    //     cnfrm.room_id.name,
+    //     cnfrm.booking_date),
+    //     (error, info) =>{
+    //       if(error){
+    //         return console.log(error)
+    //       }
+    //       console.log(`Message sent: ${info.messageId}`)
+    //     }
+    //   );
     // console.log("this was also executed")
     response.title = "Booking saved in db.";
-    response.message = `${format(booking.booking_date, "iii '-' do 'of' MMMM', ' yyyy")}`
+    response.message = `${format(addMinutes(cnfrm.booking_date, cnfrm.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm")}`
     response.success = true;
     response.booking = booking.booking_date;
     console.log(response.message)
@@ -248,58 +271,36 @@ router.post("/maintenance", isLogged, isAuthenticated, async (req, res) => {
       )
 
       // since every message is different, cant use send multiple, etc... 
-
+      // check out personalizations to see if possible to use sendMultiple
       if(cancelled.acknowledged){
         console.log(`acknowledged: ${cancelled.acknowledged}`)
         await Promise.all(records.map((r)=>{
-          transporter.sendMail(
+          sendGridMail.send(
             mailCancelNotice(
               `${r.user_id.first_name} ${r.user_id.last_name}`,
               r.user_id.email,
               r.room_id.name,
-              r.booking_date,
-              `Maintenance needed for ${r.room_id.name}`),
-              (error, info)=>{
-                if(error){
-                  return console.log(error)
-                }
-                console.log(`Message sent: ${info.messageId}`)
-              }
-            )
+              format(addMinutes(r.booking_date, r.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
+              `Maintenance needed for ${r.room_id.name}`)
+          )
+                      .then((res)=>{
+                        console.log(res[0].statusCode)
+                        console.log(res[0].headers)
+                      })
+                      .catch((err)=>{
+                        console.log(err)
+                      })
         }))
-      }else{
-        throw new Error(`Update Many operation failed: documents matched - ${cancelled.matchedCount} ; documents modified - ${cancelled.modifiedCount}. Maintenance bookings not saved`)
       }
-
-      // check out personalizations to see if possible to use sendMultiple
-      // if(cancelled.acknowledged){
-      //   console.log(`acknowledged: ${cancelled.acknowledged}`)
-      //   await Promise.all(records.map((r)=>{
-      //     sendGrilMail.send(
-      //       mailCancelNotice(
-      //         `${r.user_id.first_name} ${r.user_id.last_name}`,
-      //         r.user_id.email,
-      //         r.room_id.name,
-      //         r.booking_date,
-      //         `Maintenance needed for ${r.room_id.name}`),
-      //         (error, info)=>{
-      //           if(error){
-      //             return console.log(error)
-      //           }
-      //           console.log(`Message sent: ${info.messageId}`)
-      //         }
-      //     )
-      //   }))
-      // }
       
       // update multiple logs
-      // console.log(`Number of documents upserted (should be 0 always):`)
-      // console.log(cancelled.upsertedCount)
-      // console.log(`update status ${cancelled.acknowledged}`)
-      // console.log(`Number of documents matched (should be equal the numbr of records found):`)
-      // console.log(cancelled.matchedCount)
-      // console.log(`Number of documents modified (should be equal the matched number):`)
-      // console.log(cancelled.modifiedCount)
+      console.log(`Number of documents upserted (should be 0 always):`)
+      console.log(cancelled.upsertedCount)
+      console.log(`update status ${cancelled.acknowledged}`)
+      console.log(`Number of documents matched (should be equal the numbr of records found):`)
+      console.log(cancelled.matchedCount)
+      console.log(`Number of documents modified (should be equal the matched number):`)
+      console.log(cancelled.modifiedCount)
     }
     // Save maintenance bookings
     bookings = await Booking.bulkSave(bookings);
@@ -338,7 +339,7 @@ router.patch("/cancel_request/:id", async (req,res)=>{
     response.booking = bkns.booking_date
     if(bkns.cancel_request){
       response.title = `Cancel request sent`
-      response.message = `Cancel request for booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+      response.message = `Cancel request for booking on date ${format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
       has been set. Please wait for processing.`
     }else{
       response.title = `Cancel request was not sent`
@@ -388,7 +389,7 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
     response.booking = bkns.booking_date
     if(bkns._isCancelled){
       response.title = `Booking Cancelled`
-      response.message = `Booking on date ${format(bkns.booking_date, "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
+      response.message = `Booking on date ${format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy")} at ${bkns.booking_date.getUTCHours()}
                           has been successfully cancelled`
     }else{
       response.title = `Cancel request was not updated`
@@ -404,21 +405,21 @@ router.patch("/cancel_approve/:id", async (req,res)=>{
     console.log(format(bkns.booking_date, "iii '-' do 'of' MMMM',' yyyy '- cancelled'"))
     
     // Send cancellation email notification
-    console.log(`sending email`)
-    transporter.sendMail(
+    sendGridMail.send(
       mailCancelNotice(
-        `${bkns.user_id.first_name} ${bkns.user_id.last_name}`, 
-        bkns.user_id.email, 
+        `${bkns.user_id.first_name} ${bkns.user_id.last_name}`,
+        bkns.user_id.email,
         bkns.room_id.name,
-        bkns.booking_date,
-        `Cancellation Request approved`),
-        (error, info)=>{
-          if(error){
-            return console.log(error)
-          }
-          console.log(`Message sent: ${info.messageId}`)
-        }
-      );
+        format(addMinutes(bkns.booking_date, bkns.booking_date.getTimezoneOffset()), "iii '-' do 'of' MMMM', ' yyyy ' at ' H ' : ' mm"),
+        `Cancellation request was approved.`)
+    )    
+                .then((res)=>{
+                  console.log(res[0].statusCode)
+                  console.log(res[0].headers)
+                })
+                .catch((err)=>{
+                  console.log(err)
+                })
     res.send(response)
     
   } catch (err) {

@@ -62,6 +62,13 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                       >{`${data.first_name} ${data.last_name}`}</td>
                     );
                   }
+                  case "fullname2":
+                    return(
+                      <td
+                          onClick={() => whenClicked(data)}
+                          key={index}
+                        >{`${data.user_id.first_name} ${data.user_id.last_name}`}</td>
+                    );
                 case "total":
                 case "price":
                 case "price_at_reservation":
@@ -133,6 +140,13 @@ const NewTableData = ({ values, whenClicked, customColumn, ...props }) => {
                         "iii '-' do 'of' MMMM', ' yyyy"
                       )} 
                             at ${parseISO(data.booking_date).getUTCHours()}:00`}
+                    </td>
+                  );
+
+                case "room_id":
+                  return (
+                    <td key={index} onClick={() => whenClicked(data)}>
+                      {data.room_id.name}
                     </td>
                   );
 

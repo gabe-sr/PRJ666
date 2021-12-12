@@ -12,6 +12,7 @@ import UserReport from "../reports/user-report/UserReport";
 import Reports from "../reports/Reports";
 import Booking from "../scheduler/Booking";
 import BookingList from "../dashboard/bookings/BookingList";
+import Maintenance from "../scheduler/Maintenance";
 import MonthlyTotalReport from "../reports/monthly-total/MonthlyTotalReport";
 import MonthlyUserReport from "../reports/monthly-user/MonthlyUserReport";
 import Maintenance from "../scheduler/Maintenance";
@@ -89,17 +90,6 @@ const ProtectedRoutes = ({ match }) => {
                 />
               )}
             />
-
-            {/* <Route
-              exact
-              path={`${match.url}/:userid/:roomid/maintenance`}
-              render={(props) => (
-                <Maintenance
-                  userid={data._id}
-                  roomid={props.match.params.roomid}
-                />
-              )}
-            /> */}
 
             <Route
               exact

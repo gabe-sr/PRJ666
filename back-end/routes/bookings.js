@@ -168,9 +168,7 @@ router.post("/", isLogged, isAuthenticated, async (req, res) => {
         select: "name"
       })
       .exec();
-      
-      //ResponseError: Forbidden
-      // at node_modules/@sendgrid/client/src/classes/client.js:146:29
+
       await sendGridMail.send(
         mailConfirmNotice(
           `${cnfrm.user_id.first_name} ${cnfrm.user_id.last_name}`,

@@ -71,8 +71,8 @@ const Maintenance = ({ userid, roomid }) => {
         })
         // console.log("hello");
         setBookings(newB);
-        console.log(day);
-        console.log(day.getDate())
+        //console.log(day);
+        //console.log(day.getDate())
       } catch (err) {
         alert(err.message);
         console.log(err);
@@ -178,7 +178,6 @@ const Maintenance = ({ userid, roomid }) => {
             selected.map((s, idx) =>{
                 return(
                     <Row key={idx}className="justify-content-md-center">
-                        {/* {s.toString()} */}
                         <p className="font-weight-bold ">{idx !== 0 ? null : s.toDateString()}</p>
                         <p className="font-weight-bold ">{!selected ? null : `at ${s.getUTCHours()}:00`}</p>
                     </Row>

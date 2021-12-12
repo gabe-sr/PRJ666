@@ -19,9 +19,18 @@ import { router as authRouter } from "./routes/authentication.js";
 import { router as reportRouter } from "./routes/reports.js";
 import session from "express-session";
 import { sessionConfig } from "./middleware/sessionConfig.js"; // configuration for session middleware
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 // Create express app
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
+app.use(express.static(path.join(__dirname, "build")));
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 // enable CORS requests
 //app.use(cors({ credentials: true, origin: "http://localhost:3000" }));

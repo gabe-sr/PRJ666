@@ -28,7 +28,7 @@ const app = express();
 
 // Directory names
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
+const __dirname = dirname(__filename);
 
 
 // enable CORS requests

@@ -25,16 +25,18 @@ import { fileURLToPath } from "url";
 
 // Create express app
 const app = express();
+
+// Directory names
 const __filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
-app.use(express.static(path.join(__dirname, "build")));
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
+
 
 // enable CORS requests
 //app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(cors());
+
+//correctly construct url 
+app.use(express.static(path.join(__dirname, "build")));
 
 // Used to parse JSON bodies
 app.use(express.json());
@@ -55,10 +57,9 @@ app.use("/book", bookingRouter);
 app.use("/authentication", authRouter);
 app.use("/reports", reportRouter);
 
-// TESTING ROUTE
-/* delete after linking with frontend home page route */
-app.get("/", (req, res) => {
-  res.send(" PSICOWORKING -  HOMEPAGE");
+// Serve path to frontend 
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 //----------- DATABASE CONNECTION ----------//

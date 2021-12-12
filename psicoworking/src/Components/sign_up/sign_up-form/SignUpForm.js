@@ -129,7 +129,7 @@ const SignUpForm = (props) => {
       setLoadingSpinner(true, "Submitting user information...");
       const response = await axios({
         method: "post",
-        url: "http://localhost:8080/users",
+        url: "/users",
         data: values,
       });
 

@@ -134,12 +134,9 @@ const UserAuthorization = (props) => {
   const activeUserStatus = userToActivate.active;
 
   const patchUser = useCallback(async () => {
-    await axios.patch(
-      `http://localhost:8080/users/update_authorize/${userId}`,
-      {
-        active: activeUserStatus,
-      }
-    );
+    await axios.patch(`/users/update_authorize/${userId}`, {
+      active: activeUserStatus,
+    });
     setShowModalMessage(true);
     await fetchData(key);
   }, [userId, activeUserStatus, key, fetchData]);

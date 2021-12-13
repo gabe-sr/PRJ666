@@ -121,13 +121,13 @@ const BookingList = ({user}) => {
         //set cancel request -> set cancel
         // console.log(bk)
         if(!bk._isCancelled && user.isAdmin){
-            const res = await axios.patch(`http://localhost:8080/book/cancel_approve/${bk._id}`,
+            const res = await axios.patch(`/book/cancel_approve/${bk._id}`,
             {
                 _isCancelled: true 
             })
             // console.log(res)
         }else if(!bk.cancel_request){
-            const res = await axios.patch(`http://localhost:8080/book/cancel_request/${bk._id}`,
+            const res = await axios.patch(`/book/cancel_request/${bk._id}`,
             {
                 cancel_request: true 
             })

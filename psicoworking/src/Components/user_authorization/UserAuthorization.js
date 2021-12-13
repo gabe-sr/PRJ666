@@ -135,7 +135,7 @@ const UserAuthorization = (props) => {
 
   const patchUser = useCallback(async () => {
     await axios.patch(
-      `http://localhost:8080/users/update_authorize/${userId}`,
+      `/users/update_authorize/${userId}`,
       {
         active: activeUserStatus,
       }
